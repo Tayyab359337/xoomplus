@@ -1,0 +1,454 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Explicit sources so section utilities (md:/lg: grids) are always generated */
+@source "../app/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+@source "../lib/**/*.{js,ts,jsx,tsx}";
+
+@custom-variant dark (&:is(.dark *));
+
+/* -------------------------------------------------------------------------- */
+/* Design tokens — teal brand (#478997 light / #3D7883 dark)                  */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Teal brand — light: cool mist around #478997 */
+  --background: #f4f8f9;
+  --foreground: #1a2e33;
+  --card: #fafcfc;
+  --card-foreground: #1a2e33;
+  --popover: #fafcfc;
+  --popover-foreground: #1a2e33;
+
+  --primary: #478997;
+  --primary-foreground: #f7fbfc;
+  --secondary: #e4eef0;
+  --secondary-foreground: #243a40;
+
+  --muted: #e8f0f2;
+  --muted-foreground: #5a7278;
+
+  --accent: #478997;
+  --accent-foreground: #f7fbfc;
+
+  --hover: #d9eaed;
+  --hover-foreground: #2f5f68;
+
+  --destructive: #c0392b;
+  --destructive-foreground: #fef8f7;
+
+  --border: color-mix(in srgb, #1a2e33 14%, transparent);
+  --input: color-mix(in srgb, #1a2e33 16%, transparent);
+  --ring: #478997;
+
+  --chart-1: #478997;
+  --chart-2: #2f6b76;
+  --chart-3: #6aadb8;
+  --chart-4: #3d7883;
+  --chart-5: #1f4a52;
+
+  --sidebar: #f0f5f6;
+  --sidebar-foreground: #1a2e33;
+  --sidebar-primary: #478997;
+  --sidebar-primary-foreground: #f7fbfc;
+  --sidebar-accent: #d9eaed;
+  --sidebar-accent-foreground: #2f5f68;
+  --sidebar-border: color-mix(in srgb, #1a2e33 14%, transparent);
+  --sidebar-ring: #478997;
+
+  /* Sharp editorial corners — not pill SaaS */
+  --radius: 0.25rem;
+
+  /* Layout rhythm — one container, two vertical bands */
+  --layout-max: 1400px;
+  --section-y: 5rem;
+  --section-y-md: 6.75rem;
+  --section-y-lg: 7.5rem;
+  --section-y-compact: 2.75rem;
+  --section-y-compact-md: 3.25rem;
+  --title-gap: 0.85rem;
+  --btn-pad-y: 0.9rem;
+  --btn-pad-x: 1.35rem;
+
+  --motion-fast: 160ms;
+  --motion-base: 500ms;
+  --motion-slow: 750ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark {
+  /* Near-black base #04070a + teal brand */
+  --background: #04070a;
+  --foreground: #e8f0f2;
+  --card: #0a1014;
+  --card-foreground: #e8f0f2;
+  --popover: #0a1014;
+  --popover-foreground: #e8f0f2;
+
+  --primary: #3D7883;
+  --primary-foreground: #f7fbfc;
+  --secondary: #101820;
+  --secondary-foreground: #d5e4e7;
+
+  --muted: #0d1419;
+  --muted-foreground: #8eaaaf;
+
+  /* Accent stays slightly brighter than primary for interactive chrome */
+  --accent: #4a8f9b;
+  --accent-foreground: #04070a;
+
+  --hover: #121c22;
+  --hover-foreground: #b8d4d9;
+
+  --destructive: #e05a4a;
+  --destructive-foreground: #fef8f7;
+
+  --border: color-mix(in srgb, #e8f0f2 12%, transparent);
+  --input: color-mix(in srgb, #e8f0f2 14%, transparent);
+  --ring: #3D7883;
+
+  --chart-1: #3D7883;
+  --chart-2: #5a9aa5;
+  --chart-3: #2a5f68;
+  --chart-4: #7ab4be;
+  --chart-5: #1f4a52;
+
+  --sidebar: #060b0f;
+  --sidebar-foreground: #e8f0f2;
+  --sidebar-primary: #3D7883;
+  --sidebar-primary-foreground: #f7fbfc;
+  --sidebar-accent: #121c22;
+  --sidebar-accent-foreground: #b8d4d9;
+  --sidebar-border: color-mix(in srgb, #e8f0f2 12%, transparent);
+  --sidebar-ring: #3D7883;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-hover: var(--hover);
+  --color-hover-foreground: var(--hover-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Typography — oversized, tight, editorial */
+  --text-display: clamp(2.65rem, 7vw, 5.25rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 600;
+
+  --text-h1: clamp(2.65rem, 6vw, 4.75rem);
+  --text-h1--line-height: 0.94;
+  --text-h1--letter-spacing: -0.04em;
+  --text-h1--font-weight: 600;
+
+  --text-h2: clamp(1.9rem, 3.6vw, 3.1rem);
+  --text-h2--line-height: 1.02;
+  --text-h2--letter-spacing: -0.032em;
+  --text-h2--font-weight: 550;
+
+  --text-h3: clamp(1.25rem, 2vw, 1.65rem);
+  --text-h3--line-height: 1.18;
+  --text-h3--letter-spacing: -0.02em;
+  --text-h3--font-weight: 550;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.7;
+  --text-body--letter-spacing: -0.012em;
+  --text-body--font-weight: 400;
+
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1.35;
+  --text-meta--letter-spacing: 0.12em;
+  --text-meta--font-weight: 500;
+
+  --text-nav: 0.9375rem;
+  --text-nav--line-height: 1.2;
+  --text-nav--letter-spacing: -0.012em;
+  --text-nav--font-weight: 500;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply antialiased;
+    /* Native + Lenis — never combine with CSS scroll-smooth (causes lag / double-ease) */
+    scroll-behavior: auto;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--accent) 45%, transparent);
+    color: var(--foreground);
+  }
+}
+
+/* Typography utility tokens */
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .type-display {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    line-height: var(--text-display--line-height);
+    letter-spacing: var(--text-display--letter-spacing);
+    font-weight: var(--text-display--font-weight);
+  }
+
+  .type-h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    line-height: var(--text-h1--line-height);
+    letter-spacing: var(--text-h1--letter-spacing);
+    font-weight: var(--text-h1--font-weight);
+  }
+
+  .type-h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+    letter-spacing: var(--text-h2--letter-spacing);
+    font-weight: var(--text-h2--font-weight);
+  }
+
+  .type-h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+    letter-spacing: var(--text-h3--letter-spacing);
+    font-weight: var(--text-h3--font-weight);
+  }
+
+  .type-body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    letter-spacing: var(--text-body--letter-spacing);
+    font-weight: var(--text-body--font-weight);
+  }
+
+  .type-meta {
+    font-family: var(--font-sans);
+    font-size: var(--text-meta);
+    line-height: var(--text-meta--line-height);
+    letter-spacing: var(--text-meta--letter-spacing);
+    font-weight: var(--text-meta--font-weight);
+    text-transform: uppercase;
+  }
+
+  .type-nav {
+    font-family: var(--font-sans);
+    font-size: var(--text-nav);
+    line-height: var(--text-nav--line-height);
+    letter-spacing: var(--text-nav--letter-spacing);
+    font-weight: var(--text-nav--font-weight);
+  }
+
+  .type-button {
+    font-family: var(--font-sans);
+    font-size: var(--text-nav);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    font-weight: 550;
+  }
+
+  /* Hover surface helpers */
+  .surface-hover {
+    @apply transition-colors;
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--motion-ease);
+  }
+
+  .surface-hover:hover {
+    background-color: var(--hover);
+    color: var(--hover-foreground);
+  }
+
+  /* Shared layout — prefer over per-section width recipes */
+  .site-container {
+    width: min(100% - 2rem, var(--layout-max));
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .site-container {
+      width: min(100% - 4rem, var(--layout-max));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-container {
+      width: min(100% - 6rem, var(--layout-max));
+    }
+  }
+
+  /* Primary CTA — accent fill, sharp radius, quiet lift */
+  .btn-primary {
+    font-family: var(--font-sans);
+    font-size: var(--text-nav);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    font-weight: 550;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--btn-pad-y) var(--btn-pad-x);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: var(--accent-foreground);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color var(--motion-fast) var(--motion-ease),
+      filter var(--motion-fast) var(--motion-ease),
+      transform var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease);
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 35%, transparent);
+  }
+
+  .btn-ghost {
+    font-family: var(--font-sans);
+    font-size: var(--text-nav);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    font-weight: 550;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--btn-pad-y) var(--btn-pad-x);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--background) 30%, transparent);
+    color: var(--foreground);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color var(--motion-fast) var(--motion-ease),
+      color var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease);
+  }
+
+  .btn-ghost:hover {
+    background: var(--hover);
+    color: var(--hover-foreground);
+  }
+
+  .btn-link {
+    font-family: var(--font-sans);
+    font-size: var(--text-nav);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    font-weight: 550;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--foreground) 30%, transparent);
+    padding-bottom: 0.15rem;
+    transition:
+      color var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease);
+  }
+
+  .btn-link:hover {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+}
+
+/* Accessibility — kill non-essential motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Magic UI Animated Theme Toggler — View Transitions */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-magicui-theme-vt="active"]::view-transition-group(root) {
+  animation-duration: var(--magicui-theme-toggle-vt-duration, 400ms);
+}
+
+html[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  clip-path: var(--magicui-theme-vt-clip-from);
+}

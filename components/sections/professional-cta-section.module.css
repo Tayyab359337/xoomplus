@@ -1,0 +1,100 @@
+.section {
+  position: relative;
+  width: 100%;
+  /* Stage owns the viewport; avoid extra chrome around ScrollExpand */
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: var(--background);
+}
+
+.expand {
+  width: 100%;
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  line-height: var(--text-meta--line-height);
+  letter-spacing: var(--text-meta--letter-spacing);
+  font-weight: var(--text-meta--font-weight);
+  text-transform: uppercase;
+  color: color-mix(in srgb, #ffffff 72%, var(--accent));
+  margin: 0 0 var(--title-gap);
+}
+
+.overlayTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 4.5vw, 3.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.032em;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+  max-width: 18ch;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
+}
+
+.body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  letter-spacing: var(--text-body--letter-spacing);
+  color: rgba(255, 255, 255, 0.82);
+  margin: 1.25rem 0 0;
+  max-width: 42ch;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem 1.25rem;
+  margin-top: 2rem;
+}
+
+.primary {
+  font-family: var(--font-sans);
+  font-size: var(--text-nav);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-weight: 550;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  text-decoration: none;
+  transition:
+    filter var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+
+.primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.secondary {
+  font-family: var(--font-sans);
+  font-size: var(--text-nav);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-weight: 550;
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  padding-bottom: 0.2rem;
+  transition:
+    color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease);
+}
+
+.secondary:hover {
+  color: color-mix(in srgb, #ffffff 70%, var(--accent));
+  border-color: color-mix(in srgb, #ffffff 70%, var(--accent));
+}

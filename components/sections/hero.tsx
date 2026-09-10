@@ -1,0 +1,140 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
+
+import { SparklesText } from "@/components/ui/sparkles-text"
+
+import { Reveal } from "@/components/motion/reveal";
+import { ParallaxHeroImages } from "@/components/ui/parallax-hero-images";
+import { useIsClient } from "@/hooks/use-is-client";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { heroParallaxImages } from "@/lib/data/homepage";
+import { cn } from "@/lib/utils";
+
+const LiquidEther = dynamic(() => import("@/components/effects/liquid-ether"), {
+  ssr: false,
+  loading: () => null,
+});
+
+/** Teal brand field — variants of #478997 / #3D7883 */
+const ETHER_COLORS_DARK = ["#2f6b76", "#3D7883", "#6aadb8"];
+const ETHER_COLORS_LIGHT = ["#478997", "#2f6b76", "#5a9aa5"];
+
+type HeroProps = {
+  className?: string;
+};
+
+function canUseHeroWebGL(): boolean {
+  if (typeof window === "undefined") return false;
+
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  const compact = window.matchMedia("(max-width: 768px)").matches;
+  const nav = navigator as Navigator & {
+    deviceMemory?: number;
+    connection?: { saveData?: boolean };
+  };
+
+  if (coarse || compact || nav.connection?.saveData) return false;
+  if (typeof nav.deviceMemory === "number" && nav.deviceMemory < 4) return false;
+  return true;
+}
+
+/**
+ * Homepage Hero — LiquidEther + Aceternity parallax images + LCP-safe typography.
+ * SplashCursor stays global; no second cursor system here.
+ */
+export function Hero({ className }: HeroProps) {
+  const reduceMotion = usePrefersReducedMotion();
+  const { resolvedTheme } = useTheme();
+  const isClient = useIsClient();
+  const allowWebGL = isClient && !reduceMotion && canUseHeroWebGL();
+  const allowParallax = isClient && !reduceMotion;
+  const isLight = isClient && resolvedTheme === "light";
+
+  return (
+    <section
+      data-hero
+      className={cn(
+        "relative flex min-h-[100dvh] flex-col overflow-hidden border-b border-border",
+        className,
+      )}
+    >
+      {/* WebGL atmosphere — decorative, never blocks LCP text */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 opacity-90"
+      >
+        {allowWebGL ? (
+          <LiquidEther
+            colors={isLight ? ETHER_COLORS_LIGHT : ETHER_COLORS_DARK}
+            mouseForce={18}
+            cursorSize={110}
+            isViscous={false}
+            viscous={30}
+            iterationsViscous={16}
+            iterationsPoisson={16}
+            resolution={0.28}
+            isBounce={false}
+            autoDemo={false}
+            autoSpeed={0.45}
+            autoIntensity={2}
+            takeoverDuration={0.25}
+            autoResumeDelay={2800}
+            autoRampDuration={0.6}
+            BFECC={false}
+            lightMode={isLight}
+            backgroundColor={isLight ? "#f4f8f9" : "#04070a"}
+            style={{ width: "100%", height: "100%", position: "absolute" }}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,color-mix(in_oklch,var(--accent)_18%,transparent),transparent_55%)]" />
+        )}
+      </div>
+
+      {/* Aceternity mouse parallax — sits above ether, below copy */}
+      {allowParallax ? (
+        <ParallaxHeroImages
+          images={[...heroParallaxImages]}
+          variant="edge-focus"
+          className="z-[1] opacity-[0.55] md:opacity-70"
+          imageClassName="rounded-[var(--radius)] shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_18%,transparent)] ring-border/40"
+        />
+      ) : null}
+
+      {/* Readability veil — keeps type clear over ether + images */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-background/25 via-background/45 to-background/90"
+      />
+
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col items-center justify-center px-4 pb-14 pt-24 text-center md:px-8 md:pb-24 md:pt-32 lg:px-12">
+        <div className="flex w-full max-w-4xl flex-col items-center">
+          <p className="type-meta text-accent">Creative studio</p>
+
+          {/* Real HTML heading for LCP — visible without JS animation */}
+          <h1 className="type-display mt-5 max-w-[20ch] text-foreground">
+            Xoomplus{" "}
+            <span className="text-accent">Digital Marketing</span>, Web &amp;
+            Design Experts.
+          </h1>
+
+          <Reveal variant="fadeUp" className="mt-7">
+            <p className="type-body mx-auto max-w-xl text-muted-foreground">
+            Ready to shine online? At XoomPlus, we create smart digital marketing, web development, and design solutions that get attention, engage visitors, and drive sales. From SEO and social media to branding and beautiful websites, we help your business grow quickly and effectively
+            </p>
+          </Reveal>
+
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <a href="#contact" className="btn-primary">
+              Start a project
+            </a>
+            <a href="#work" className="btn-ghost backdrop-blur-sm">
+              View selected work
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

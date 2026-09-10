@@ -1,0 +1,280 @@
+/*
+ * Mobile nav — portaled to body.
+ * Frost is applied on the header itself (never via opacity on a child).
+ */
+
+.root {
+  /* Marker only — children are position:fixed */
+  display: contents;
+}
+
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 80;
+  width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+  padding: 0.55rem 1rem;
+  border-radius: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  pointer-events: none;
+  transition:
+    width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.barCompact {
+  width: 92%;
+  top: 8px;
+  border-radius: 9999px;
+  padding: 0.45rem 0.85rem;
+}
+
+/* The actual frost — on THIS node, always opacity 1, webkit prefix required */
+.barFrost {
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow: 0 1px 0 0 color-mix(in srgb, var(--border) 75%, transparent);
+  /* Fallback if backdrop-filter unsupported */
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .barFrost {
+    background: color-mix(in srgb, var(--background) 55%, transparent);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+  }
+}
+
+.barOpen.barFrost {
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .barOpen.barFrost {
+    background: color-mix(in srgb, var(--background) 70%, transparent);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+  }
+}
+
+.barRow {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  pointer-events: auto;
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ham {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.ham:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: 3px;
+}
+
+.hamIcon {
+  position: relative;
+  display: block;
+  width: 1.25rem;
+  height: 0.85rem;
+}
+
+.hamIcon span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease,
+    top 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hamIcon span:nth-child(1) {
+  top: 0;
+}
+
+.hamIcon span:nth-child(2) {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.hamIcon span:nth-child(3) {
+  bottom: 0;
+  top: auto;
+}
+
+.hamIcon[data-open="true"] span:nth-child(1) {
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.hamIcon[data-open="true"] span:nth-child(2) {
+  opacity: 0;
+  transform: translateY(-50%) scaleX(0.35);
+}
+
+.hamIcon[data-open="true"] span:nth-child(3) {
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--background) 50%, transparent);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .backdrop {
+    background: color-mix(in srgb, var(--background) 40%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+  }
+}
+
+.backdropHit {
+  position: fixed;
+  inset: 0;
+  z-index: 71;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.panel {
+  position: fixed;
+  inset: 0;
+  z-index: 75;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 6.25rem 1.5rem 2rem;
+  box-sizing: border-box;
+  background: var(--background);
+  color: var(--foreground);
+  pointer-events: auto;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  text-decoration: none;
+  color: var(--foreground);
+  border-bottom: 1px solid var(--border);
+}
+
+.linkLabel {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 12vw, 3.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+
+.linkIndex {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  line-height: 1;
+  letter-spacing: var(--text-meta--letter-spacing);
+  font-weight: var(--text-meta--font-weight);
+  text-transform: uppercase;
+  color: var(--accent);
+  flex: 0 0 auto;
+}
+
+.link:hover .linkLabel,
+.link:focus-visible .linkLabel {
+  color: var(--accent);
+}
+
+.footer {
+  margin-top: 1.75rem;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-nav);
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition:
+    filter var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+
+.cta:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* Desktop: this portal nav must not show */
+@media (min-width: 1024px) {
+  .root,
+  .bar,
+  .backdrop,
+  .backdropHit,
+  .panel {
+    display: none !important;
+  }
+}
