@@ -63,14 +63,14 @@
 
   /* Layout rhythm — one container, two vertical bands */
   --layout-max: 1400px;
-  --section-y: 5rem;
-  --section-y-md: 6.75rem;
-  --section-y-lg: 7.5rem;
-  --section-y-compact: 2.75rem;
-  --section-y-compact-md: 3.25rem;
-  --title-gap: 0.85rem;
-  --btn-pad-y: 0.9rem;
-  --btn-pad-x: 1.35rem;
+  --section-y: 5.5rem;
+  --section-y-md: 7.25rem;
+  --section-y-lg: 8.5rem;
+  --section-y-compact: 3rem;
+  --section-y-compact-md: 3.5rem;
+  --title-gap: 0.9rem;
+  --btn-pad-y: 0.95rem;
+  --btn-pad-x: 1.45rem;
 
   --motion-fast: 160ms;
   --motion-base: 500ms;
@@ -177,28 +177,28 @@
   --animate-shiny-text: shiny-text 8s infinite;
 
   /* Typography — oversized, tight, editorial */
-  --text-display: clamp(2.65rem, 7vw, 5.25rem);
-  --text-display--line-height: 1.02;
-  --text-display--letter-spacing: -0.035em;
+  --text-display: clamp(2.85rem, 7.2vw, 5.5rem);
+  --text-display--line-height: 1.0;
+  --text-display--letter-spacing: -0.038em;
   --text-display--font-weight: 600;
 
-  --text-h1: clamp(2.65rem, 6vw, 4.75rem);
+  --text-h1: clamp(2.75rem, 6.2vw, 4.85rem);
   --text-h1--line-height: 0.94;
-  --text-h1--letter-spacing: -0.04em;
+  --text-h1--letter-spacing: -0.042em;
   --text-h1--font-weight: 600;
 
-  --text-h2: clamp(1.9rem, 3.6vw, 3.1rem);
+  --text-h2: clamp(2rem, 3.8vw, 3.25rem);
   --text-h2--line-height: 1.02;
-  --text-h2--letter-spacing: -0.032em;
+  --text-h2--letter-spacing: -0.034em;
   --text-h2--font-weight: 550;
 
-  --text-h3: clamp(1.25rem, 2vw, 1.65rem);
+  --text-h3: clamp(1.3rem, 2.1vw, 1.7rem);
   --text-h3--line-height: 1.18;
-  --text-h3--letter-spacing: -0.02em;
+  --text-h3--letter-spacing: -0.022em;
   --text-h3--font-weight: 550;
 
-  --text-body: 1.0625rem;
-  --text-body--line-height: 1.7;
+  --text-body: 1.075rem;
+  --text-body--line-height: 1.72;
   --text-body--letter-spacing: -0.012em;
   --text-body--font-weight: 400;
 
@@ -513,6 +513,10 @@
 
   /* GSAP scroll system — keep content visible without motion */
   [data-animate],
+  [data-motion],
+  [data-reveal],
+  [data-reveal-stagger],
+  [data-reveal-stagger] > *,
   [data-parallax],
   [data-hero-eyebrow],
   [data-hero-body],
@@ -540,6 +544,152 @@
   30%,
   60% {
     background-position: calc(100% + var(--shiny-width)) 0;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Custom cursor — 2 nodes, transform/opacity only, pointer-events none       */
+/* -------------------------------------------------------------------------- */
+
+html.xp-cursor-on,
+html.xp-cursor-on * {
+  cursor: none !important;
+}
+
+html.xp-cursor-on.xp-cursor-native,
+html.xp-cursor-on.xp-cursor-native * {
+  cursor: auto !important;
+}
+
+html.xp-cursor-on.xp-cursor-native input,
+html.xp-cursor-on.xp-cursor-native textarea,
+html.xp-cursor-on.xp-cursor-native [contenteditable="true"] {
+  cursor: text !important;
+}
+
+.xp-cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  contain: layout style;
+  opacity: 0;
+  transition: opacity 120ms var(--motion-ease-out);
+  --xp-dot-scale: 1;
+  --xp-ring-scale: 1;
+}
+
+.xp-cursor.is-visible {
+  opacity: 1;
+}
+
+.xp-cursor.is-hidden {
+  opacity: 0 !important;
+}
+
+/* Position shells — JS writes translate3d only; no transition */
+.xp-cursor__dot,
+.xp-cursor__ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translate3d(-100px, -100px, 0) translate(-50%, -50%);
+}
+
+.xp-cursor__dot {
+  width: 6px;
+  height: 6px;
+}
+
+.xp-cursor__ring {
+  width: 28px;
+  height: 28px;
+}
+
+/* Visual cores — scale/opacity only */
+.xp-cursor__dot > i,
+.xp-cursor__ring > i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: scale(var(--xp-dot-scale));
+  transition: transform 140ms var(--motion-ease-out),
+    opacity 140ms var(--motion-ease-out),
+    background-color 140ms var(--motion-ease-out),
+    border-color 140ms var(--motion-ease-out);
+}
+
+.xp-cursor__dot > i {
+  background: var(--foreground);
+  mix-blend-mode: difference;
+}
+
+.xp-cursor__ring > i {
+  transform: scale(var(--xp-ring-scale));
+  border: 1px solid color-mix(in srgb, var(--foreground) 55%, transparent);
+  background: transparent;
+  opacity: 0.7;
+  transition-duration: 160ms;
+}
+
+.xp-cursor[data-mode="hover"] {
+  --xp-dot-scale: 1.65;
+  --xp-ring-scale: 1.45;
+}
+
+.xp-cursor[data-mode="hover"] .xp-cursor__dot > i {
+  background: var(--accent);
+  mix-blend-mode: normal;
+}
+
+.xp-cursor[data-mode="hover"] .xp-cursor__ring > i {
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  opacity: 0.85;
+}
+
+.xp-cursor[data-mode="card"] {
+  --xp-dot-scale: 1.25;
+  --xp-ring-scale: 1.85;
+}
+
+.xp-cursor[data-mode="card"] .xp-cursor__ring > i {
+  border-color: color-mix(in srgb, var(--foreground) 40%, transparent);
+  opacity: 0.55;
+}
+
+.xp-cursor[data-mode="drag"] {
+  --xp-dot-scale: 0.75;
+  --xp-ring-scale: 1.3;
+}
+
+.xp-cursor[data-mode="drag"] .xp-cursor__ring > i {
+  border-style: dashed;
+  opacity: 0.75;
+}
+
+.xp-cursor.is-pressed {
+  --xp-dot-scale: 0.7;
+  --xp-ring-scale: 0.8;
+}
+
+.xp-cursor.is-pressed .xp-cursor__dot > i,
+.xp-cursor.is-pressed .xp-cursor__ring > i {
+  opacity: 0.75;
+}
+
+@media (pointer: coarse), (max-width: 768px), (prefers-reduced-motion: reduce) {
+  html.xp-cursor-on,
+  html.xp-cursor-on * {
+    cursor: auto !important;
+  }
+
+  .xp-cursor {
+    display: none !important;
   }
 }
 

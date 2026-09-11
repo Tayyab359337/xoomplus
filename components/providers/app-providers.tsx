@@ -8,6 +8,7 @@ import {
   PageTransition,
   Preloader,
 } from "@/components/animations";
+import { GlobalCustomCursor } from "@/components/effects/global-custom-cursor";
 import { GlobalSplashCursor } from "@/components/effects/global-splash-cursor";
 import { PageBottomBlur } from "@/components/effects/page-bottom-blur";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
@@ -18,8 +19,9 @@ type AppProvidersProps = {
 };
 
 /**
- * Single client boundary for theme, smooth scroll, SplashCursor, GSAP, and page blur.
- * SplashCursor mounts once here — never per-section.
+ * Single client boundary for theme, smooth scroll, cursors, GSAP, and page blur.
+ * SplashCursor + custom cursor mount once here — never per-section.
+ * Custom cursor is deferred until after load / idle (see GlobalCustomCursor).
  */
 export function AppProviders({ children }: AppProvidersProps) {
   return (
@@ -34,6 +36,7 @@ export function AppProviders({ children }: AppProvidersProps) {
           <Preloader />
           <PageTransition />
           <GlobalSplashCursor />
+          <GlobalCustomCursor />
           {/* Stack above the fixed fluid canvas (z-0) so UI stays interactive & visible */}
           <div
             data-animation-root

@@ -7,7 +7,7 @@
 
 .header {
   width: min(100% - 2rem, var(--layout-max));
-  margin: 0 auto 2rem;
+  margin: 0 auto 2.25rem;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -21,7 +21,7 @@
   letter-spacing: var(--text-meta--letter-spacing);
   font-weight: var(--text-meta--font-weight);
   text-transform: uppercase;
-  color: var(--muted-foreground);
+  color: var(--accent);
   margin: 0;
 }
 
@@ -34,7 +34,7 @@
   text-transform: uppercase;
   color: var(--muted-foreground);
   margin: 0;
-  opacity: 0.7;
+  opacity: 0.65;
   display: none;
 }
 
@@ -46,10 +46,10 @@
 
 .brand {
   font-family: var(--font-display);
-  font-size: 1.05em;
+  font-size: 1.1em;
   font-weight: 550;
   letter-spacing: -0.03em;
-  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+  color: color-mix(in srgb, var(--foreground) 48%, transparent);
   transition: color var(--motion-base) var(--motion-ease);
   white-space: nowrap;
 }

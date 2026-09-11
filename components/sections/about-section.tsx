@@ -4,15 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   useCallback,
-  useEffect,
   useRef,
-  useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { useGSAP } from "@gsap/react";
 
+import { HoverLift } from "@/components/animations/HoverLift";
 import { ScrollItem } from "@/components/scroll";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useSectionReveal } from "@/hooks/use-section-reveal";
+import { DUR_HOVER, EASE, gsap, registerGsapPlugins } from "@/lib/animations";
 import { aboutContent } from "@/lib/data/homepage";
 import { cn } from "@/lib/utils";
 
@@ -32,48 +34,61 @@ function canUsePointerTilt(reduceMotion: boolean): boolean {
 
 /**
  * Editorial About — asymmetric composition, display type, restrained motion.
- * GSAP data-animate for scroll reveals; pointer tilt on fine pointers only.
  */
 export function AboutSection({ className }: AboutSectionProps) {
   const reduceMotion = usePrefersReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const rotXTo = useRef<ReturnType<typeof gsap.quickTo> | null>(null);
+  const rotYTo = useRef<ReturnType<typeof gsap.quickTo> | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
+  useSectionReveal(sectionRef);
+
+  useGSAP(
+    () => {
+      const frame = frameRef.current;
+      if (!frame || !canUsePointerTilt(reduceMotion)) return;
+      registerGsapPlugins();
+      gsap.set(frame, { transformPerspective: 900 });
+      rotXTo.current = gsap.quickTo(frame, "rotationX", {
+        duration: DUR_HOVER,
+        ease: EASE,
+      });
+      rotYTo.current = gsap.quickTo(frame, "rotationY", {
+        duration: DUR_HOVER,
+        ease: EASE,
+      });
+      return () => {
+        rotXTo.current = null;
+        rotYTo.current = null;
+      };
+    },
+    { dependencies: [reduceMotion], scope: sectionRef },
+  );
 
   const onPointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (!canUsePointerTilt(reduceMotion) || !frameRef.current) return;
-
       const rect = frameRef.current.getBoundingClientRect();
       const px = (event.clientX - rect.left) / rect.width - 0.5;
       const py = (event.clientY - rect.top) / rect.height - 0.5;
-
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        setTilt({
-          x: -(py * TILT_MAX),
-          y: px * TILT_MAX,
-        });
-      });
+      rotXTo.current?.(-(py * TILT_MAX));
+      rotYTo.current?.(px * TILT_MAX);
     },
     [reduceMotion],
   );
 
   const onPointerLeave = useCallback(() => {
-    if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-    setTilt({ x: 0, y: 0 });
+    rotXTo.current?.(0);
+    rotYTo.current?.(0);
   }, []);
 
   return (
     <section
+      ref={sectionRef}
       id="studio"
       aria-labelledby="about-heading"
+      data-section-reveal
       className={cn(styles.section, className)}
     >
       <div className={styles.grid}>
@@ -82,34 +97,28 @@ export function AboutSection({ className }: AboutSectionProps) {
 
           <SectionEyebrow
             number={aboutContent.index}
-            data-animate="fade-up"
+            data-reveal
             className={styles.eyebrow}
           >
             {aboutContent.eyebrow}
           </SectionEyebrow>
 
-          <p
-            data-animate="fade-up"
-            data-animate-delay="0.06"
-            className={styles.intro}
-          >
+          <p data-reveal className={styles.intro}>
             {aboutContent.intro}
           </p>
 
-          <div
-            data-animate="fade-up"
-            data-animate-delay="0.12"
-            className={styles.ctaReveal}
-          >
-            <Link href={aboutContent.cta.href} className={styles.cta}>
-              <span>{aboutContent.cta.label}</span>
-              <span aria-hidden className={styles.ctaArrow}>
-                →
-              </span>
-            </Link>
+          <div data-reveal className={styles.ctaReveal}>
+            <HoverLift y={-2} scale={1.01} className="inline-flex">
+              <Link href={aboutContent.cta.href} className={styles.cta}>
+                <span>{aboutContent.cta.label}</span>
+                <span aria-hidden className={styles.ctaArrow}>
+                  →
+                </span>
+              </Link>
+            </HoverLift>
           </div>
 
-          <div data-animate="stagger" className={styles.metaRow}>
+          <div data-reveal-stagger className={styles.metaRow}>
             {aboutContent.meta.map((item) => (
               <div key={item.label} className={styles.metaItem}>
                 <span className={styles.metaLabel}>{item.label}</span>
@@ -122,8 +131,7 @@ export function AboutSection({ className }: AboutSectionProps) {
         <div className={styles.main}>
           <h2
             id="about-heading"
-            data-animate="fade-up"
-            data-animate-delay="0.04"
+            data-reveal
             className={styles.statement}
           >
             {aboutContent.statementLines.map((line, i) =>
@@ -137,18 +145,13 @@ export function AboutSection({ className }: AboutSectionProps) {
             )}
           </h2>
 
-          <p
-            data-animate="fade-up"
-            data-animate-delay="0.1"
-            className={styles.body}
-          >
+          <p data-reveal className={styles.body}>
             {aboutContent.body}
           </p>
 
           {aboutContent.image ? (
             <div
               data-animate="image-reveal"
-              data-animate-delay="0.14"
               className={styles.mediaReveal}
             >
               <ScrollItem
@@ -161,9 +164,6 @@ export function AboutSection({ className }: AboutSectionProps) {
                     className={styles.mediaFrame}
                     onPointerMove={onPointerMove}
                     onPointerLeave={onPointerLeave}
-                    style={{
-                      transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-                    }}
                   >
                     <Image
                       data-animate-media

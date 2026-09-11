@@ -7,7 +7,6 @@ import { useAnimation } from "@/components/animations/AnimationProvider";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
-  killAllScrollTriggers,
   playPageEnter,
   playPageLeave,
   refreshScrollTrigger,
@@ -42,7 +41,6 @@ export function PageTransition() {
     let cancelled = false;
 
     const run = async () => {
-      killAllScrollTriggers();
       scrollTo(0, { immediate: true });
       await playPageEnter();
       if (!cancelled) {

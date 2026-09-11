@@ -8,6 +8,10 @@
   background: var(--background);
 }
 
+.expandWrap {
+  width: 100%;
+}
+
 .expand {
   width: 100%;
 }

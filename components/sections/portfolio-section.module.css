@@ -2,7 +2,13 @@
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  background: var(--background);
+  background:
+    radial-gradient(
+      60% 45% at 50% 0%,
+      color-mix(in srgb, var(--primary) 9%, transparent),
+      transparent 60%
+    ),
+    var(--background);
   padding: var(--section-y) 0;
 }
 

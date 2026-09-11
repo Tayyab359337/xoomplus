@@ -17,7 +17,6 @@ import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
   initScrollAnimations,
-  killAllScrollTriggers,
   refreshScrollTrigger,
   registerGsapPlugins,
   syncScrollTriggerWithLenis,
@@ -86,12 +85,13 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
     requestAnimationFrame(() => refreshScrollTrigger());
   }, [reduceMotion]);
 
-  // Init / re-init after preloader + on route change
+  // Init / re-init after preloader + on route change.
+  // Only revert this provider's data-animate context — do not kill
+  // section-owned ScrollTriggers from useSectionReveal / kinetic type.
   useGSAP(
     () => {
       if (!preloaderDone) return;
 
-      killAllScrollTriggers();
       ctxRef.current?.revert();
       ctxRef.current = null;
 

@@ -2,7 +2,13 @@
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  background: var(--background);
+  background:
+    radial-gradient(
+      70% 55% at 0% 20%,
+      color-mix(in srgb, var(--primary) 8%, transparent),
+      transparent 60%
+    ),
+    var(--background);
   padding: var(--section-y) 0;
 }
 
@@ -180,11 +186,14 @@
   max-width: 40rem;
   aspect-ratio: 5 / 3.45;
   overflow: hidden;
-  border: 1px solid color-mix(in oklch, var(--border) 90%, var(--accent) 10%);
+  border: 1px solid color-mix(in oklch, var(--border) 80%, var(--accent) 20%);
+  border-radius: calc(var(--radius) * 1.2);
   background: color-mix(in oklch, var(--foreground) 4%, var(--background));
   transform-style: preserve-3d;
   will-change: transform;
-  transition: transform 0.45s var(--motion-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  box-shadow:
+    0 18px 48px color-mix(in srgb, var(--foreground) 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 
 .mediaImage {

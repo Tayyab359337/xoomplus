@@ -102,7 +102,7 @@ function revealElement(el: HTMLElement, kind: AnimateKind) {
   const delay =
     Number(el.dataset.motionDelay ?? el.dataset.animateDelay ?? 0) || 0;
   const start =
-    el.dataset.motionStart ?? el.dataset.animateStart ?? "top 88%";
+    el.dataset.motionStart ?? el.dataset.animateStart ?? "top 80%";
   const once =
     (el.dataset.motionOnce ?? el.dataset.animateOnce) !== "false";
   const tier = resolveMotionTier({
@@ -231,10 +231,14 @@ export function initScrollAnimations(
       ) {
         return;
       }
-      // Avoid double-binding if both attrs present — prefer data-motion
-      if (el.dataset.motion && el.dataset.animate && el.getAttribute("data-animate") !== el.dataset.motion) {
-        // still only animate once via readKind
+
+      // Sections owning their reveal via useSectionReveal — keep only
+      // image-reveal / parallax here to avoid double fades.
+      if (el.closest("[data-section-reveal]")) {
+        const kind = parseKind(readKind(el));
+        if (kind !== "image-reveal" && kind !== "parallax") return;
       }
+
       revealElement(el, parseKind(readKind(el)));
     });
 

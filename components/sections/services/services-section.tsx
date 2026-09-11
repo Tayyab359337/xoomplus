@@ -1,10 +1,13 @@
 "use client";
 
+import { useRef } from "react";
+
 import {
   serviceCategories,
   servicesSectionCopy,
 } from "@/lib/data/services";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
+import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { cn } from "@/lib/utils";
 
 import { ServicesInfiniteCarousel } from "./services-infinite-carousel";
@@ -22,14 +25,18 @@ type ServicesSectionProps = {
  */
 export function ServicesSection({ className }: ServicesSectionProps) {
   const mode = useServicesInteractionMode();
+  const sectionRef = useRef<HTMLElement>(null);
+  useSectionReveal(sectionRef);
 
   return (
     <section
+      ref={sectionRef}
       id="approach"
       aria-label="Services"
+      data-section-reveal
       className={cn(styles.section, className)}
     >
-      <div data-animate="fade-up" className={styles.header}>
+      <div data-reveal className={styles.header}>
         <div>
           <SectionEyebrow className={styles.eyebrow}>
             {servicesSectionCopy.eyebrow}
@@ -39,7 +46,7 @@ export function ServicesSection({ className }: ServicesSectionProps) {
         <p className={styles.body}>{servicesSectionCopy.body}</p>
       </div>
 
-      <div data-animate="fade-up" data-animate-delay="0.08">
+      <div data-reveal>
         <ServicesInfiniteCarousel
           services={serviceCategories}
           interaction={mode}

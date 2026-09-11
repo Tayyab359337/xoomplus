@@ -2,15 +2,20 @@
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--background) 92%, var(--accent));
-  padding: 2.5rem 0;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--background) 88%, var(--accent)),
+      color-mix(in srgb, var(--background) 94%, var(--primary))
+    );
+  padding: 3rem 0;
   pointer-events: none;
   user-select: none;
 }
 
 @media (min-width: 768px) {
   .section {
-    padding: 3.25rem 0;
+    padding: 3.75rem 0;
   }
 }
 

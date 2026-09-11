@@ -67,6 +67,7 @@ export function KineticTypeSection({ className }: { className?: string }) {
     <section
       ref={rootRef}
       aria-hidden
+      data-section-reveal
       className={cn(styles.section, className)}
     >
       <div className={styles.stack}>

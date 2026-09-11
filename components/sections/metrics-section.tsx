@@ -1,7 +1,11 @@
 "use client";
 
+import { useRef } from "react";
+
+import { HoverLift } from "@/components/animations/HoverLift";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
+import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { agencyMetrics } from "@/lib/data/homepage";
 import { cn } from "@/lib/utils";
 
@@ -15,10 +19,18 @@ type MetricsSectionProps = {
  * Agency metrics powered by Magic UI NumberTicker (viewport once).
  */
 export function MetricsSection({ className }: MetricsSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  useSectionReveal(sectionRef);
+
   return (
-    <section aria-label="Studio metrics" className={cn(styles.section, className)}>
+    <section
+      ref={sectionRef}
+      aria-label="Studio metrics"
+      data-section-reveal
+      className={cn(styles.section, className)}
+    >
       <div className={styles.inner}>
-        <div data-animate="fade-up" className={styles.header}>
+        <div data-reveal className={styles.header}>
           <div>
             <SectionEyebrow className={styles.eyebrow}>
               By the numbers
@@ -31,27 +43,31 @@ export function MetricsSection({ className }: MetricsSectionProps) {
           </p>
         </div>
 
-        <ul data-animate="stagger" className={styles.grid}>
+        <ul data-reveal-stagger className={styles.grid}>
           {agencyMetrics.map((metric, index) => (
             <li key={metric.id} className={styles.card}>
-              <span className={styles.label}>{metric.label}</span>
-              <div>
-                <p className={styles.value}>
-                  {metric.prefix}
-                  <NumberTicker
-                    value={metric.value}
-                    decimalPlaces={metric.decimalPlaces ?? 0}
-                    delay={0.05 * index}
-                    className={styles.value}
-                  />
-                  {metric.suffix ? (
-                    <span className={styles.suffix}>{metric.suffix}</span>
-                  ) : null}
-                </p>
-                {metric.hint ? (
-                  <p className={styles.hint}>{metric.hint}</p>
-                ) : null}
-              </div>
+              <HoverLift y={-3} scale={1.01} className={styles.cardHover}>
+                <div className={styles.cardInner}>
+                  <span className={styles.label}>{metric.label}</span>
+                  <div>
+                    <p className={styles.value}>
+                      {metric.prefix}
+                      <NumberTicker
+                        value={metric.value}
+                        decimalPlaces={metric.decimalPlaces ?? 0}
+                        delay={0.05 * index}
+                        className={styles.value}
+                      />
+                      {metric.suffix ? (
+                        <span className={styles.suffix}>{metric.suffix}</span>
+                      ) : null}
+                    </p>
+                    {metric.hint ? (
+                      <p className={styles.hint}>{metric.hint}</p>
+                    ) : null}
+                  </div>
+                </div>
+              </HoverLift>
             </li>
           ))}
         </ul>

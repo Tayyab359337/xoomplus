@@ -1,14 +1,13 @@
 "use client";
 
 import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { useAnimation } from "@/components/animations/AnimationProvider";
+import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
-  animatePreloaderProgress,
-  createPreloaderTimeline,
-  playPreloaderExit,
+  createPreloaderController,
   PRELOADER_MAX_MS,
   PRELOADER_MIN_MS,
 } from "@/lib/animations";
@@ -16,23 +15,46 @@ import {
 import styles from "./preloader.module.css";
 
 /**
- * Premium first-load preloader.
+ * Premium first-load preloader — zoom-through reveal on exit.
  * Visual transition only — does not gate HTML parsing or LCP.
- * Exits as soon as the document is interactive (with a short polish floor).
+ * Locks body/Lenis scroll while active; unmounts on exit complete.
  */
 export function Preloader() {
   const reduceMotion = usePrefersReducedMotion();
   const { preloaderDone, setPreloaderDone } = useAnimation();
+  const { stop, start } = useSmoothScroll();
   const rootRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLParagraphElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
-  const started = useRef(false);
+  const stopRef = useRef(stop);
+  const startRef = useRef(start);
+  const prevHtmlOverflow = useRef("");
+  const prevBodyOverflow = useRef("");
+
+  useEffect(() => {
+    stopRef.current = stop;
+    startRef.current = start;
+  }, [stop, start]);
+
+  const lockScroll = () => {
+    prevHtmlOverflow.current = document.documentElement.style.overflow;
+    prevBodyOverflow.current = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    stopRef.current();
+  };
+
+  const unlockScroll = () => {
+    document.documentElement.style.overflow = prevHtmlOverflow.current;
+    document.body.style.overflow = prevBodyOverflow.current;
+    startRef.current();
+  };
 
   useGSAP(
     () => {
-      if (reduceMotion || preloaderDone || started.current) return;
+      if (reduceMotion || preloaderDone) return;
       if (
         !rootRef.current ||
         !markRef.current ||
@@ -42,29 +64,30 @@ export function Preloader() {
         return;
       }
 
-      started.current = true;
+      let cancelled = false;
+      lockScroll();
+
       const startedAt = performance.now();
       let ready = false;
       let finished = false;
       let progress = 0;
 
-      const els = {
+      const controller = createPreloaderController({
         root: rootRef.current,
         mark: markRef.current,
         tagline: taglineRef.current,
         progressFill: fillRef.current,
         progressLabel: labelRef.current,
-      };
-
-      createPreloaderTimeline(els);
+      });
 
       const tickProgress = (target: number) => {
+        if (cancelled) return;
         progress = Math.max(progress, target);
-        animatePreloaderProgress(els.progressFill, els.progressLabel, progress);
+        controller.setProgress(progress);
       };
 
       const tryFinish = async () => {
-        if (finished || !ready) return;
+        if (cancelled || finished || !ready) return;
         finished = true;
 
         const elapsed = performance.now() - startedAt;
@@ -72,14 +95,18 @@ export function Preloader() {
         if (wait > 0) {
           await new Promise((r) => setTimeout(r, wait));
         }
+        if (cancelled) return;
 
         tickProgress(1);
-        await playPreloaderExit(els);
+        await controller.playExit();
+        if (cancelled) return;
+
+        unlockScroll();
         setPreloaderDone(true);
       };
 
       const markReady = () => {
-        if (ready) return;
+        if (cancelled || ready) return;
         ready = true;
         tickProgress(0.92);
         void tryFinish();
@@ -107,16 +134,20 @@ export function Preloader() {
 
       if (document.fonts?.ready) {
         void document.fonts.ready.then(() => {
-          if (!finished) tickProgress(0.85);
+          if (!cancelled && !finished) tickProgress(0.85);
         });
       }
 
       return () => {
+        cancelled = true;
         window.clearTimeout(maxTimer);
         window.clearTimeout(soft);
         window.clearTimeout(soft2);
+        controller.kill();
+        unlockScroll();
       };
     },
+    // stop/start held in refs so Strict Mode / Lenis remounts don't re-kill the run
     { dependencies: [reduceMotion, preloaderDone, setPreloaderDone] },
   );
 

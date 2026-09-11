@@ -327,6 +327,7 @@ export function ServicesInfiniteCarousel({
 
       <div
         className={styles.carousel}
+        data-xp-cursor="drag"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}

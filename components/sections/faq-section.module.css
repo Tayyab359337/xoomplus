@@ -2,7 +2,12 @@
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  background: var(--background);
+  background:
+    linear-gradient(
+      180deg,
+      var(--background) 0%,
+      color-mix(in srgb, var(--muted) 40%, var(--background)) 100%
+    );
   padding: var(--section-y) 0;
 }
 
@@ -108,10 +113,11 @@
 }
 
 .accordion {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--card) 92%, var(--primary));
-  padding: 0.25rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--border) 85%, var(--accent) 15%);
+  border-radius: calc(var(--radius) * 1.4);
+  background: color-mix(in srgb, var(--card) 90%, var(--primary));
+  padding: 0.35rem 1.35rem;
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--foreground) 5%, transparent);
 }
 
 .item {

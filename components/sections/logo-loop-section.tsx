@@ -1,6 +1,9 @@
 "use client";
 
+import { useRef } from "react";
+
 import LogoLoop from "@/components/LogoLoop";
+import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { partnerLogos } from "@/lib/data/homepage";
 import { cn } from "@/lib/utils";
 
@@ -25,17 +28,22 @@ type LogoLoopSectionProps = {
  * React Bits LogoLoop (JS + CSS) — seamless partner/tech strip under the Hero.
  */
 export function LogoLoopSection({ className }: LogoLoopSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  useSectionReveal(sectionRef);
+
   return (
     <section
+      ref={sectionRef}
       aria-label="Partners and technologies"
+      data-section-reveal
       className={cn(styles.section, className)}
     >
-      <div data-animate="fade-up" className={styles.header}>
+      <div data-reveal className={styles.header}>
         <p className={styles.meta}>Trusted by teams building next</p>
         <p className={styles.metaMuted}>Partners · platforms · tools</p>
       </div>
 
-      <div data-animate="fade" data-animate-delay="0.08" className={styles.loopWrap}>
+      <div data-reveal className={styles.loopWrap}>
         <LogoLoop
           logos={logos}
           speed={70}

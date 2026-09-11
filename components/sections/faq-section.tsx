@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import {
   Accordion,
   AccordionContent,
@@ -7,6 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
+import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { faqItems, faqSectionCopy } from "@/lib/data/faq";
 import { cn } from "@/lib/utils";
 
@@ -20,14 +23,19 @@ type FaqSectionProps = {
  * FAQ — left editorial copy, right shadcn Accordion (not full-bleed).
  */
 export function FaqSection({ className }: FaqSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  useSectionReveal(sectionRef);
+
   return (
     <section
+      ref={sectionRef}
       id="faq"
       aria-label="Frequently asked questions"
+      data-section-reveal
       className={cn(styles.section, className)}
     >
       <div className={styles.grid}>
-        <div data-animate="fade-up" className={styles.aside}>
+        <div data-reveal className={styles.aside}>
           <SectionEyebrow className={styles.eyebrow}>
             {faqSectionCopy.eyebrow}
           </SectionEyebrow>
@@ -35,11 +43,7 @@ export function FaqSection({ className }: FaqSectionProps) {
           <p className={styles.body}>{faqSectionCopy.body}</p>
         </div>
 
-        <div
-          data-animate="fade-up"
-          data-animate-delay="0.08"
-          className={styles.panel}
-        >
+        <div data-reveal className={styles.panel}>
           <Accordion type="single" collapsible className={styles.accordion}>
             {faqItems.map((item) => (
               <AccordionItem

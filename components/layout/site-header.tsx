@@ -36,8 +36,11 @@ export function SiteHeader() {
           <DesktopNavItems />
           <div className="relative z-20 flex items-center gap-2">
             <ThemeToggle />
-            <NavbarButton href="#contact" variant="primary">
-              Start a project
+            <NavbarButton
+              href="https://xoomplus.co.uk/appointment-booking/"
+              variant="primary"
+            >
+              Get a Quote
             </NavbarButton>
           </div>
         </NavBody>

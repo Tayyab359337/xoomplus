@@ -56,7 +56,7 @@ export function Hero({ className }: HeroProps) {
     <section
       data-hero
       className={cn(
-        "relative flex min-h-[100dvh] flex-col overflow-hidden border-b border-border",
+        "relative flex min-h-[100dvh] origin-center flex-col overflow-hidden border-b border-border bg-background",
         className,
       )}
     >
@@ -111,14 +111,14 @@ export function Hero({ className }: HeroProps) {
         className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-background/25 via-background/45 to-background/90"
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col items-center justify-center px-4 pb-14 pt-24 text-center md:px-8 md:pb-24 md:pt-32 lg:px-12">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col items-center justify-center px-4 pb-16 pt-28 text-center md:px-8 md:pb-28 md:pt-36 lg:px-12">
         <div className="flex w-full max-w-4xl flex-col items-center">
           <SectionEyebrow variant="bare" showArrow={false} data-hero-eyebrow>
             Creative studio
           </SectionEyebrow>
 
           {/* Real HTML heading for LCP — visible without JS animation */}
-          <h1 data-lcp className="type-display mt-5 max-w-[20ch] text-foreground">
+          <h1 data-lcp className="type-display mt-6 max-w-[18ch] text-foreground">
             Xoomplus{" "}
             <span className="text-accent">Digital Marketing</span>, Web &amp;
             Design Experts.
@@ -126,7 +126,7 @@ export function Hero({ className }: HeroProps) {
 
           <p
             data-hero-body
-            className="type-body mx-auto mt-7 max-w-xl text-muted-foreground"
+            className="type-body mx-auto mt-8 max-w-lg text-muted-foreground"
           >
             Ready to shine online? At XoomPlus, we create smart digital
             marketing, web development, and design solutions that get attention,
@@ -137,7 +137,7 @@ export function Hero({ className }: HeroProps) {
 
           <div
             data-hero-actions
-            className="mt-9 flex flex-wrap items-center justify-center gap-3.5"
+            className="mt-10 flex flex-wrap items-center justify-center gap-4"
           >
             <Magnetic strength={0.22}>
               <a href="#contact" className="btn-primary min-w-[10.5rem]">

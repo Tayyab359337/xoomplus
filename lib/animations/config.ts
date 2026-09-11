@@ -52,6 +52,7 @@ export const motionConfig = {
   },
 
   features: {
+    customCursor: { desktop: true, tablet: false, mobile: false, reduced: false },
     cursorPreview: { desktop: true, tablet: false, mobile: false, reduced: false },
     magnetic: { desktop: true, tablet: false, mobile: false, reduced: false },
     velocityThrow: { desktop: true, tablet: false, mobile: false, reduced: false },

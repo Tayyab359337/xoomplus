@@ -2,6 +2,7 @@
 
 import {
   useId,
+  useRef,
   useState,
   type FormEvent,
   type FormEventHandler,
@@ -10,6 +11,7 @@ import {
 import { Magnetic } from "@/components/animations/Magnetic";
 import { NoiseTexture } from "@/components/ui/noise-texture";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
+import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { contactSectionCopy } from "@/lib/data/contact";
 import { cn } from "@/lib/utils";
 
@@ -29,8 +31,11 @@ type FieldErrors = Partial<
 export function ContactSection({ className }: ContactSectionProps) {
   const copy = contactSectionCopy;
   const formId = useId();
+  const sectionRef = useRef<HTMLElement>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<"idle" | "ok">("idle");
+
+  useSectionReveal(sectionRef);
 
   const validate = (form: HTMLFormElement): FieldErrors => {
     const data = new FormData(form);
@@ -75,8 +80,10 @@ export function ContactSection({ className }: ContactSectionProps) {
 
   return (
     <section
+      ref={sectionRef}
       id="contact"
       aria-labelledby={`${formId}-title`}
+      data-section-reveal
       className={cn(styles.section, className)}
     >
       <NoiseTexture
@@ -89,7 +96,7 @@ export function ContactSection({ className }: ContactSectionProps) {
       />
 
       <div className={styles.inner}>
-        <div data-animate="fade-up" className={styles.intro}>
+        <div data-reveal className={styles.intro}>
           <SectionEyebrow className={styles.eyebrow}>
             {copy.eyebrow}
           </SectionEyebrow>
@@ -100,7 +107,7 @@ export function ContactSection({ className }: ContactSectionProps) {
         </div>
 
         <div className={styles.grid}>
-          <div data-animate="fade-up" className={styles.mapCol}>
+          <div data-reveal className={styles.mapCol}>
             <div className={styles.mapFrame}>
               <iframe
                 title={copy.map.title}
@@ -113,9 +120,8 @@ export function ContactSection({ className }: ContactSectionProps) {
             </div>
           </div>
 
-          <div data-motion="fade-up" data-motion-delay="0.06" className={styles.formCol}>
+          <div data-reveal className={styles.formCol}>
             <form
-              data-motion="stagger"
               className={styles.form}
               noValidate
               onSubmit={onSubmit}
