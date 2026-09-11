@@ -9,7 +9,6 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
   type ReactNode,
 } from "react";
 
@@ -24,14 +23,15 @@ import {
 
 type AnimationContextValue = {
   ready: boolean;
+  /** Always true — preloader removed; kept for call-site compatibility */
   preloaderDone: boolean;
   setPreloaderDone: (done: boolean) => void;
   reinitScrollAnimations: () => void;
 };
 
 const AnimationContext = createContext<AnimationContextValue>({
-  ready: false,
-  preloaderDone: false,
+  ready: true,
+  preloaderDone: true,
   setPreloaderDone: () => undefined,
   reinitScrollAnimations: () => undefined,
 });
@@ -46,13 +46,13 @@ type AnimationProviderProps = {
 
 /**
  * Registers GSAP, bridges Lenis ↔ ScrollTrigger, and owns scroll-animation lifecycle.
+ * Preloader is retired — animations start immediately.
  */
 export function AnimationProvider({ children }: AnimationProviderProps) {
   const reduceMotion = usePrefersReducedMotion();
   const { ready: scrollReady, getInstance } = useSmoothScroll();
   const pathname = usePathname();
-  const [preloaderComplete, setPreloaderComplete] = useState(false);
-  const preloaderDone = reduceMotion || preloaderComplete;
+  const preloaderDone = true;
   const ctxRef = useRef<ReturnType<typeof initScrollAnimations>>(null);
 
   useEffect(() => {
@@ -70,8 +70,8 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
     refreshScrollTrigger();
   }, [scrollReady, getInstance]);
 
-  const setPreloaderDone = useCallback((done: boolean) => {
-    setPreloaderComplete(done);
+  const setPreloaderDone = useCallback((_done: boolean) => {
+    // no-op — preloader removed
   }, []);
 
   const reinitScrollAnimations = useCallback(() => {
@@ -85,13 +85,11 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
     requestAnimationFrame(() => refreshScrollTrigger());
   }, [reduceMotion]);
 
-  // Init / re-init after preloader + on route change.
+  // Init / re-init on mount + route change.
   // Only revert this provider's data-animate context — do not kill
   // section-owned ScrollTriggers from useSectionReveal / kinetic type.
   useGSAP(
     () => {
-      if (!preloaderDone) return;
-
       ctxRef.current?.revert();
       ctxRef.current = null;
 
@@ -107,7 +105,7 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
         ctxRef.current = null;
       };
     },
-    { dependencies: [preloaderDone, pathname, reduceMotion] },
+    { dependencies: [pathname, reduceMotion] },
   );
 
   const value = useMemo(

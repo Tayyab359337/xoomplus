@@ -10,41 +10,34 @@ export type AgencyMetric = {
 
 /**
  * Editable homepage metrics — feed NumberTicker from this object only.
+ * Homepage shows exactly three counters (WordPress source).
  */
 export const agencyMetrics: AgencyMetric[] = [
   {
-    id: "projects",
-    label: "Projects delivered",
-    value: 180,
+    id: "projects-done",
+    label: "Projects Done",
+    value: 50,
     suffix: "+",
-    hint: "Brand, product & growth",
   },
   {
-    id: "clients",
-    label: "Clients partnered",
-    value: 64,
+    id: "happy-clients",
+    label: "Happy Clients",
+    value: 2,
+    suffix: "K+",
+  },
+  {
+    id: "team-members",
+    label: "Team Members",
+    value: 25,
     suffix: "+",
-    hint: "Startups to enterprises",
-  },
-  {
-    id: "years",
-    label: "Years in craft",
-    value: 8,
-    hint: "Studios across markets",
-  },
-  {
-    id: "growth",
-    label: "Avg. revenue lift",
-    value: 3.2,
-    decimalPlaces: 1,
-    suffix: "×",
-    hint: "Measured post-launch",
   },
 ];
 
 export type PartnerLogo = {
   name: string;
   href?: string;
+  /** WordPress / remote logo asset when available */
+  src?: string;
 };
 
 /** Partner / tech marks shown in the LogoLoop band */
@@ -67,25 +60,21 @@ export const partnerLogos: PartnerLogo[] = [
  */
 export const aboutContent = {
   index: "01",
-  eyebrow: "About",
+  eyebrow: "About XoomPlus",
   intro:
-    "An all-in-one digital growth partner — strategy, craft, and performance composed as one system.",
+    "We are a top digital marketing company that works to grow your business by providing expert and specialised digital services.",
   statementLines: [
-    "We don't bolt",
-    "on growth.",
-    "",
-    "We design it",
-    "in from day one.",
+    "Smart Digital Marketing",
+    "For Real Business Growth",
   ],
   body: "Xoomplus blends strategy, SEO, creative, product, and growth marketing into a single operating rhythm — so brands ship sharper work without the handoff tax.",
   meta: [
-    { label: "Est.", value: "2017" },
-    { label: "Base", value: "Remote-first" },
-    { label: "Craft", value: "Brand · Product · Growth" },
+    { label: "Client Satisfaction", value: "99%" },
+    { label: "Project Success Rate", value: "99%" },
   ],
   cta: {
-    label: "Discover our approach",
-    href: "#approach",
+    label: "Explore more",
+    href: "/about/",
   },
   image: {
     src: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1400&q=80",

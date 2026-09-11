@@ -12,8 +12,9 @@ export type PortfolioProject = {
   category: string;
   summary: string;
   technologies: string[];
-  image: string;
-  imageAlt: string;
+  /** Optional — homepage portfolio migration omits images when WP has none */
+  image?: string;
+  imageAlt?: string;
   href: string;
   ctaLabel: string;
   tone: PortfolioTone;

@@ -57,12 +57,13 @@ export const controls = {
   cardSpacing: [180, 40, 320, 5] as const,
 };
 
-const toneClass: Record<PortfolioProject["tone"], string> = {
-  ember: "bg-[oklch(0.42_0.12_35)] text-white",
-  ink: "bg-[oklch(0.22_0.02_250)] text-white",
-  sand: "bg-[oklch(0.86_0.03_85)] text-[oklch(0.2_0.02_250)]",
-  steel: "bg-[oklch(0.38_0.03_250)] text-white",
-  olive: "bg-[oklch(0.42_0.06_130)] text-white",
+/** Unified dark media-card surface — tones only tint the wash, not the shell. */
+const toneWash: Record<PortfolioProject["tone"], string> = {
+  ember: "from-[oklch(0.42_0.08_200)]/35",
+  ink: "from-[oklch(0.28_0.04_220)]/40",
+  sand: "from-[oklch(0.55_0.05_200)]/30",
+  steel: "from-[oklch(0.38_0.04_220)]/35",
+  olive: "from-[oklch(0.42_0.05_190)]/35",
 };
 
 /**
@@ -230,7 +231,7 @@ export function InterfaceCraftsCards({
                 aria-expanded={isCurrent}
                 aria-label={`${card.title}, ${card.category}`}
                 data-portfolio-card
-                data-preview-src={card.image}
+                data-preview-src={card.image || undefined}
                 initial={{ x: 0, scale: 0.96, opacity: 0 }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -260,39 +261,44 @@ export function InterfaceCraftsCards({
                   zIndex: isCurrent ? 50 : card.config.zIndex,
                 }}
                 className={cn(
-                  "absolute top-1/2 left-1/2 flex cursor-pointer flex-col overflow-hidden rounded-sm border border-border/40 p-2 outline-none focus-visible:ring-2 focus-visible:ring-ring md:p-3",
-                  toneClass[card.tone],
+                  "absolute top-1/2 left-1/2 flex cursor-pointer flex-col gap-3 overflow-hidden rounded-3xl border border-border/50 bg-card p-3 text-card-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring md:gap-4 md:p-4",
+                  "shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_5%,transparent)]",
                 )}
               >
                 <div
                   data-portfolio-media
-                  className="relative h-[42%] w-full shrink-0 overflow-hidden rounded-sm"
+                  className="relative h-[46%] w-full shrink-0 overflow-hidden rounded-2xl bg-muted"
                 >
-                  <Image
-                    src={card.image}
-                    alt={card.imageAlt}
-                    fill
-                    sizes="(max-width: 1024px) 230px, 300px"
-                    className="object-cover"
-                    priority={index < 2}
-                  />
+                  {card.image ? (
+                    <Image
+                      src={card.image}
+                      alt={card.imageAlt || card.title}
+                      fill
+                      sizes="(max-width: 1024px) 230px, 300px"
+                      className="object-cover"
+                      priority={index < 2}
+                    />
+                  ) : null}
                   <div
                     aria-hidden
                     className={cn(
-                      "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 to-transparent transition-opacity duration-300",
+                      "pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent transition-opacity duration-300",
+                      toneWash[card.tone],
                       isCurrent ? "opacity-100" : "opacity-0",
                     )}
                   />
                 </div>
 
-                <div className="mt-3 flex min-h-0 flex-1 flex-col">
-                  <p className="type-meta mb-1.5 opacity-70">{card.category}</p>
+                <div className="flex min-h-0 flex-1 flex-col gap-1 px-0.5">
                   <motion.h3
                     layoutId={`${card.id}-title`}
-                    className="font-display max-w-[12ch] text-left text-lg leading-[1.05] tracking-tight md:text-2xl"
+                    className="font-display max-w-[14ch] text-left text-lg leading-[1.15] font-semibold tracking-tight md:text-xl"
                   >
                     {card.title}
                   </motion.h3>
+                  <p className="line-clamp-2 text-left text-sm leading-relaxed text-muted-foreground">
+                    {isCurrent ? card.summary : card.category}
+                  </p>
 
                   <AnimatePresence mode="popLayout">
                     {isCurrent ? (
@@ -302,16 +308,13 @@ export function InterfaceCraftsCards({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 12 }}
                         transition={spring}
-                        className="mt-2 flex min-h-0 flex-1 flex-col"
+                        className="mt-1 flex min-h-0 flex-1 flex-col"
                       >
-                        <p className="line-clamp-3 text-left text-xs leading-relaxed opacity-85 md:text-sm">
-                          {card.summary}
-                        </p>
-                        <ul className="mt-2 flex flex-wrap gap-1">
+                        <ul className="mt-1 flex flex-wrap gap-1">
                           {card.technologies.map((tech) => (
                             <li
                               key={tech}
-                              className="rounded-sm border border-current/25 px-1.5 py-0.5 text-[0.65rem] tracking-wide uppercase opacity-80"
+                              className="rounded-md border border-border/60 px-1.5 py-0.5 text-[0.65rem] tracking-wide text-muted-foreground uppercase"
                             >
                               {tech}
                             </li>
@@ -320,7 +323,7 @@ export function InterfaceCraftsCards({
                         <Link
                           href={card.href}
                           onClick={(e) => e.stopPropagation()}
-                          className="type-button mt-auto inline-flex items-center gap-1.5 self-start pt-3 underline-offset-4 hover:underline"
+                          className="type-button mt-auto inline-flex items-center gap-1.5 self-start pt-3 text-foreground underline-offset-4 hover:underline"
                         >
                           {card.ctaLabel}
                           <ArrowUpRight

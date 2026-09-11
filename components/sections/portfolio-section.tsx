@@ -3,28 +3,38 @@
 import Link from "next/link";
 import { useRef } from "react";
 
-import { Magnetic } from "@/components/animations/Magnetic";
+import Magnet from "@/components/ui/magnet";
 import { InterfaceCraftsCards } from "@/components/ui/interface-crafts-cards";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
 import {
   portfolioProjects,
   portfolioSectionCopy,
+  type PortfolioProject,
 } from "@/lib/data/portfolio";
+import type { HomepagePortfolioCopy } from "@/lib/wordpress/types";
 import { cn } from "@/lib/utils";
 
 import styles from "./portfolio-section.module.css";
 
 type PortfolioSectionProps = {
   className?: string;
+  projects?: PortfolioProject[];
+  copy?: HomepagePortfolioCopy;
 };
 
 /**
  * Portfolio — Aceternity Interface Crafts Cards fed by local TS data.
  */
-export function PortfolioSection({ className }: PortfolioSectionProps) {
+export function PortfolioSection({
+  className,
+  projects,
+  copy,
+}: PortfolioSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
+  const items = projects ?? portfolioProjects;
+  const sectionCopy = copy ?? portfolioSectionCopy;
 
   return (
     <section
@@ -37,31 +47,33 @@ export function PortfolioSection({ className }: PortfolioSectionProps) {
       <div className={styles.header}>
         <div data-reveal>
           <SectionEyebrow className={styles.eyebrow}>
-            {portfolioSectionCopy.eyebrow}
+            {sectionCopy.eyebrow}
           </SectionEyebrow>
-          <h2 className={styles.title}>{portfolioSectionCopy.title}</h2>
+          <h2 className={styles.title}>{sectionCopy.title}</h2>
         </div>
-        <p data-reveal className={styles.body}>
-          {portfolioSectionCopy.body}
-        </p>
+        {sectionCopy.body ? (
+          <p data-reveal className={styles.body}>
+            {sectionCopy.body}
+          </p>
+        ) : null}
       </div>
 
       <div data-reveal className={styles.stage}>
-        <InterfaceCraftsCards items={portfolioProjects} />
+        <InterfaceCraftsCards items={items} />
       </div>
 
       <div data-reveal className={styles.ctaWrap}>
-        <Magnetic strength={0.22}>
+        <Magnet padding={60} magnetStrength={3}>
           <Link
-            href={portfolioSectionCopy.exploreCta.href}
+            href={sectionCopy.exploreCta.href}
             className="btn-primary"
           >
-            {portfolioSectionCopy.exploreCta.label}
+            {sectionCopy.exploreCta.label}
             <span aria-hidden className="translate-y-px text-[0.95em]">
               →
             </span>
           </Link>
-        </Magnetic>
+        </Magnet>
       </div>
     </section>
   );

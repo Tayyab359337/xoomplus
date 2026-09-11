@@ -19,6 +19,10 @@ export type ServiceCategory = {
   description: string;
   /** Visual panel tone — mapped in CSS, not hardcoded purple */
   tone: ServiceTone;
+  /** Optional WordPress service image (homepage main cards) */
+  image?: string;
+  /** Optional service detail URL mapped from WordPress */
+  href?: string;
   children: ChildService[];
 };
 

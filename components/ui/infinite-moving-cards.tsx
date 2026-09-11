@@ -90,13 +90,17 @@ export function InfiniteMovingCards({
                       ) : null}
                       <span className={styles.meta}>
                         <span className={styles.name}>{item.name}</span>
-                        <span className={styles.role}>
-                          {item.role}
-                          <span className={styles.dot} aria-hidden>
-                            ·
+                        {item.role || item.company ? (
+                          <span className={styles.role}>
+                            {item.role}
+                            {item.role && item.company ? (
+                              <span className={styles.dot} aria-hidden>
+                                ·
+                              </span>
+                            ) : null}
+                            {item.company}
                           </span>
-                          {item.company}
-                        </span>
+                        ) : null}
                       </span>
                     </footer>
                   </blockquote>

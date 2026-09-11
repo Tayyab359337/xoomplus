@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 import { HoverLift } from "@/components/animations/HoverLift";
 import { Menu, MenuItem, HoveredLink } from "@/components/ui/navbar-menu";
@@ -18,23 +18,24 @@ import {
   portfolioProjects,
   portfolioSectionCopy,
 } from "@/lib/data/portfolio";
+import { mapWpHref } from "@/lib/wordpress/urls";
 import { cn } from "@/lib/utils";
 
 type NavLink = { name: string; link: string };
 
-/** Labels/hrefs from reference/xm-services-menu.html */
+/** Labels/hrefs from reference/xm-services-menu.html — relative for current host */
 const LEFT_LINKS: NavLink[] = [
   { name: "Home", link: "/" },
-  { name: "About Us", link: "https://xoomplus.co.uk/about/" },
+  { name: "About Us", link: "/about/" },
 ];
 const RIGHT_LINKS: NavLink[] = [
-  { name: "Blogs", link: "https://xoomplus.co.uk/blogs/" },
-  { name: "Contact Us", link: "https://xoomplus.co.uk/contact/" },
+  { name: "Blogs", link: "/blogs/" },
+  { name: "Contact Us", link: "/contact/" },
 ];
 
 const SERVICES_ITEM = "Services";
 const PORTFOLIOS_ITEM = "Portfolios";
-const PORTFOLIOS_HREF = "https://xoomplus.co.uk/projects/";
+const PORTFOLIOS_HREF = "/projects/";
 const PILL_PAD = "px-4 py-2";
 
 /** Two cards side-by-side — slightly under sticky nav width */
@@ -69,12 +70,13 @@ export function DesktopNavItems({ className }: { className?: string }) {
           label={SERVICES_ITEM}
           hovered={hovered}
           onHover={setHovered}
+          onOpen={setActive}
         >
           <MenuItem
             setActive={setActive}
             active={active}
             item={SERVICES_ITEM}
-            href={servicesMegaFeatured.href}
+            href={mapWpHref(servicesMegaFeatured.href)}
             triggerClassName="relative z-20"
             matchNavWidth
           >
@@ -86,6 +88,7 @@ export function DesktopNavItems({ className }: { className?: string }) {
           label={PORTFOLIOS_ITEM}
           hovered={hovered}
           onHover={setHovered}
+          onOpen={setActive}
         >
           <MenuItem
             setActive={setActive}
@@ -116,17 +119,22 @@ function MegaTrigger({
   label,
   hovered,
   onHover,
+  onOpen,
   children,
 }: {
   label: string;
   hovered: string | null;
   onHover: (name: string) => void;
+  onOpen: (name: string) => void;
   children: ReactNode;
 }) {
   return (
     <div
       className={cn("relative inline-flex items-center rounded-full", PILL_PAD)}
-      onMouseEnter={() => onHover(label)}
+      onMouseEnter={() => {
+        onHover(label);
+        onOpen(label);
+      }}
     >
       {hovered === label ? (
         <motion.div
@@ -198,7 +206,7 @@ function ServicesMegaPanel({ open }: { open: boolean }) {
           return (
             <a
               key={column.href}
-              href={column.href}
+              href={mapWpHref(column.href)}
               onMouseEnter={() => setActiveIndex(index)}
               onFocus={() => setActiveIndex(index)}
               aria-current={isActive ? "page" : undefined}
@@ -233,26 +241,51 @@ function ServicesMegaPanel({ open }: { open: boolean }) {
         })}
       </div>
 
-      {/* Column 2 — active category child links */}
-      <div className="border-t border-border/70 p-3.5 sm:p-4 lg:border-t-0 lg:border-l lg:pl-3 lg:pr-3">
-        <ul className="flex flex-col gap-0.5">
-          {activeColumn.links.map((link) => (
-            <li key={link.href}>
-              <HoveredLink
-                href={link.href}
-                className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[0.875rem] text-foreground/80 hover:bg-muted/40 hover:text-foreground"
+      {/* Column 2 — active category child links (animate on parent hover) */}
+      <div className="relative border-t border-border/70 p-3.5 sm:p-4 lg:border-t-0 lg:border-l lg:pl-3 lg:pr-3">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.ul
+            key={activeColumn.href}
+            className="flex flex-col gap-0.5"
+            initial="hidden"
+            animate="show"
+            exit="hidden"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: { staggerChildren: 0.045, delayChildren: 0.02 },
+              },
+            }}
+          >
+            {activeColumn.links.map((link) => (
+              <motion.li
+                key={link.href}
+                variants={{
+                  hidden: { opacity: 0, x: 12 },
+                  show: {
+                    opacity: 1,
+                    x: 0,
+                    transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
+                  },
+                }}
               >
-                <span
-                  className="inline-flex size-[1.05rem] shrink-0 items-center justify-center text-primary [&>svg]:h-full [&>svg]:w-full"
-                  dangerouslySetInnerHTML={{
-                    __html: themeIconSvg(link.iconSvg),
-                  }}
-                />
-                <span className="leading-snug">{link.label}</span>
-              </HoveredLink>
-            </li>
-          ))}
-        </ul>
+                <HoveredLink
+                  href={mapWpHref(link.href)}
+                  className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[0.875rem] text-foreground/80 hover:bg-muted/40 hover:text-foreground"
+                >
+                  <span
+                    className="inline-flex size-[1.05rem] shrink-0 items-center justify-center text-primary [&>svg]:h-full [&>svg]:w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: themeIconSvg(link.iconSvg),
+                    }}
+                  />
+                  <span className="leading-snug">{link.label}</span>
+                </HoveredLink>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </AnimatePresence>
       </div>
 
       {/* Column 3 — featured panel */}
@@ -266,7 +299,7 @@ function ServicesMegaPanel({ open }: { open: boolean }) {
         <div className="mt-4 pt-1 lg:mt-auto lg:pt-6">
           <HoverLift y={-3} scale={1.04} className="inline-flex">
             <a
-              href={servicesMegaFeatured.href}
+              href={mapWpHref(servicesMegaFeatured.href)}
               aria-label={`${servicesMegaFeatured.title} — view services`}
               className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:border-accent/50 hover:text-accent"
             >
@@ -290,7 +323,7 @@ function PortfoliosMegaPanel() {
           <a
             key={project.id}
             href={project.href}
-            className="group block min-w-0 overflow-hidden rounded-xl border border-border/60 bg-background/40 transition-colors hover:border-accent/40 hover:bg-muted/30"
+            className="group flex min-w-0 flex-col gap-2.5 overflow-hidden rounded-2xl border border-border/50 bg-card p-2.5 text-card-foreground transition-colors hover:border-accent/35 hover:bg-card/90"
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- remote Unsplash URLs from portfolio data */}
             <img
@@ -298,14 +331,14 @@ function PortfoliosMegaPanel() {
               alt={project.imageAlt}
               width={640}
               height={360}
-              className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              className="aspect-[16/10] w-full rounded-xl object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
-            <div className="flex items-start justify-between gap-2 px-2.5 py-2 sm:px-3 sm:py-2.5">
+            <div className="flex items-start justify-between gap-2 px-0.5 pb-0.5">
               <div className="min-w-0">
-                <p className="truncate font-display text-sm font-semibold leading-snug text-foreground">
+                <p className="truncate font-display text-sm font-semibold leading-snug tracking-tight text-foreground">
                   {project.title}
                 </p>
-                <p className="mt-0.5 truncate text-[0.7rem] text-muted-foreground">
+                <p className="mt-0.5 truncate text-[0.8rem] text-muted-foreground">
                   {project.category}
                 </p>
               </div>

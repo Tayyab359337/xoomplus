@@ -11,7 +11,9 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { BrandMark } from "@/components/layout/brand-mark";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import Magnet from "@/components/ui/magnet";
 import { useIsClient } from "@/hooks/use-is-client";
 import {
   portfolioProjects,
@@ -26,34 +28,22 @@ import {
   themeIconSvg,
 } from "@/lib/data/services-mega-ui";
 import { cn } from "@/lib/utils";
+import { mapWpHref } from "@/lib/wordpress/urls";
 
 import styles from "./mobile-nav.module.css";
 
-/** Same labels/hrefs as desktop nav (reference + current desktop) */
+/** Same labels/hrefs as desktop nav — relative for current host */
 const TOP_LINKS = [
   { name: "Home", link: "/" },
-  { name: "About Us", link: "https://xoomplus.co.uk/about/" },
+  { name: "About Us", link: "/about/" },
 ] as const;
 
 const BOTTOM_LINKS = [
-  { name: "Blogs", link: "https://xoomplus.co.uk/blogs/" },
-  { name: "Contact Us", link: "https://xoomplus.co.uk/contact/" },
+  { name: "Blogs", link: "/blogs/" },
+  { name: "Contact Us", link: "/contact/" },
 ] as const;
 
-const QUOTE_HREF = "https://xoomplus.co.uk/appointment-booking/";
-
-function BrandMark({ onClick }: { onClick?: () => void }) {
-  return (
-    <Link
-      href="/"
-      onClick={onClick}
-      className="font-display text-lg tracking-tight text-foreground"
-    >
-      Xoom
-      <span className="text-accent">plus</span>
-    </Link>
-  );
-}
+const QUOTE_HREF = "/appointment-booking/";
 
 function linkIndex(n: number) {
   return String(n).padStart(2, "0");
@@ -152,7 +142,7 @@ export function MobileNav() {
         )}
       >
         <div className={styles.barRow}>
-          <BrandMark onClick={close} />
+          <BrandMark height={28} onClick={close} />
           <div className={styles.actions}>
             <ThemeToggle className="size-8" />
             <button
@@ -258,7 +248,7 @@ export function MobileNav() {
                               return (
                                 <a
                                   key={column.href}
-                                  href={column.href}
+                                  href={mapWpHref(column.href)}
                                   aria-current={isActive ? "true" : undefined}
                                   onClick={(event) => {
                                     // First tap selects children; tap again follows the parent link
@@ -298,7 +288,7 @@ export function MobileNav() {
                             {activeColumn.links.map((link) => (
                               <li key={link.href}>
                                 <a
-                                  href={link.href}
+                                  href={mapWpHref(link.href)}
                                   className={styles.megaChild}
                                   onClick={close}
                                 >
@@ -322,7 +312,7 @@ export function MobileNav() {
                               {servicesMegaFeatured.description}
                             </p>
                             <a
-                              href={servicesMegaFeatured.href}
+                              href={mapWpHref(servicesMegaFeatured.href)}
                               className={styles.megaFeaturedBtn}
                               aria-label="View all services"
                               onClick={close}
@@ -442,16 +432,18 @@ export function MobileNav() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.35 }}
               >
-                <a
-                  href={QUOTE_HREF}
-                  className={cn("btn-primary", styles.cta)}
-                  onClick={close}
-                >
-                  Get a Quote
-                  <span aria-hidden className="translate-y-px text-[0.95em]">
-                    →
-                  </span>
-                </a>
+                <Magnet padding={40} magnetStrength={3}>
+                  <a
+                    href={QUOTE_HREF}
+                    className={cn("btn-primary", styles.cta)}
+                    onClick={close}
+                  >
+                    Get a Quote
+                    <span aria-hidden className="translate-y-px text-[0.95em]">
+                      →
+                    </span>
+                  </a>
+                </Magnet>
               </motion.div>
             </nav>
           </>

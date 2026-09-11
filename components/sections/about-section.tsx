@@ -9,22 +9,24 @@ import {
 } from "react";
 import { useGSAP } from "@gsap/react";
 
-import { HoverLift } from "@/components/animations/HoverLift";
 import { ScrollItem } from "@/components/scroll";
+import Magnet from "@/components/ui/magnet";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { DUR_HOVER, EASE, gsap, registerGsapPlugins } from "@/lib/animations";
 import { aboutContent } from "@/lib/data/homepage";
+import type { HomepageAbout } from "@/lib/wordpress/types";
 import { cn } from "@/lib/utils";
 
 import styles from "./about-section.module.css";
 
 type AboutSectionProps = {
   className?: string;
+  content?: HomepageAbout;
 };
 
-const TILT_MAX = 4.5;
+const TILT_MAX = 3.5;
 const FINE_POINTER_MQ = "(pointer: fine) and (hover: hover)";
 
 function canUsePointerTilt(reduceMotion: boolean): boolean {
@@ -33,9 +35,10 @@ function canUsePointerTilt(reduceMotion: boolean): boolean {
 }
 
 /**
- * Editorial About — asymmetric composition, display type, restrained motion.
+ * About — media + copy: eyebrow/statement sit directly above body text.
  */
-export function AboutSection({ className }: AboutSectionProps) {
+export function AboutSection({ className, content }: AboutSectionProps) {
+  const about = content ?? aboutContent;
   const reduceMotion = usePrefersReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -91,98 +94,98 @@ export function AboutSection({ className }: AboutSectionProps) {
       data-section-reveal
       className={cn(styles.section, className)}
     >
-      <div className={styles.grid}>
-        <aside className={styles.aside}>
-          <div aria-hidden className={styles.accentRail} />
-
-          <SectionEyebrow
-            number={aboutContent.index}
-            data-reveal
-            className={styles.eyebrow}
-          >
-            {aboutContent.eyebrow}
-          </SectionEyebrow>
-
-          <p data-reveal className={styles.intro}>
-            {aboutContent.intro}
-          </p>
-
-          <div data-reveal className={styles.ctaReveal}>
-            <HoverLift y={-2} scale={1.01} className="inline-flex">
-              <Link href={aboutContent.cta.href} className={styles.cta}>
-                <span>{aboutContent.cta.label}</span>
-                <span aria-hidden className={styles.ctaArrow}>
-                  →
-                </span>
-              </Link>
-            </HoverLift>
-          </div>
-
-          <div data-reveal-stagger className={styles.metaRow}>
-            {aboutContent.meta.map((item) => (
-              <div key={item.label} className={styles.metaItem}>
-                <span className={styles.metaLabel}>{item.label}</span>
-                <span className={styles.metaValue}>{item.value}</span>
-              </div>
-            ))}
-          </div>
-        </aside>
-
-        <div className={styles.main}>
-          <h2
-            id="about-heading"
-            data-reveal
-            className={styles.statement}
-          >
-            {aboutContent.statementLines.map((line, i) =>
-              line === "" ? (
-                <span key={`break-${i}`} className={styles.statementBreak} />
-              ) : (
-                <span key={`${line}-${i}`} className={styles.statementLine}>
-                  {line}
-                </span>
-              ),
-            )}
-          </h2>
-
-          <p data-reveal className={styles.body}>
-            {aboutContent.body}
-          </p>
-
-          {aboutContent.image ? (
-            <div
-              data-animate="image-reveal"
-              className={styles.mediaReveal}
-            >
+      <div className={styles.shell}>
+        <div className={styles.panel}>
+          {about.image ? (
+            <div data-animate="image-reveal" className={styles.mediaCol}>
               <ScrollItem
-                speed={reduceMotion ? undefined : 0.28}
+                speed={reduceMotion ? undefined : 0.22}
                 className={styles.mediaScroll}
               >
-                <div data-parallax={reduceMotion ? undefined : "18"}>
+                <div data-parallax={reduceMotion ? undefined : "14"}>
                   <div
                     ref={frameRef}
-                    className={styles.mediaFrame}
+                    className={styles.mediaCard}
                     onPointerMove={onPointerMove}
                     onPointerLeave={onPointerLeave}
                   >
-                    <Image
-                      data-animate-media
-                      src={aboutContent.image.src}
-                      alt={aboutContent.image.alt}
-                      width={1400}
-                      height={980}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 640px"
-                      className={styles.mediaImage}
-                      priority={false}
-                    />
-                    <span aria-hidden className={styles.mediaCaption}>
-                      Studio still · 01
-                    </span>
+                    <div className={styles.mediaFrame}>
+                      <Image
+                        data-animate-media
+                        src={about.image.src}
+                        alt={about.image.alt}
+                        width={1400}
+                        height={980}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 46vw, 520px"
+                        className={styles.mediaImage}
+                        priority={false}
+                      />
+                    </div>
+                    <div className={styles.mediaMeta}>
+                      <p className={styles.mediaTitle}>Studio craft</p>
+                      <p className={styles.mediaDesc}>
+                        Strategy · design · growth
+                      </p>
+                    </div>
                   </div>
                 </div>
               </ScrollItem>
             </div>
           ) : null}
+
+          <div className={styles.copyCol}>
+            <SectionEyebrow
+              number={about.index}
+              data-reveal
+              className={styles.eyebrow}
+            >
+              {about.eyebrow}
+            </SectionEyebrow>
+
+            <h2 id="about-heading" data-reveal className={styles.statement}>
+              {about.statementLines.map((line, i) =>
+                line === "" ? (
+                  <span key={`break-${i}`} className={styles.statementBreak} />
+                ) : (
+                  <span key={`${line}-${i}`} className={styles.statementLine}>
+                    {line}
+                  </span>
+                ),
+              )}
+            </h2>
+
+            <p data-reveal className={styles.lead}>
+              {about.intro}
+            </p>
+
+            {about.body ? (
+              <p data-reveal className={styles.body}>
+                {about.body}
+              </p>
+            ) : null}
+
+            <div data-reveal className={styles.ctaRow}>
+              <Magnet padding={48} magnetStrength={3}>
+                <Link href={about.cta.href} className="btn-primary">
+                  {about.cta.label}
+                  <span aria-hidden className="translate-y-px text-[0.95em]">
+                    →
+                  </span>
+                </Link>
+              </Magnet>
+            </div>
+
+            {about.meta.length > 0 ? (
+              <ul data-reveal-stagger className={styles.metaRow}>
+                {about.meta.map((item) => (
+                  <li key={item.label} className={styles.metaItem}>
+                    <span className={styles.metaLabel}>{item.label}</span>
+                    <span className={styles.metaValue}>{item.value}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         </div>
       </div>
     </section>

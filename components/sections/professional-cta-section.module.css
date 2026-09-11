@@ -23,8 +23,29 @@
   letter-spacing: var(--text-meta--letter-spacing);
   font-weight: var(--text-meta--font-weight);
   text-transform: uppercase;
-  color: color-mix(in srgb, #ffffff 72%, var(--accent));
+  color: #fff;
   margin: 0 0 var(--title-gap);
+}
+
+/* Pill sits on dark media — light-theme muted/40 reads as a faint wash.
+   Force a solid accent plate so "Talk to a Specialist Today" pops. */
+.eyebrow > :global(span) {
+  border-color: color-mix(in srgb, #ffffff 28%, var(--accent));
+  background: color-mix(in srgb, var(--accent) 90%, #041016);
+  color: #fff;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent),
+    0 10px 28px color-mix(in srgb, #000000 38%, transparent),
+    0 0 32px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.eyebrow > :global(span:hover) {
+  background: color-mix(in srgb, var(--accent) 96%, #041016);
+  border-color: color-mix(in srgb, #ffffff 40%, var(--accent));
+}
+
+.eyebrow :global(.type-meta) {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .overlayTitle {

@@ -12,7 +12,7 @@ type ThemeToggleProps = {
 
 /**
  * Magic UI Animated Theme Toggler wired to next-themes.
- * Default theme remains dark via ThemeProvider.
+ * Default theme remains light via ThemeProvider.
  */
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();

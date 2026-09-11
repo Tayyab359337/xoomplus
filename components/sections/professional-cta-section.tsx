@@ -4,18 +4,20 @@ import Link from "next/link";
 import { useRef } from "react";
 
 import { HoverLift } from "@/components/animations/HoverLift";
-import { Magnetic } from "@/components/animations/Magnetic";
 import { ScrollExpand } from "@/components/scroll-expand";
+import Magnet from "@/components/ui/magnet";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { professionalCtaCopy } from "@/lib/data/cta";
+import type { HomepageCta } from "@/lib/wordpress/types";
 import { cn } from "@/lib/utils";
 
 import styles from "./professional-cta-section.module.css";
 
 type ProfessionalCtaSectionProps = {
   className?: string;
+  content?: HomepageCta;
 };
 
 /**
@@ -23,8 +25,9 @@ type ProfessionalCtaSectionProps = {
  */
 export function ProfessionalCtaSection({
   className,
+  content,
 }: ProfessionalCtaSectionProps) {
-  const copy = professionalCtaCopy;
+  const copy = content ?? professionalCtaCopy;
   const isMobile = useMediaQuery("(max-width: 767px)");
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
@@ -60,14 +63,24 @@ export function ProfessionalCtaSection({
           <h2 className={styles.overlayTitle}>{copy.title}</h2>
           <p className={styles.body}>{copy.body}</p>
           <div className={styles.actions}>
-            <Magnetic strength={0.22}>
-              <Link href={copy.primaryCta.href} className="btn-primary">
-                {copy.primaryCta.label}
-                <span aria-hidden className="translate-y-px text-[0.95em]">
-                  →
-                </span>
-              </Link>
-            </Magnetic>
+            <Magnet padding={60} magnetStrength={3}>
+              {copy.primaryCta.href.startsWith("tel:") ||
+              copy.primaryCta.href.startsWith("mailto:") ? (
+                <a href={copy.primaryCta.href} className="btn-primary">
+                  {copy.primaryCta.label}
+                  <span aria-hidden className="translate-y-px text-[0.95em]">
+                    →
+                  </span>
+                </a>
+              ) : (
+                <Link href={copy.primaryCta.href} className="btn-primary">
+                  {copy.primaryCta.label}
+                  <span aria-hidden className="translate-y-px text-[0.95em]">
+                    →
+                  </span>
+                </Link>
+              )}
+            </Magnet>
             <HoverLift y={-2} scale={1.01} className="inline-flex">
               <Link href={copy.secondaryCta.href} className={styles.secondary}>
                 {copy.secondaryCta.label}

@@ -18,12 +18,13 @@ const instrument = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://xoomplus.co.uk"),
   title: {
-    default: "Xoomplus",
+    default: "Xoomplus - Digital Marketing & Web Development Agency",
     template: "%s · Xoomplus",
   },
   description:
-    "Xoomplus is a creative studio crafting brands, products, and digital experiences.",
+    "Grow your businesses with Xoomplus. We deliver expert digital marketing, SEO, web development, and creative solutions to boost traffic and conversions.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

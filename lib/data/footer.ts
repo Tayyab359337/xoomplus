@@ -18,10 +18,9 @@ export const footerCopy = {
     href: `#approach`,
   })),
   social: [
-    { label: "LinkedIn", href: "https://www.linkedin.com/" },
-    { label: "Instagram", href: "https://www.instagram.com/" },
-    { label: "X", href: "https://x.com/" },
-    { label: "Behance", href: "https://www.behance.net/" },
+    { label: "Facebook", href: "https://www.facebook.com/xoomplus1/" },
+    { label: "Instagram", href: "https://www.instagram.com/xoomplus1/" },
+    { label: "LinkedIn", href: "https://pk.linkedin.com/company/xoomplus" },
   ],
   contact: {
     email: "hello@xoomplus.com",

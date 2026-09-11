@@ -21,8 +21,7 @@ function ensureOverlay(): HTMLElement | null {
 }
 
 /**
- * Short leave transition (~250–400ms).
- * Resolves when the route may change.
+ * GSAP fade leave — overlay fades in, then route may change.
  */
 export function playPageLeave(): Promise<void> {
   registerGsapPlugins();
@@ -35,22 +34,21 @@ export function playPageLeave(): Promise<void> {
   if (!overlay) return Promise.resolve();
 
   return new Promise((resolve) => {
-    gsap.set(overlay, {
-      autoAlpha: 1,
-      pointerEvents: "none",
-      clipPath: "inset(100% 0 0 0)",
-    });
-
-    gsap.to(overlay, {
-      clipPath: "inset(0% 0 0 0)",
-      duration: durations.transition,
-      ease: EASE_OUT_EXPO,
-      onComplete: () => resolve(),
-    });
+    gsap.killTweensOf(overlay);
+    gsap.fromTo(
+      overlay,
+      { autoAlpha: 0 },
+      {
+        autoAlpha: 1,
+        duration: durations.transition,
+        ease: EASE_OUT_EXPO,
+        onComplete: () => resolve(),
+      },
+    );
   });
 }
 
-/** Enter transition after the new route mounts. */
+/** GSAP fade enter — overlay fades out after the new route mounts. */
 export function playPageEnter(): Promise<void> {
   registerGsapPlugins();
 
@@ -66,15 +64,20 @@ export function playPageEnter(): Promise<void> {
   if (!overlay) return Promise.resolve();
 
   return new Promise((resolve) => {
-    gsap.to(overlay, {
-      clipPath: "inset(0 0 100% 0)",
-      duration: durations.transition * 0.9,
-      ease: EASE_OUT_SOFT,
-      onComplete: () => {
-        gsap.set(overlay, { pointerEvents: "none", autoAlpha: 0 });
-        resolve();
+    gsap.killTweensOf(overlay);
+    gsap.fromTo(
+      overlay,
+      { autoAlpha: 1 },
+      {
+        autoAlpha: 0,
+        duration: durations.transition * 0.95,
+        ease: EASE_OUT_SOFT,
+        onComplete: () => {
+          gsap.set(overlay, { pointerEvents: "none", autoAlpha: 0 });
+          resolve();
+        },
       },
-    });
+    );
   });
 }
 

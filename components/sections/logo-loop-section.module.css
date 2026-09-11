@@ -42,6 +42,26 @@
   width: 100%;
   max-width: var(--layout-max);
   margin-inline: auto;
+  padding-block: 0.35rem;
+}
+
+/*
+ * Dark theme only: muted zinc strip (not white) so black logos read,
+ * without invert filters that flatten colored logos to solid white.
+ */
+:global(.dark) .loopWrap {
+  padding-block: 1.25rem;
+  border-radius: 1.25rem;
+  background: #d4d4d8; /* zinc-300 */
+  border: 1px solid color-mix(in srgb, #71717a 22%, transparent);
+}
+
+:global(.dark) .loopWrap :global(.logoloop) {
+  --logoloop-fadeColor: #d4d4d8;
+}
+
+:global(.dark) .brand {
+  color: color-mix(in srgb, #18181b 55%, transparent);
 }
 
 .brand {
@@ -71,6 +91,10 @@
 
   .loopWrap {
     width: min(100% - 2rem, var(--layout-max));
+  }
+
+  :global(.dark) .loopWrap {
+    padding-block: 1.4rem;
   }
 }
 

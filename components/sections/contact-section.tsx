@@ -8,32 +8,41 @@ import {
   type FormEventHandler,
 } from "react";
 
-import { Magnetic } from "@/components/animations/Magnetic";
+import Magnet from "@/components/ui/magnet";
 import { NoiseTexture } from "@/components/ui/noise-texture";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { contactSectionCopy } from "@/lib/data/contact";
+import type { SectionCopy } from "@/lib/wordpress/types";
 import { cn } from "@/lib/utils";
 
 import styles from "./contact-section.module.css";
 
 type ContactSectionProps = {
   className?: string;
+  /** WordPress homepage headings only — form/map stay local */
+  headings?: SectionCopy;
 };
 
 type FieldErrors = Partial<
   Record<"name" | "email" | "subject" | "message", string>
 >;
 
+type SubmitStatus = "idle" | "loading" | "ok" | "error";
+
 /**
- * Contact — map + form, Magic UI noise underlay, no backend yet.
+ * Contact — map + form posting to `/api/contact`.
  */
-export function ContactSection({ className }: ContactSectionProps) {
+export function ContactSection({ className, headings }: ContactSectionProps) {
   const copy = contactSectionCopy;
+  const eyebrow = headings?.eyebrow || copy.eyebrow;
+  const title = headings?.title || copy.title;
+  const body = headings?.body || copy.body;
   const formId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [status, setStatus] = useState<"idle" | "ok">("idle");
+  const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [formError, setFormError] = useState<string | null>(null);
 
   useSectionReveal(sectionRef);
 
@@ -57,7 +66,7 @@ export function ContactSection({ className }: ContactSectionProps) {
     return next;
   };
 
-  const onSubmit: FormEventHandler<HTMLFormElement> = (
+  const onSubmit: FormEventHandler<HTMLFormElement> = async (
     event: FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
@@ -67,16 +76,63 @@ export function ContactSection({ className }: ContactSectionProps) {
 
     if (Object.keys(next).length > 0) {
       setStatus("idle");
+      setFormError(null);
       const firstKey = Object.keys(next)[0];
       const el = form.querySelector<HTMLElement>(`[name="${firstKey}"]`);
       el?.focus();
       return;
     }
 
-    // Structured for a future fetch — no external backend yet.
-    setStatus("ok");
-    form.reset();
+    const data = new FormData(form);
+    const payload = {
+      name: String(data.get("name") ?? "").trim(),
+      email: String(data.get("email") ?? "").trim(),
+      subject: String(data.get("subject") ?? "").trim(),
+      message: String(data.get("message") ?? "").trim(),
+    };
+
+    setStatus("loading");
+    setFormError(null);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        fieldErrors?: FieldErrors;
+      } | null;
+
+      if (!response.ok || !result?.ok) {
+        if (result?.fieldErrors) {
+          setErrors(result.fieldErrors);
+          const firstKey = Object.keys(result.fieldErrors)[0];
+          if (firstKey) {
+            form
+              .querySelector<HTMLElement>(`[name="${firstKey}"]`)
+              ?.focus();
+          }
+        }
+        setFormError(result?.error || copy.errorMessage);
+        setStatus("error");
+        return;
+      }
+
+      setErrors({});
+      setFormError(null);
+      setStatus("ok");
+      form.reset();
+    } catch {
+      setFormError(copy.errorMessage);
+      setStatus("error");
+    }
   };
+
+  const isLoading = status === "loading";
 
   return (
     <section
@@ -98,12 +154,12 @@ export function ContactSection({ className }: ContactSectionProps) {
       <div className={styles.inner}>
         <div data-reveal className={styles.intro}>
           <SectionEyebrow className={styles.eyebrow}>
-            {copy.eyebrow}
+            {eyebrow}
           </SectionEyebrow>
           <h2 id={`${formId}-title`} className={styles.title}>
-            {copy.title}
+            {title}
           </h2>
-          <p className={styles.body}>{copy.body}</p>
+          <p className={styles.body}>{body}</p>
         </div>
 
         <div className={styles.grid}>
@@ -125,40 +181,55 @@ export function ContactSection({ className }: ContactSectionProps) {
               className={styles.form}
               noValidate
               onSubmit={onSubmit}
+              aria-busy={isLoading || undefined}
               aria-describedby={
-                status === "ok" ? `${formId}-success` : undefined
+                status === "ok"
+                  ? `${formId}-success`
+                  : status === "error"
+                    ? `${formId}-form-error`
+                    : undefined
               }
             >
               <Field
                 {...copy.fields.name}
                 error={errors.name}
                 errorId={`${formId}-name-error`}
+                disabled={isLoading}
               />
               <Field
                 {...copy.fields.email}
                 error={errors.email}
                 errorId={`${formId}-email-error`}
+                disabled={isLoading}
               />
               <Field
                 {...copy.fields.subject}
                 error={errors.subject}
                 errorId={`${formId}-subject-error`}
+                disabled={isLoading}
               />
               <TextAreaField
                 {...copy.fields.message}
                 error={errors.message}
                 errorId={`${formId}-message-error`}
+                disabled={isLoading}
               />
 
               <div className={styles.actions}>
-                <Magnetic strength={0.24}>
-                  <button type="submit" className="btn-primary">
-                    {copy.submitLabel}
-                    <span aria-hidden className="translate-y-px text-[0.95em]">
-                      →
-                    </span>
+                <Magnet padding={60} magnetStrength={3} disabled={isLoading}>
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? copy.submittingLabel : copy.submitLabel}
+                    {!isLoading ? (
+                      <span aria-hidden className="translate-y-px text-[0.95em]">
+                        →
+                      </span>
+                    ) : null}
                   </button>
-                </Magnetic>
+                </Magnet>
                 {status === "ok" ? (
                   <p
                     id={`${formId}-success`}
@@ -166,6 +237,15 @@ export function ContactSection({ className }: ContactSectionProps) {
                     className={styles.success}
                   >
                     {copy.successMessage}
+                  </p>
+                ) : null}
+                {status === "error" ? (
+                  <p
+                    id={`${formId}-form-error`}
+                    role="alert"
+                    className={styles.error}
+                  >
+                    {formError || copy.errorMessage}
                   </p>
                 ) : null}
               </div>
@@ -186,6 +266,7 @@ type FieldProps = {
   type: "text" | "email";
   error?: string;
   errorId: string;
+  disabled?: boolean;
 };
 
 function Field({
@@ -197,6 +278,7 @@ function Field({
   type,
   error,
   errorId,
+  disabled,
 }: FieldProps) {
   const invalid = Boolean(error);
 
@@ -216,6 +298,7 @@ function Field({
         type={type}
         required={required}
         autoComplete={autoComplete}
+        disabled={disabled}
         aria-required={required || undefined}
         aria-invalid={invalid || undefined}
         aria-describedby={invalid ? errorId : undefined}
@@ -238,6 +321,7 @@ type TextAreaProps = {
   rows: number;
   error?: string;
   errorId: string;
+  disabled?: boolean;
 };
 
 function TextAreaField({
@@ -248,6 +332,7 @@ function TextAreaField({
   rows,
   error,
   errorId,
+  disabled,
 }: TextAreaProps) {
   const invalid = Boolean(error);
 
@@ -266,6 +351,7 @@ function TextAreaField({
         name={name}
         required={required}
         rows={rows}
+        disabled={disabled}
         aria-required={required || undefined}
         aria-invalid={invalid || undefined}
         aria-describedby={invalid ? errorId : undefined}

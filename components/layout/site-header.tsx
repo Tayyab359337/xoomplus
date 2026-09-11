@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { BrandMark } from "@/components/layout/brand-mark";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { DesktopNavItems } from "@/components/layout/desktop-nav-items";
 import {
@@ -10,18 +9,6 @@ import {
   Navbar,
   NavbarButton,
 } from "@/components/ui/resizable-navbar";
-
-function BrandMark() {
-  return (
-    <Link
-      href="/"
-      className="relative z-20 flex items-baseline gap-0 px-2 py-1.5 font-display text-xl tracking-tight text-foreground"
-    >
-      Xoom
-      <span className="text-accent">plus</span>
-    </Link>
-  );
-}
 
 /**
  * Desktop: Aceternity Resizable Navbar.
@@ -32,12 +19,12 @@ export function SiteHeader() {
     <>
       <Navbar className="hidden lg:block" data-nav-entrance>
         <NavBody>
-          <BrandMark />
+          <BrandMark height={30} />
           <DesktopNavItems />
           <div className="relative z-20 flex items-center gap-2">
             <ThemeToggle />
             <NavbarButton
-              href="https://xoomplus.co.uk/appointment-booking/"
+              href="/appointment-booking/"
               variant="primary"
             >
               Get a Quote

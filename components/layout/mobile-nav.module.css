@@ -453,11 +453,13 @@
 .portfolioCard {
   display: flex;
   flex-direction: column;
+  gap: 0.55rem;
   min-width: 0;
   overflow: hidden;
-  border-radius: 0.75rem;
+  padding: 0.55rem;
+  border-radius: 1rem;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  background: color-mix(in srgb, var(--background) 45%, transparent);
+  background: color-mix(in srgb, var(--card) 92%, var(--primary));
   text-decoration: none;
   color: inherit;
 }
@@ -467,13 +469,14 @@
   width: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
+  border-radius: 0.7rem;
 }
 
 .portfolioMeta {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  padding: 0.55rem 0.6rem 0.65rem;
+  padding: 0 0.15rem 0.2rem;
 }
 
 .portfolioTitle {

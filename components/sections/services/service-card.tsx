@@ -64,7 +64,16 @@ export function ServiceCard({
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className={styles.visualWash} />
-          <span className={styles.visualMark}>{service.title.slice(0, 1)}</span>
+          {service.image ? (
+            // eslint-disable-next-line @next/next/no-img-element -- remote WP service thumbs in existing visual slot
+            <img
+              src={service.image}
+              alt=""
+              className={styles.visualImage}
+            />
+          ) : (
+            <span className={styles.visualMark}>{service.title.slice(0, 1)}</span>
+          )}
         </motion.div>
 
         <motion.div
@@ -75,7 +84,7 @@ export function ServiceCard({
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className={styles.cardCopyTop}>
-            <p className={styles.cardTagline}>{service.tagline}</p>
+            <h3 className={styles.cardTitle}>{service.title}</h3>
             {interaction === "tap" ? (
               <button
                 type="button"
@@ -101,7 +110,7 @@ export function ServiceCard({
             ) : null}
           </div>
 
-          <h3 className={styles.cardTitle}>{service.title}</h3>
+          <p className={styles.cardTagline}>{service.tagline}</p>
 
           {interaction === "tap" && !expanded ? (
             <button

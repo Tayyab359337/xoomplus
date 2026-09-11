@@ -1,6 +1,6 @@
 "use client";
 
-import { Magnetic } from "@/components/animations/Magnetic";
+import Magnet from "@/components/ui/magnet";
 import { cn } from "@/lib/utils";
 
 import styles from "./services-section.module.css";
@@ -30,7 +30,7 @@ export function CarouselArrows({
       role="group"
       aria-label={`${label} controls`}
     >
-      <Magnetic strength={0.35}>
+      <Magnet padding={28} magnetStrength={4}>
         <button
           type="button"
           className={styles.arrowBtn}
@@ -44,8 +44,8 @@ export function CarouselArrows({
         >
           <span className={styles.arrowIcon} data-dir="prev" aria-hidden />
         </button>
-      </Magnetic>
-      <Magnetic strength={0.35}>
+      </Magnet>
+      <Magnet padding={28} magnetStrength={4}>
         <button
           type="button"
           className={styles.arrowBtn}
@@ -59,7 +59,7 @@ export function CarouselArrows({
         >
           <span className={styles.arrowIcon} data-dir="next" aria-hidden />
         </button>
-      </Magnetic>
+      </Magnet>
     </div>
   );
 }

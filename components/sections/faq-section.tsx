@@ -10,21 +10,26 @@ import {
 } from "@/components/ui/accordion";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
-import { faqItems, faqSectionCopy } from "@/lib/data/faq";
+import { faqItems, faqSectionCopy, type FaqItem } from "@/lib/data/faq";
+import type { SectionCopy } from "@/lib/wordpress/types";
 import { cn } from "@/lib/utils";
 
 import styles from "./faq-section.module.css";
 
 type FaqSectionProps = {
   className?: string;
+  items?: FaqItem[];
+  copy?: SectionCopy;
 };
 
 /**
  * FAQ — left editorial copy, right shadcn Accordion (not full-bleed).
  */
-export function FaqSection({ className }: FaqSectionProps) {
+export function FaqSection({ className, items, copy }: FaqSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
+  const faqs = items ?? faqItems;
+  const sectionCopy = copy ?? faqSectionCopy;
 
   return (
     <section
@@ -37,15 +42,17 @@ export function FaqSection({ className }: FaqSectionProps) {
       <div className={styles.grid}>
         <div data-reveal className={styles.aside}>
           <SectionEyebrow className={styles.eyebrow}>
-            {faqSectionCopy.eyebrow}
+            {sectionCopy.eyebrow}
           </SectionEyebrow>
-          <h2 className={styles.title}>{faqSectionCopy.title}</h2>
-          <p className={styles.body}>{faqSectionCopy.body}</p>
+          <h2 className={styles.title}>{sectionCopy.title}</h2>
+          {sectionCopy.body ? (
+            <p className={styles.body}>{sectionCopy.body}</p>
+          ) : null}
         </div>
 
         <div data-reveal className={styles.panel}>
           <Accordion type="single" collapsible className={styles.accordion}>
-            {faqItems.map((item) => (
+            {faqs.map((item) => (
               <AccordionItem
                 key={item.id}
                 value={item.id}

@@ -1,17 +1,18 @@
 /**
  * Editable contact section — map embed + form copy.
- * Form is client-only until a backend is wired.
  */
 export const contactSectionCopy = {
   eyebrow: "Contact",
   title: "Tell us what you're building.",
   body: "Share the brief, the constraint, or the half-finished idea. We'll reply with how we'd begin.",
   submitLabel: "Send message",
-  successMessage: "Message ready — connect a backend to deliver it.",
+  submittingLabel: "Sending…",
+  successMessage: "Thanks — your message is on its way. We'll reply soon.",
+  errorMessage: "Something went wrong. Please try again in a moment.",
   map: {
-    /** Google Maps embed URL — replace with your studio location. */
+    /** Google Maps embed — Xoomplus studio (from maps.app.goo.gl/gUywR3SxgCF4esyN8) */
     embedSrc:
-      "https://maps.google.com/maps?q=Dubai%20Internet%20City&t=&z=13&ie=UTF8&iwloc=&output=embed",
+      "https://www.google.com/maps?q=Xoomplus@33.6559732,73.042949&z=17&output=embed",
     title: "Xoomplus studio location map",
   },
   fields: {

@@ -149,7 +149,7 @@ export const MenuItem = ({
     <div
       ref={triggerRef}
       onMouseEnter={() => setActive(item)}
-      className={cn("relative", className)}
+      className={cn("relative z-20", className)}
     >
       <motion.a
         href={href}

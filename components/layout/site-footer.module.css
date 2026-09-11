@@ -21,18 +21,7 @@
 
 .logo {
   display: inline-flex;
-  align-items: baseline;
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-weight: 600;
-  color: var(--foreground);
-  text-decoration: none;
-}
-
-.logoAccent {
-  color: var(--accent);
+  padding-inline: 0;
 }
 
 .tagline {
@@ -55,6 +44,9 @@
 }
 
 .socialLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--font-sans);
   font-size: 0.8125rem;
   line-height: 1.2;
@@ -64,6 +56,12 @@
   color: var(--muted-foreground);
   text-decoration: none;
   transition: color var(--motion-fast) var(--motion-ease);
+}
+
+.socialIcon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
 }
 
 .socialLink:hover,

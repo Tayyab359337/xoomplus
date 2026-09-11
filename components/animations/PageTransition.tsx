@@ -3,7 +3,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-import { useAnimation } from "@/components/animations/AnimationProvider";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
@@ -16,14 +15,13 @@ import {
 import "./page-transition.css";
 
 /**
- * Intercepts same-origin internal navigations for a short transition veil.
+ * Intercepts same-origin internal navigations for a GSAP fade veil.
  * Does not block anchors, mailto, tel, external, or download links.
  */
 export function PageTransition() {
   const router = useRouter();
   const pathname = usePathname();
   const reduceMotion = usePrefersReducedMotion();
-  const { preloaderDone } = useAnimation();
   const { scrollTo } = useSmoothScroll();
   const transitioning = useRef(false);
   const lastPath = useRef(pathname);
@@ -33,7 +31,7 @@ export function PageTransition() {
     if (lastPath.current === pathname) return;
     lastPath.current = pathname;
 
-    if (reduceMotion || !preloaderDone) {
+    if (reduceMotion) {
       transitioning.current = false;
       return;
     }
@@ -53,7 +51,7 @@ export function PageTransition() {
     return () => {
       cancelled = true;
     };
-  }, [pathname, reduceMotion, preloaderDone, scrollTo]);
+  }, [pathname, reduceMotion, scrollTo]);
 
   useEffect(() => {
     if (reduceMotion) return;

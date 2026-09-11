@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 
-import { Magnetic } from "@/components/animations/Magnetic";
+import Magnet from "@/components/ui/magnet";
 import { ParallaxHeroImages } from "@/components/ui/parallax-hero-images";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useIsClient } from "@/hooks/use-is-client";
@@ -139,19 +139,19 @@ export function Hero({ className }: HeroProps) {
             data-hero-actions
             className="mt-10 flex flex-wrap items-center justify-center gap-4"
           >
-            <Magnetic strength={0.22}>
+            <Magnet padding={60} magnetStrength={3}>
               <a href="#contact" className="btn-primary min-w-[10.5rem]">
                 Start a project
                 <span aria-hidden className="translate-y-px text-[0.95em]">
                   →
                 </span>
               </a>
-            </Magnetic>
-            <Magnetic strength={0.18}>
+            </Magnet>
+            <Magnet padding={50} magnetStrength={3.5}>
               <a href="#work" className="btn-ghost backdrop-blur-sm">
                 View selected work
               </a>
-            </Magnetic>
+            </Magnet>
           </div>
         </div>
       </div>
