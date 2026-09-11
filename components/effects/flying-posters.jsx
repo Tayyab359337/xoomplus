@@ -266,7 +266,8 @@ class Canvas {
     scrollEase,
     cameraFov,
     cameraZ,
-    externalControl = false
+    externalControl = false,
+    quality = 'high'
   }) {
     this.container = container;
     this.canvas = canvas;
@@ -275,6 +276,7 @@ class Canvas {
     this.planeHeight = planeHeight;
     this.distortion = distortion;
     this.externalControl = externalControl;
+    this.quality = quality;
     this.scroll = {
       ease: scrollEase,
       current: 0,
@@ -304,8 +306,8 @@ class Canvas {
     this.renderer = new Renderer({
       canvas: this.canvas,
       alpha: true,
-      antialias: true,
-      dpr: Math.min(window.devicePixelRatio, 2)
+      antialias: this.quality !== 'low',
+      dpr: Math.min(window.devicePixelRatio, this.quality === 'low' ? 1.25 : 2)
     });
     this.gl = this.renderer.gl;
     // Solid clear avoids translucent trail / flicker on transparent canvases
@@ -325,7 +327,7 @@ class Canvas {
   createGeometry() {
     this.planeGeometry = new Plane(this.gl, {
       heightSegments: 1,
-      widthSegments: 100
+      widthSegments: this.quality === 'low' ? 36 : 100
     });
   }
 
@@ -519,6 +521,13 @@ class Canvas {
     window.removeEventListener('touchstart', this.onTouchDown);
     window.removeEventListener('touchmove', this.onTouchMove);
     window.removeEventListener('touchend', this.onTouchUp);
+
+    try {
+      const lose = this.gl?.getExtension?.('WEBGL_lose_context');
+      lose?.loseContext();
+    } catch {
+      /* ignore */
+    }
   }
 }
 
@@ -534,6 +543,8 @@ export default function FlyingPosters({
   externalControl = false,
   /** Optional 0–1 progress (prefer imperative setScrollProgress for scrub). */
   scrollProgress = undefined,
+  /** `low` = lighter DPR/mesh for mobile. */
+  quality = 'high',
   onReady,
   className,
   ...props
@@ -551,38 +562,47 @@ export default function FlyingPosters({
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const instance = new Canvas({
-      container: containerRef.current,
-      canvas: canvasRef.current,
-      items,
-      planeWidth,
-      planeHeight,
-      distortion,
-      scrollEase,
-      cameraFov,
-      cameraZ,
-      externalControl
-    });
+    let instance = null;
+    let ro = null;
 
-    instanceRef.current = instance;
-    onReadyRef.current?.({
-      setScrollProgress: progress => instance.setScrollProgress(progress),
-      getScrollRange: () => instance.getScrollRange()
-    });
+    try {
+      instance = new Canvas({
+        container: containerRef.current,
+        canvas: canvasRef.current,
+        items,
+        planeWidth,
+        planeHeight,
+        distortion,
+        scrollEase,
+        cameraFov,
+        cameraZ,
+        externalControl,
+        quality
+      });
 
-    const ro = new ResizeObserver(() => {
-      instance.onResize();
-    });
-    ro.observe(containerRef.current);
+      instanceRef.current = instance;
+      onReadyRef.current?.({
+        setScrollProgress: progress => instance.setScrollProgress(progress),
+        getScrollRange: () => instance.getScrollRange()
+      });
+
+      ro = new ResizeObserver(() => {
+        instance?.onResize();
+      });
+      ro.observe(containerRef.current);
+    } catch {
+      instanceRef.current = null;
+      onReadyRef.current?.(null);
+    }
 
     return () => {
-      ro.disconnect();
-      instance.destroy();
+      ro?.disconnect();
+      instance?.destroy();
       instanceRef.current = null;
       onReadyRef.current?.(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- size props applied via setParams below
-  }, [items, externalControl]);
+  }, [items, externalControl, quality]);
 
   useEffect(() => {
     instanceRef.current?.setParams({
