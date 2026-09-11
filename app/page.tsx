@@ -5,6 +5,7 @@ import { BlogsSection } from "@/components/sections/blogs-section";
 import { ContactSection } from "@/components/sections/contact-section";
 import { FaqSection } from "@/components/sections/faq-section";
 import { Hero } from "@/components/sections/hero";
+import { KineticTypeSection } from "@/components/sections/kinetic-type-section";
 import { LogoLoopSection } from "@/components/sections/logo-loop-section";
 import { MetricsSection } from "@/components/sections/metrics-section";
 import { PortfolioSection } from "@/components/sections/portfolio-section";
@@ -24,6 +25,7 @@ export default function Home() {
         <LogoLoopSection />
         <AboutSection />
         <MetricsSection />
+        <KineticTypeSection />
         <ServicesSection />
         <PortfolioSection />
         <FaqSection />

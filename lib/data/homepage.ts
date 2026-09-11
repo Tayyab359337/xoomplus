@@ -61,15 +61,36 @@ export const partnerLogos: PartnerLogo[] = [
   { name: "Slack" },
 ];
 
+/**
+ * Editorial About / Studio — copy kept separate from presentation.
+ * Image is optional: set `image` to null to render without media.
+ */
 export const aboutContent = {
-  eyebrow: "Studio",
-  statement: "An all-in-one digital growth partner.",
-  body: "Xoomplus unites brand, product, and performance under one roof — so strategy, craft, and launch move as a single system instead of a pile of vendors.",
-  meta: [
-    { label: "Model", value: "Embedded partnership" },
-    { label: "Focus", value: "Brand · Product · Growth" },
-    { label: "Footprint", value: "Remote-first, global" },
+  index: "01",
+  eyebrow: "About",
+  intro:
+    "An all-in-one digital growth partner — strategy, craft, and performance composed as one system.",
+  statementLines: [
+    "We don't bolt",
+    "on growth.",
+    "",
+    "We design it",
+    "in from day one.",
   ],
+  body: "Xoomplus blends strategy, SEO, creative, product, and growth marketing into a single operating rhythm — so brands ship sharper work without the handoff tax.",
+  meta: [
+    { label: "Est.", value: "2017" },
+    { label: "Base", value: "Remote-first" },
+    { label: "Craft", value: "Brand · Product · Growth" },
+  ],
+  cta: {
+    label: "Discover our approach",
+    href: "#approach",
+  },
+  image: {
+    src: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1400&q=80",
+    alt: "Art-directed creative workspace with design tools and colour studies",
+  },
 } as const;
 
 /**

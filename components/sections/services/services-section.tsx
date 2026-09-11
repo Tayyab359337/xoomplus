@@ -1,10 +1,10 @@
 "use client";
 
-import { Reveal } from "@/components/motion/reveal";
 import {
   serviceCategories,
   servicesSectionCopy,
 } from "@/lib/data/services";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { cn } from "@/lib/utils";
 
 import { ServicesInfiniteCarousel } from "./services-infinite-carousel";
@@ -29,20 +29,22 @@ export function ServicesSection({ className }: ServicesSectionProps) {
       aria-label="Services"
       className={cn(styles.section, className)}
     >
-      <div className={styles.header}>
-        <Reveal variant="fadeUp">
-          <p className={styles.eyebrow}>{servicesSectionCopy.eyebrow}</p>
+      <div data-animate="fade-up" className={styles.header}>
+        <div>
+          <SectionEyebrow className={styles.eyebrow}>
+            {servicesSectionCopy.eyebrow}
+          </SectionEyebrow>
           <h2 className={styles.title}>{servicesSectionCopy.title}</h2>
-        </Reveal>
-        <Reveal variant="fadeUp" delay={0.06}>
-          <p className={styles.body}>{servicesSectionCopy.body}</p>
-        </Reveal>
+        </div>
+        <p className={styles.body}>{servicesSectionCopy.body}</p>
       </div>
 
-      <ServicesInfiniteCarousel
-        services={serviceCategories}
-        interaction={mode}
-      />
+      <div data-animate="fade-up" data-animate-delay="0.08">
+        <ServicesInfiniteCarousel
+          services={serviceCategories}
+          interaction={mode}
+        />
+      </div>
     </section>
   );
 }

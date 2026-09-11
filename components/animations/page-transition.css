@@ -1,0 +1,17 @@
+/* Global page-transition veil — fixed, no layout impact, pointer-events none by default */
+.xp-page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: #06090c;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  clip-path: inset(100% 0 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-page-transition {
+    display: none !important;
+  }
+}

@@ -155,8 +155,15 @@ export function MobileNav() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.24 }}
               >
-                <a href="#contact" className={styles.cta} onClick={close}>
+                <a
+                  href="#contact"
+                  className={cn("btn-primary", styles.cta)}
+                  onClick={close}
+                >
                   Start a project
+                  <span aria-hidden className="translate-y-px text-[0.95em]">
+                    →
+                  </span>
                 </a>
               </motion.div>
             </nav>

@@ -2,6 +2,12 @@
 
 import type { ReactNode } from "react";
 
+import {
+  AnimationProvider,
+  HeroEntrance,
+  PageTransition,
+  Preloader,
+} from "@/components/animations";
 import { GlobalSplashCursor } from "@/components/effects/global-splash-cursor";
 import { PageBottomBlur } from "@/components/effects/page-bottom-blur";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
@@ -12,7 +18,7 @@ type AppProvidersProps = {
 };
 
 /**
- * Single client boundary for theme, smooth scroll, SplashCursor, and page blur.
+ * Single client boundary for theme, smooth scroll, SplashCursor, GSAP, and page blur.
  * SplashCursor mounts once here — never per-section.
  */
 export function AppProviders({ children }: AppProvidersProps) {
@@ -24,12 +30,20 @@ export function AppProviders({ children }: AppProvidersProps) {
       disableTransitionOnChange
     >
       <SmoothScrollProvider>
-        <GlobalSplashCursor />
-        {/* Stack above the fixed fluid canvas (z-0) so UI stays interactive & visible */}
-        <div className="relative z-10 flex min-h-full flex-1 flex-col">
-          {children}
-        </div>
-        <PageBottomBlur />
+        <AnimationProvider>
+          <Preloader />
+          <PageTransition />
+          <GlobalSplashCursor />
+          {/* Stack above the fixed fluid canvas (z-0) so UI stays interactive & visible */}
+          <div
+            data-animation-root
+            className="relative z-10 flex min-h-full flex-1 flex-col"
+          >
+            <HeroEntrance />
+            {children}
+          </div>
+          <PageBottomBlur />
+        </AnimationProvider>
       </SmoothScrollProvider>
     </ThemeProvider>
   );

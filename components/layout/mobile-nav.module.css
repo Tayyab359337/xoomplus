@@ -244,28 +244,7 @@
 }
 
 .cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-  padding: var(--btn-pad-y) var(--btn-pad-x);
-  border-radius: var(--radius);
-  border: 1px solid transparent;
-  background: var(--accent);
-  color: var(--accent-foreground);
-  font-family: var(--font-sans);
-  font-size: var(--text-nav);
-  font-weight: 550;
-  letter-spacing: -0.01em;
-  text-decoration: none;
-  transition:
-    filter var(--motion-fast) var(--motion-ease),
-    transform var(--motion-fast) var(--motion-ease);
-}
-
-.cta:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
 }
 
 /* Desktop: this portal nav must not show */

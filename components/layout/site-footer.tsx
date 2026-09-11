@@ -20,7 +20,7 @@ export function SiteFooter({ className }: SiteFooterProps) {
   const copy = footerCopy;
 
   return (
-    <footer className={cn(styles.footer, className)}>
+    <footer data-animate="fade-up" className={cn(styles.footer, className)}>
       <div className={styles.inner}>
         <div className={styles.brandCol}>
           <Link href="/" className={styles.logo}>

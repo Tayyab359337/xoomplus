@@ -7,8 +7,9 @@ import {
   type FormEventHandler,
 } from "react";
 
-import { Reveal } from "@/components/motion/reveal";
+import { Magnetic } from "@/components/animations/Magnetic";
 import { NoiseTexture } from "@/components/ui/noise-texture";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { contactSectionCopy } from "@/lib/data/contact";
 import { cn } from "@/lib/utils";
 
@@ -88,16 +89,18 @@ export function ContactSection({ className }: ContactSectionProps) {
       />
 
       <div className={styles.inner}>
-        <Reveal variant="fadeUp" className={styles.intro}>
-          <p className={styles.eyebrow}>{copy.eyebrow}</p>
+        <div data-animate="fade-up" className={styles.intro}>
+          <SectionEyebrow className={styles.eyebrow}>
+            {copy.eyebrow}
+          </SectionEyebrow>
           <h2 id={`${formId}-title`} className={styles.title}>
             {copy.title}
           </h2>
           <p className={styles.body}>{copy.body}</p>
-        </Reveal>
+        </div>
 
         <div className={styles.grid}>
-          <Reveal variant="fadeUp" className={styles.mapCol}>
+          <div data-animate="fade-up" className={styles.mapCol}>
             <div className={styles.mapFrame}>
               <iframe
                 title={copy.map.title}
@@ -108,10 +111,11 @@ export function ContactSection({ className }: ContactSectionProps) {
                 className={styles.map}
               />
             </div>
-          </Reveal>
+          </div>
 
-          <Reveal variant="fadeUp" delay={0.06} className={styles.formCol}>
+          <div data-motion="fade-up" data-motion-delay="0.06" className={styles.formCol}>
             <form
+              data-motion="stagger"
               className={styles.form}
               noValidate
               onSubmit={onSubmit}
@@ -141,9 +145,14 @@ export function ContactSection({ className }: ContactSectionProps) {
               />
 
               <div className={styles.actions}>
-                <button type="submit" className={styles.submit}>
-                  {copy.submitLabel}
-                </button>
+                <Magnetic strength={0.24}>
+                  <button type="submit" className="btn-primary">
+                    {copy.submitLabel}
+                    <span aria-hidden className="translate-y-px text-[0.95em]">
+                      →
+                    </span>
+                  </button>
+                </Magnetic>
                 {status === "ok" ? (
                   <p
                     id={`${formId}-success`}
@@ -155,7 +164,7 @@ export function ContactSection({ className }: ContactSectionProps) {
                 ) : null}
               </div>
             </form>
-          </Reveal>
+          </div>
         </div>
       </div>
     </section>

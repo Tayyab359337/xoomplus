@@ -93,8 +93,7 @@ export default function ScrollExpand({
   const scrimRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
 
-  const propsRef = useRef<ProgressProps>({} as ProgressProps);
-  propsRef.current = {
+  const propsRef = useRef<ProgressProps>({
     startWidth,
     startHeight,
     startRadius,
@@ -106,7 +105,35 @@ export default function ScrollExpand({
     overlayScrim,
     useWindowScroll,
     enabled,
-  };
+  });
+
+  useEffect(() => {
+    propsRef.current = {
+      startWidth,
+      startHeight,
+      startRadius,
+      endRadius,
+      mediaZoom,
+      scrollDistance,
+      holdDistance,
+      smoothing,
+      overlayScrim,
+      useWindowScroll,
+      enabled,
+    };
+  }, [
+    startWidth,
+    startHeight,
+    startRadius,
+    endRadius,
+    mediaZoom,
+    scrollDistance,
+    holdDistance,
+    smoothing,
+    overlayScrim,
+    useWindowScroll,
+    enabled,
+  ]);
 
   const applyProgress = useCallback((p: number) => {
     const frame = frameRef.current;

@@ -30,12 +30,12 @@ export function LogoLoopSection({ className }: LogoLoopSectionProps) {
       aria-label="Partners and technologies"
       className={cn(styles.section, className)}
     >
-      <div className={styles.header}>
+      <div data-animate="fade-up" className={styles.header}>
         <p className={styles.meta}>Trusted by teams building next</p>
         <p className={styles.metaMuted}>Partners · platforms · tools</p>
       </div>
 
-      <div className={styles.loopWrap}>
+      <div data-animate="fade" data-animate-delay="0.08" className={styles.loopWrap}>
         <LogoLoop
           logos={logos}
           speed={70}

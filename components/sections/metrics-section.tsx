@@ -1,7 +1,7 @@
 "use client";
 
-import { Reveal } from "@/components/motion/reveal";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { agencyMetrics } from "@/lib/data/homepage";
 import { cn } from "@/lib/utils";
 
@@ -18,18 +18,20 @@ export function MetricsSection({ className }: MetricsSectionProps) {
   return (
     <section aria-label="Studio metrics" className={cn(styles.section, className)}>
       <div className={styles.inner}>
-        <Reveal variant="fadeUp" className={styles.header}>
+        <div data-animate="fade-up" className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>By the numbers</p>
+            <SectionEyebrow className={styles.eyebrow}>
+              By the numbers
+            </SectionEyebrow>
             <h2 className={styles.title}>Proof, not promises.</h2>
           </div>
           <p className={styles.headerCopy}>
             Selected outcomes from partnerships across brand, product, and
             growth.
           </p>
-        </Reveal>
+        </div>
 
-        <ul className={styles.grid}>
+        <ul data-animate="stagger" className={styles.grid}>
           {agencyMetrics.map((metric, index) => (
             <li key={metric.id} className={styles.card}>
               <span className={styles.label}>{metric.label}</span>

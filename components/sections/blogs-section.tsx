@@ -4,13 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
-import { Reveal } from "@/components/motion/reveal";
-import { Stagger, StaggerItem } from "@/components/motion/stagger";
 import {
   latestBlogPosts,
   blogsSectionCopy,
   type BlogPost,
 } from "@/lib/data/blogs";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { cn } from "@/lib/utils";
 
 import styles from "./blogs-section.module.css";
@@ -30,26 +29,32 @@ export function BlogsSection({ className }: BlogsSectionProps) {
       className={cn(styles.section, className)}
     >
       <div className={styles.header}>
-        <Reveal variant="fadeUp">
-          <p className={styles.eyebrow}>{blogsSectionCopy.eyebrow}</p>
+        <div data-animate="fade-up">
+          <SectionEyebrow className={styles.eyebrow}>
+            {blogsSectionCopy.eyebrow}
+          </SectionEyebrow>
           <h2 className={styles.title}>{blogsSectionCopy.title}</h2>
-        </Reveal>
-        <Reveal variant="fadeUp" delay={0.06} className={styles.headerAside}>
+        </div>
+        <div
+          data-animate="fade-up"
+          data-animate-delay="0.06"
+          className={styles.headerAside}
+        >
           <p className={styles.body}>{blogsSectionCopy.body}</p>
           <Link href={blogsSectionCopy.viewAll.href} className={styles.viewAll}>
             {blogsSectionCopy.viewAll.label}
             <ArrowUpRight className={styles.viewAllIcon} aria-hidden />
           </Link>
-        </Reveal>
+        </div>
       </div>
 
-      <Stagger className={styles.grid}>
+      <div data-animate="stagger" className={styles.grid}>
         {latestBlogPosts.map((post) => (
-          <StaggerItem key={post.id} className={styles.gridItem}>
+          <div key={post.id} className={styles.gridItem}>
             <BlogCard post={post} />
-          </StaggerItem>
+          </div>
         ))}
-      </Stagger>
+      </div>
     </section>
   );
 }

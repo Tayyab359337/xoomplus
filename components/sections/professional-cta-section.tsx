@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 
+import { Magnetic } from "@/components/animations/Magnetic";
 import { ScrollExpand } from "@/components/scroll-expand";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { professionalCtaCopy } from "@/lib/data/cta";
 import { cn } from "@/lib/utils";
@@ -14,7 +16,7 @@ type ProfessionalCtaSectionProps = {
 };
 
 /**
- * Professional CTA — ScrollExpand frame that opens to full-bleed on page scroll.
+ * Professional CTA — ScrollExpand crescendo + restrained GSAP entrance.
  */
 export function ProfessionalCtaSection({
   className,
@@ -26,6 +28,7 @@ export function ProfessionalCtaSection({
     <section
       id="start"
       aria-label="Start a project"
+      data-motion="fade-up"
       className={cn(styles.section, className)}
     >
       <ScrollExpand
@@ -44,13 +47,28 @@ export function ProfessionalCtaSection({
         overlayScrim={0.72}
         className={styles.expand}
       >
-        <p className={styles.eyebrow}>{copy.eyebrow}</p>
-        <h2 className={styles.overlayTitle}>{copy.title}</h2>
-        <p className={styles.body}>{copy.body}</p>
-        <div className={styles.actions}>
-          <Link href={copy.primaryCta.href} className={styles.primary}>
-            {copy.primaryCta.label}
-          </Link>
+        <SectionEyebrow data-motion="fade-up" className={styles.eyebrow}>
+          {copy.eyebrow}
+        </SectionEyebrow>
+        <h2 data-motion="clip" className={styles.overlayTitle}>
+          {copy.title}
+        </h2>
+        <p data-motion="fade-up" data-motion-delay="0.08" className={styles.body}>
+          {copy.body}
+        </p>
+        <div
+          data-motion="fade-up"
+          data-motion-delay="0.14"
+          className={styles.actions}
+        >
+          <Magnetic strength={0.22}>
+            <Link href={copy.primaryCta.href} className="btn-primary">
+              {copy.primaryCta.label}
+              <span aria-hidden className="translate-y-px text-[0.95em]">
+                →
+              </span>
+            </Link>
+          </Magnetic>
           <Link href={copy.secondaryCta.href} className={styles.secondary}>
             {copy.secondaryCta.label}
           </Link>

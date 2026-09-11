@@ -11,8 +11,21 @@ import {
   type KeyboardEvent,
 } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { useGSAP } from "@gsap/react";
 
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import type { PortfolioProject } from "@/lib/data/portfolio";
+import {
+  attachImageHover,
+  attachVelocityThrow,
+  destroyCursorPreview,
+  ensureCursorPreview,
+  featureEnabled,
+  hideCursorPreview,
+  moveCursorPreview,
+  resolveMotionTier,
+  showCursorPreview,
+} from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
 type SpringConfig = {
@@ -53,8 +66,8 @@ const toneClass: Record<PortfolioProject["tone"], string> = {
 };
 
 /**
- * Aceternity Interface Crafts Cards — fan layout with scale / offset animation.
- * Adapted to accept portfolio project data (image, category, tech, CTA).
+ * Aceternity Interface Crafts Cards — fan layout (Motion) + GSAP media polish.
+ * Cursor preview / velocity throw are desktop enhancements only.
  */
 export function InterfaceCraftsCards({
   items,
@@ -67,6 +80,7 @@ export function InterfaceCraftsCards({
   const [spacing, setSpacing] = useState(cardSpacing);
   const ref = useRef<HTMLDivElement>(null);
   const labelId = useId();
+  const reduceMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -95,6 +109,83 @@ export function InterfaceCraftsCards({
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, [cardSpacing]);
+
+  // Shared cursor preview + image hover / one velocity throw
+  useGSAP(
+    () => {
+      const root = ref.current;
+      if (!root || reduceMotion) return;
+
+      const tier = resolveMotionTier({
+        reducedMotion: reduceMotion,
+        width: window.innerWidth,
+      });
+
+      const cleanups: Array<() => void> = [];
+      const cards = root.querySelectorAll<HTMLElement>("[data-portfolio-card]");
+
+      if (featureEnabled("cursorPreview", tier)) {
+        const preview = ensureCursorPreview();
+
+        cards.forEach((card) => {
+          const src = card.dataset.previewSrc;
+          if (!src) return;
+
+          const onEnter = (event: PointerEvent) => {
+            showCursorPreview(preview, src, event);
+          };
+          const onMove = (event: PointerEvent) => {
+            moveCursorPreview(preview, event);
+          };
+          const onLeave = () => {
+            hideCursorPreview(preview);
+          };
+
+          card.addEventListener("pointerenter", onEnter);
+          card.addEventListener("pointermove", onMove);
+          card.addEventListener("pointerleave", onLeave);
+          cleanups.push(() => {
+            card.removeEventListener("pointerenter", onEnter);
+            card.removeEventListener("pointermove", onMove);
+            card.removeEventListener("pointerleave", onLeave);
+          });
+        });
+
+        cleanups.push(() => {
+          hideCursorPreview(preview);
+        });
+      }
+
+      if (featureEnabled("imageHover", tier)) {
+        cards.forEach((card, index) => {
+          const mediaWrap = card.querySelector<HTMLElement>(
+            "[data-portfolio-media]",
+          );
+          const media = mediaWrap?.querySelector<HTMLElement>("img");
+          if (!mediaWrap || !media) return;
+
+          // First project: special velocity throw; others: physical hover
+          if (index === 0 && featureEnabled("velocityThrow", tier)) {
+            cleanups.push(attachVelocityThrow(mediaWrap, media));
+          } else {
+            cleanups.push(
+              attachImageHover(mediaWrap, media, {
+                scale: 1.07,
+                rotate: 0.5,
+                y: -5,
+              }),
+            );
+          }
+        });
+      }
+
+      return () => {
+        cleanups.forEach((fn) => fn());
+        destroyCursorPreview();
+      };
+    },
+    { dependencies: [reduceMotion, items] },
+  );
 
   const middle = (items.length - 1) / 2;
   const anyActive = Boolean(activeId);
@@ -138,7 +229,9 @@ export function InterfaceCraftsCards({
                 tabIndex={0}
                 aria-expanded={isCurrent}
                 aria-label={`${card.title}, ${card.category}`}
-                initial={{ x: 0, scale: 0 }}
+                data-portfolio-card
+                data-preview-src={card.image}
+                initial={{ x: 0, scale: 0.96, opacity: 0 }}
                 onClick={(e) => {
                   e.stopPropagation();
                   setActiveId(isCurrent ? null : card.id);
@@ -153,9 +246,10 @@ export function InterfaceCraftsCards({
                       ? 0.2 * card.config.rotate
                       : card.config.rotate,
                   scale: isCurrent ? activeScale : muted ? 0.7 : 1,
+                  opacity: 1,
                 }}
                 whileHover={{
-                  scale: isCurrent ? activeScale : muted ? 0.7 : 1.05,
+                  scale: isCurrent ? activeScale : muted ? 0.7 : 1.04,
                 }}
                 transition={spring}
                 style={{
@@ -170,7 +264,10 @@ export function InterfaceCraftsCards({
                   toneClass[card.tone],
                 )}
               >
-                <div className="relative h-[42%] w-full shrink-0 overflow-hidden rounded-sm">
+                <div
+                  data-portfolio-media
+                  className="relative h-[42%] w-full shrink-0 overflow-hidden rounded-sm"
+                >
                   <Image
                     src={card.image}
                     alt={card.imageAlt}
@@ -178,6 +275,13 @@ export function InterfaceCraftsCards({
                     sizes="(max-width: 1024px) 230px, 300px"
                     className="object-cover"
                     priority={index < 2}
+                  />
+                  <div
+                    aria-hidden
+                    className={cn(
+                      "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 to-transparent transition-opacity duration-300",
+                      isCurrent ? "opacity-100" : "opacity-0",
+                    )}
                   />
                 </div>
 
@@ -219,7 +323,10 @@ export function InterfaceCraftsCards({
                           className="type-button mt-auto inline-flex items-center gap-1.5 self-start pt-3 underline-offset-4 hover:underline"
                         >
                           {card.ctaLabel}
-                          <ArrowUpRight className="size-3.5" aria-hidden />
+                          <ArrowUpRight
+                            className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                            aria-hidden
+                          />
                         </Link>
                       </motion.div>
                     ) : null}

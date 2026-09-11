@@ -196,36 +196,6 @@
   margin-top: 0.35rem;
 }
 
-.submit {
-  font-family: var(--font-sans);
-  font-size: var(--text-nav);
-  line-height: 1;
-  letter-spacing: -0.01em;
-  font-weight: 550;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--btn-pad-y) var(--btn-pad-x);
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: var(--accent-foreground);
-  cursor: pointer;
-  transition:
-    filter var(--motion-fast) var(--motion-ease),
-    transform var(--motion-fast) var(--motion-ease);
-}
-
-.submit:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-}
-
-.submit:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 35%, transparent);
-}
-
 .success {
   margin: 0;
   font-family: var(--font-sans);

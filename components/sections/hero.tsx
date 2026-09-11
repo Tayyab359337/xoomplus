@@ -3,10 +3,9 @@
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 
-import { SparklesText } from "@/components/ui/sparkles-text"
-
-import { Reveal } from "@/components/motion/reveal";
+import { Magnetic } from "@/components/animations/Magnetic";
 import { ParallaxHeroImages } from "@/components/ui/parallax-hero-images";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useIsClient } from "@/hooks/use-is-client";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { heroParallaxImages } from "@/lib/data/homepage";
@@ -43,6 +42,7 @@ function canUseHeroWebGL(): boolean {
 /**
  * Homepage Hero — LiquidEther + Aceternity parallax images + LCP-safe typography.
  * SplashCursor stays global; no second cursor system here.
+ * Primary heading is always visible HTML (never opacity:0 for LCP).
  */
 export function Hero({ className }: HeroProps) {
   const reduceMotion = usePrefersReducedMotion();
@@ -63,6 +63,7 @@ export function Hero({ className }: HeroProps) {
       {/* WebGL atmosphere — decorative, never blocks LCP text */}
       <div
         aria-hidden
+        data-hero-visual
         className="pointer-events-none absolute inset-0 z-0 opacity-90"
       >
         {allowWebGL ? (
@@ -94,12 +95,14 @@ export function Hero({ className }: HeroProps) {
 
       {/* Aceternity mouse parallax — sits above ether, below copy */}
       {allowParallax ? (
-        <ParallaxHeroImages
-          images={[...heroParallaxImages]}
-          variant="edge-focus"
-          className="z-[1] opacity-[0.55] md:opacity-70"
-          imageClassName="rounded-[var(--radius)] shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_18%,transparent)] ring-border/40"
-        />
+        <div data-hero-visual className="contents">
+          <ParallaxHeroImages
+            images={[...heroParallaxImages]}
+            variant="edge-focus"
+            className="z-[1] opacity-[0.55] md:opacity-70"
+            imageClassName="rounded-[var(--radius)] shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_18%,transparent)] ring-border/40"
+          />
+        </div>
       ) : null}
 
       {/* Readability veil — keeps type clear over ether + images */}
@@ -110,28 +113,45 @@ export function Hero({ className }: HeroProps) {
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col items-center justify-center px-4 pb-14 pt-24 text-center md:px-8 md:pb-24 md:pt-32 lg:px-12">
         <div className="flex w-full max-w-4xl flex-col items-center">
-          <p className="type-meta text-accent">Creative studio</p>
+          <SectionEyebrow variant="bare" showArrow={false} data-hero-eyebrow>
+            Creative studio
+          </SectionEyebrow>
 
           {/* Real HTML heading for LCP — visible without JS animation */}
-          <h1 className="type-display mt-5 max-w-[20ch] text-foreground">
+          <h1 data-lcp className="type-display mt-5 max-w-[20ch] text-foreground">
             Xoomplus{" "}
             <span className="text-accent">Digital Marketing</span>, Web &amp;
             Design Experts.
           </h1>
 
-          <Reveal variant="fadeUp" className="mt-7">
-            <p className="type-body mx-auto max-w-xl text-muted-foreground">
-            Ready to shine online? At XoomPlus, we create smart digital marketing, web development, and design solutions that get attention, engage visitors, and drive sales. From SEO and social media to branding and beautiful websites, we help your business grow quickly and effectively
-            </p>
-          </Reveal>
+          <p
+            data-hero-body
+            className="type-body mx-auto mt-7 max-w-xl text-muted-foreground"
+          >
+            Ready to shine online? At XoomPlus, we create smart digital
+            marketing, web development, and design solutions that get attention,
+            engage visitors, and drive sales. From SEO and social media to
+            branding and beautiful websites, we help your business grow quickly
+            and effectively
+          </p>
 
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <a href="#contact" className="btn-primary">
-              Start a project
-            </a>
-            <a href="#work" className="btn-ghost backdrop-blur-sm">
-              View selected work
-            </a>
+          <div
+            data-hero-actions
+            className="mt-9 flex flex-wrap items-center justify-center gap-3.5"
+          >
+            <Magnetic strength={0.22}>
+              <a href="#contact" className="btn-primary min-w-[10.5rem]">
+                Start a project
+                <span aria-hidden className="translate-y-px text-[0.95em]">
+                  →
+                </span>
+              </a>
+            </Magnetic>
+            <Magnetic strength={0.18}>
+              <a href="#work" className="btn-ghost backdrop-blur-sm">
+                View selected work
+              </a>
+            </Magnetic>
           </div>
         </div>
       </div>

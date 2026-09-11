@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 
-import { Reveal } from "@/components/motion/reveal";
 import { InterfaceCraftsCards } from "@/components/ui/interface-crafts-cards";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import {
   portfolioProjects,
   portfolioSectionCopy,
@@ -27,27 +27,44 @@ export function PortfolioSection({ className }: PortfolioSectionProps) {
       className={cn(styles.section, className)}
     >
       <div className={styles.header}>
-        <Reveal variant="fadeUp">
-          <p className={styles.eyebrow}>{portfolioSectionCopy.eyebrow}</p>
+        <div data-motion="fade-up">
+          <SectionEyebrow className={styles.eyebrow}>
+            {portfolioSectionCopy.eyebrow}
+          </SectionEyebrow>
           <h2 className={styles.title}>{portfolioSectionCopy.title}</h2>
-        </Reveal>
-        <Reveal variant="fadeUp" delay={0.06}>
-          <p className={styles.body}>{portfolioSectionCopy.body}</p>
-        </Reveal>
+        </div>
+        <p
+          data-motion="fade-up"
+          data-motion-delay="0.06"
+          className={styles.body}
+        >
+          {portfolioSectionCopy.body}
+        </p>
       </div>
 
-      <Reveal variant="fadeUp" delay={0.1} className={styles.stage}>
+      <div
+        data-motion="scale"
+        data-motion-delay="0.1"
+        className={styles.stage}
+      >
         <InterfaceCraftsCards items={portfolioProjects} />
-      </Reveal>
+      </div>
 
-      <Reveal variant="fadeUp" delay={0.14} className={styles.ctaWrap}>
+      <div
+        data-motion="fade-up"
+        data-motion-delay="0.14"
+        className={styles.ctaWrap}
+      >
         <Link
           href={portfolioSectionCopy.exploreCta.href}
-          className={styles.explore}
+          className="btn-primary"
         >
           {portfolioSectionCopy.exploreCta.label}
+          <span aria-hidden className="translate-y-px text-[0.95em]">
+            →
+          </span>
         </Link>
-      </Reveal>
+      </div>
     </section>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 
-import { Reveal } from "@/components/motion/reveal";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { faqItems, faqSectionCopy } from "@/lib/data/faq";
 import { cn } from "@/lib/utils";
 
@@ -27,13 +27,19 @@ export function FaqSection({ className }: FaqSectionProps) {
       className={cn(styles.section, className)}
     >
       <div className={styles.grid}>
-        <Reveal variant="fadeUp" className={styles.aside}>
-          <p className={styles.eyebrow}>{faqSectionCopy.eyebrow}</p>
+        <div data-animate="fade-up" className={styles.aside}>
+          <SectionEyebrow className={styles.eyebrow}>
+            {faqSectionCopy.eyebrow}
+          </SectionEyebrow>
           <h2 className={styles.title}>{faqSectionCopy.title}</h2>
           <p className={styles.body}>{faqSectionCopy.body}</p>
-        </Reveal>
+        </div>
 
-        <Reveal variant="fadeUp" delay={0.08} className={styles.panel}>
+        <div
+          data-animate="fade-up"
+          data-animate-delay="0.08"
+          className={styles.panel}
+        >
           <Accordion type="single" collapsible className={styles.accordion}>
             {faqItems.map((item) => (
               <AccordionItem
@@ -50,7 +56,7 @@ export function FaqSection({ className }: FaqSectionProps) {
               </AccordionItem>
             ))}
           </Accordion>
-        </Reveal>
+        </div>
       </div>
     </section>
   );

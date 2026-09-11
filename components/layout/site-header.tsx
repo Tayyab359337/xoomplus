@@ -4,19 +4,12 @@ import Link from "next/link";
 
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { DesktopNavItems } from "@/components/layout/desktop-nav-items";
 import {
   NavBody,
   Navbar,
   NavbarButton,
-  NavItems,
 } from "@/components/ui/resizable-navbar";
-
-const NAV_ITEMS = [
-  { name: "Work", link: "#work" },
-  { name: "Approach", link: "#approach" },
-  { name: "Studio", link: "#studio" },
-  { name: "Contact", link: "#contact" },
-];
 
 function BrandMark() {
   return (
@@ -37,10 +30,10 @@ function BrandMark() {
 export function SiteHeader() {
   return (
     <>
-      <Navbar className="hidden lg:block">
+      <Navbar className="hidden lg:block" data-nav-entrance>
         <NavBody>
           <BrandMark />
-          <NavItems items={NAV_ITEMS} />
+          <DesktopNavItems />
           <div className="relative z-20 flex items-center gap-2">
             <ThemeToggle />
             <NavbarButton href="#contact" variant="primary">
@@ -50,7 +43,9 @@ export function SiteHeader() {
         </NavBody>
       </Navbar>
 
-      <MobileNav />
+      <div data-nav-entrance>
+        <MobileNav />
+      </div>
     </>
   );
 }

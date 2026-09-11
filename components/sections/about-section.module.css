@@ -6,47 +6,24 @@
   padding: var(--section-y) 0;
 }
 
-.orb {
-  display: none;
-  pointer-events: none;
-  position: absolute;
-  left: -6rem;
-  top: 33%;
-  width: 16rem;
-  height: 16rem;
-  border-radius: 9999px;
-  border: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
-}
-
-.accentLine {
-  display: none;
-  pointer-events: none;
-  position: absolute;
-  bottom: 4rem;
-  right: 8%;
-  width: 1px;
-  height: 5rem;
-  background: color-mix(in oklch, var(--accent) 70%, transparent);
-}
-
 .grid {
   position: relative;
   width: min(100% - 2rem, var(--layout-max));
   margin-inline: auto;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem;
+  gap: 2.5rem;
 }
 
-.aside {
-  min-width: 0;
-}
-
+.aside,
 .main {
   min-width: 0;
 }
 
 .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
   font-family: var(--font-sans);
   font-size: var(--text-meta);
   line-height: var(--text-meta--line-height);
@@ -57,50 +34,84 @@
   margin: 0;
 }
 
-.asideCopy {
+.index {
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--accent) 85%, var(--foreground));
+}
+
+.eyebrowRule {
+  display: inline-block;
+  width: 1.35rem;
+  height: 1px;
+  background: color-mix(in oklch, var(--accent) 70%, transparent);
+}
+
+.intro {
   font-family: var(--font-sans);
   font-size: var(--text-body);
   line-height: var(--text-body--line-height);
   letter-spacing: var(--text-body--letter-spacing);
   color: var(--muted-foreground);
   margin: 1.5rem 0 0;
-  max-width: 18ch;
+  max-width: 32ch;
 }
 
-.statement {
-  font-family: var(--font-display);
-  font-size: var(--text-h1);
-  line-height: var(--text-h1--line-height);
-  letter-spacing: var(--text-h1--letter-spacing);
-  font-weight: var(--text-h1--font-weight);
-  color: var(--foreground);
-  margin: 0;
-  max-width: 14ch;
+.ctaReveal {
+  margin-top: 1.5rem;
 }
 
-.body {
+.cta {
   font-family: var(--font-sans);
-  font-size: var(--text-body);
-  line-height: var(--text-body--line-height);
-  letter-spacing: var(--text-body--letter-spacing);
-  color: var(--muted-foreground);
-  margin: 2.5rem 0 0;
-  max-width: 36rem;
+  font-size: var(--text-nav);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-weight: 550;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--foreground);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 28%, transparent);
+  padding-bottom: 0.2rem;
+  transition:
+    color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease);
+}
+
+.cta:hover {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.cta:hover .ctaArrow {
+  transform: translateX(0.28rem);
+}
+
+.cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 40%, transparent);
+  border-radius: 2px;
+}
+
+.ctaArrow {
+  display: inline-block;
+  transition: transform var(--motion-fast) var(--motion-ease);
+  translate: 0 0.5px;
 }
 
 .metaRow {
-  margin-top: 3.5rem;
-  padding-top: 2.5rem;
+  margin-top: 2.25rem;
+  padding-top: 1.5rem;
   border-top: 1px solid var(--border);
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.25rem 1.5rem;
 }
 
 .metaItem {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   min-width: 0;
 }
 
@@ -116,11 +127,103 @@
 
 .metaValue {
   font-family: var(--font-display);
-  font-size: var(--text-h3);
-  line-height: var(--text-h3--line-height);
-  letter-spacing: var(--text-h3--letter-spacing);
-  font-weight: var(--text-h3--font-weight);
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 560;
   color: var(--foreground);
+}
+
+.statement {
+  font-family: var(--font-display);
+  font-size: clamp(2.35rem, 7.2vw, 4.85rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+  font-weight: var(--text-h1--font-weight);
+  color: var(--foreground);
+  margin: 0;
+  max-width: 12ch;
+  display: flex;
+  flex-direction: column;
+}
+
+.statementLine {
+  display: block;
+}
+
+.statementBreak {
+  display: block;
+  height: 0.55em;
+}
+
+.body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  letter-spacing: var(--text-body--letter-spacing);
+  color: var(--muted-foreground);
+  margin: 1.75rem 0 0;
+  max-width: 38rem;
+}
+
+.mediaReveal {
+  margin-top: 2.25rem;
+}
+
+.mediaScroll {
+  width: 100%;
+}
+
+.mediaFrame {
+  position: relative;
+  width: 100%;
+  max-width: 40rem;
+  aspect-ratio: 5 / 3.45;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--border) 90%, var(--accent) 10%);
+  background: color-mix(in oklch, var(--foreground) 4%, var(--background));
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.45s var(--motion-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.mediaImage {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  filter: saturate(0.88) contrast(1.04);
+}
+
+.mediaCaption {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, white 78%, transparent);
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+/* Decorative rail sits inside the aside padding gutter — never over text */
+.accentRail {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklch, var(--accent) 55%, transparent) 18%,
+    color-mix(in oklch, var(--border) 80%, transparent) 72%,
+    transparent
+  );
+  opacity: 0.7;
 }
 
 @media (min-width: 640px) {
@@ -134,28 +237,41 @@
     padding: var(--section-y-md) 0;
   }
 
-  .orb,
-  .accentLine {
-    display: block;
-  }
-
   .grid {
     width: min(100% - 4rem, var(--layout-max));
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 2.5rem;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
+    column-gap: 3rem;
+    row-gap: 0;
     align-items: start;
   }
 
   .aside {
-    grid-column: 1 / span 4;
+    position: relative;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .accentRail {
+    display: block;
   }
 
   .main {
-    grid-column: 5 / span 8;
+    display: flex;
+    flex-direction: column;
   }
 
-  .body {
-    margin-left: 12%;
+  .ctaReveal {
+    margin-top: 1.75rem;
+  }
+
+  .metaRow {
+    margin-top: 2.5rem;
+  }
+
+  .mediaReveal {
+    margin-top: 2.5rem;
   }
 }
 
@@ -166,13 +282,38 @@
 
   .grid {
     width: min(100% - 6rem, var(--layout-max));
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.75fr);
+    column-gap: 4rem;
   }
 
   .aside {
-    grid-column: 1 / span 3;
+    padding-left: 1.5rem;
   }
 
-  .main {
-    grid-column: 5 / span 8;
+  .intro {
+    max-width: 28ch;
+  }
+
+  .mediaFrame {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .mediaFrame {
+    will-change: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctaArrow,
+  .cta,
+  .mediaFrame {
+    transition: none;
+  }
+
+  .mediaFrame {
+    transform: none !important;
+    will-change: auto;
   }
 }

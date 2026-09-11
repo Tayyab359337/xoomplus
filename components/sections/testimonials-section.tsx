@@ -1,7 +1,7 @@
 "use client";
 
-import { Reveal } from "@/components/motion/reveal";
 import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import {
   testimonials,
   testimonialsSectionCopy,
@@ -26,32 +26,46 @@ export function TestimonialsSection({ className }: TestimonialsSectionProps) {
       className={cn(styles.section, className)}
     >
       <div className={styles.header}>
-        <Reveal variant="fadeUp">
-          <p className={styles.eyebrow}>{testimonialsSectionCopy.eyebrow}</p>
+        <div data-animate="fade-up">
+          <SectionEyebrow className={styles.eyebrow}>
+            {testimonialsSectionCopy.eyebrow}
+          </SectionEyebrow>
           <h2 className={styles.title}>{testimonialsSectionCopy.title}</h2>
-        </Reveal>
-        <Reveal variant="fadeUp" delay={0.06}>
-          <p className={styles.body}>{testimonialsSectionCopy.body}</p>
-        </Reveal>
+        </div>
+        <p
+          data-animate="fade-up"
+          data-animate-delay="0.06"
+          className={styles.body}
+        >
+          {testimonialsSectionCopy.body}
+        </p>
       </div>
 
       <div className={styles.rows}>
-        <Reveal variant="fadeUp" delay={0.08} className={styles.row}>
+        <div
+          data-animate="fade-up"
+          data-animate-delay="0.08"
+          className={styles.row}
+        >
           <InfiniteMovingCards
             items={testimonials}
             direction="left"
             speed="slow"
             pauseOnHover
           />
-        </Reveal>
-        <Reveal variant="fadeUp" delay={0.12} className={styles.row}>
+        </div>
+        <div
+          data-animate="fade-up"
+          data-animate-delay="0.12"
+          className={styles.row}
+        >
           <InfiniteMovingCards
             items={[...testimonials].reverse()}
             direction="right"
             speed="slow"
             pauseOnHover
           />
-        </Reveal>
+        </div>
       </div>
     </section>
   );

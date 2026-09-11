@@ -57,8 +57,9 @@
   --sidebar-border: color-mix(in srgb, #1a2e33 14%, transparent);
   --sidebar-ring: #478997;
 
-  /* Sharp editorial corners — not pill SaaS */
+  /* Sharp editorial corners for surfaces; buttons use a softer pill */
   --radius: 0.25rem;
+  --btn-radius: 9999px;
 
   /* Layout rhythm — one container, two vertical bands */
   --layout-max: 1400px;
@@ -172,6 +173,8 @@
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --animate-shiny-text: shiny-text 8s infinite;
 
   /* Typography — oversized, tight, editorial */
   --text-display: clamp(2.65rem, 7vw, 5.25rem);
@@ -337,8 +340,10 @@
     }
   }
 
-  /* Primary CTA — accent fill, sharp radius, quiet lift */
+  /* Primary CTA — accent fill + brand glow (eye-catching, not neon) */
   .btn-primary {
+    --btn-glow: color-mix(in srgb, var(--accent) 55%, transparent);
+    --btn-glow-soft: color-mix(in srgb, var(--accent) 28%, transparent);
     font-family: var(--font-sans);
     font-size: var(--text-nav);
     line-height: 1;
@@ -347,28 +352,57 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.4rem;
     padding: var(--btn-pad-y) var(--btn-pad-x);
-    border: 1px solid transparent;
-    border-radius: var(--radius);
-    background: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 75%, white 18%);
+    border-radius: var(--btn-radius);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 92%, white 8%) 0%,
+      var(--accent) 100%
+    );
     color: var(--accent-foreground);
     text-decoration: none;
     cursor: pointer;
+    position: relative;
+    isolation: isolate;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent),
+      0 0 18px var(--btn-glow-soft),
+      0 0 36px color-mix(in srgb, var(--accent) 18%, transparent),
+      inset 0 1px 0 color-mix(in srgb, white 28%, transparent);
     transition:
       background-color var(--motion-fast) var(--motion-ease),
       filter var(--motion-fast) var(--motion-ease),
       transform var(--motion-fast) var(--motion-ease),
-      border-color var(--motion-fast) var(--motion-ease);
+      border-color var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-base) var(--motion-ease);
+    animation: btn-glow-pulse 2.8s var(--motion-ease) infinite;
   }
 
   .btn-primary:hover {
-    filter: brightness(1.08);
-    transform: translateY(-1px);
+    filter: brightness(1.12);
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent),
+      0 0 28px var(--btn-glow),
+      0 0 56px color-mix(in srgb, var(--accent) 32%, transparent),
+      0 8px 24px color-mix(in srgb, var(--accent) 22%, transparent),
+      inset 0 1px 0 color-mix(in srgb, white 35%, transparent);
+    animation: none;
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+    filter: brightness(1.05);
   }
 
   .btn-primary:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 35%, transparent);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--ring) 40%, transparent),
+      0 0 28px var(--btn-glow),
+      0 0 48px color-mix(in srgb, var(--accent) 28%, transparent);
   }
 
   .btn-ghost {
@@ -380,22 +414,40 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.4rem;
     padding: var(--btn-pad-y) var(--btn-pad-x);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: color-mix(in srgb, var(--background) 30%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+    border-radius: var(--btn-radius);
+    background: color-mix(in srgb, var(--background) 35%, transparent);
     color: var(--foreground);
     text-decoration: none;
     cursor: pointer;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent),
+      0 0 16px color-mix(in srgb, var(--accent) 10%, transparent);
     transition:
       background-color var(--motion-fast) var(--motion-ease),
       color var(--motion-fast) var(--motion-ease),
-      border-color var(--motion-fast) var(--motion-ease);
+      border-color var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-base) var(--motion-ease),
+      transform var(--motion-fast) var(--motion-ease);
   }
 
   .btn-ghost:hover {
-    background: var(--hover);
+    background: color-mix(in srgb, var(--accent) 14%, var(--hover));
     color: var(--hover-foreground);
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    transform: translateY(-1px);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent),
+      0 0 24px color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+
+  .btn-ghost:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--ring) 35%, transparent),
+      0 0 18px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 
   .btn-link {
@@ -422,10 +474,32 @@
   }
 }
 
+@keyframes btn-glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent),
+      0 0 16px color-mix(in srgb, var(--accent) 22%, transparent),
+      0 0 32px color-mix(in srgb, var(--accent) 14%, transparent),
+      inset 0 1px 0 color-mix(in srgb, white 28%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent),
+      0 0 28px color-mix(in srgb, var(--accent) 42%, transparent),
+      0 0 52px color-mix(in srgb, var(--accent) 26%, transparent),
+      inset 0 1px 0 color-mix(in srgb, white 32%, transparent);
+  }
+}
+
 /* Accessibility — kill non-essential motion */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .btn-primary {
+    animation: none;
   }
 
   *,
@@ -435,6 +509,67 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* GSAP scroll system — keep content visible without motion */
+  [data-animate],
+  [data-parallax],
+  [data-hero-eyebrow],
+  [data-hero-body],
+  [data-hero-actions],
+  [data-hero-visual],
+  [data-nav-entrance] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Image reveal containers — clip without affecting layout size */
+[data-animate="image-reveal"],
+[data-motion="image-reveal"] {
+  overflow: hidden;
+}
+
+/* Magic UI AnimatedShinyText keyframes */
+@keyframes shiny-text {
+  0%,
+  90%,
+  100% {
+    background-position: calc(-100% - var(--shiny-width)) 0;
+  }
+  30%,
+  60% {
+    background-position: calc(100% + var(--shiny-width)) 0;
+  }
+}
+
+/* Shared portfolio cursor preview — one element, pointer-events none */
+.xp-cursor-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  width: min(220px, 28vw);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
+  box-shadow: 0 18px 48px color-mix(in srgb, black 35%, transparent);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.xp-cursor-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 1023px), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .xp-cursor-preview {
+    display: none !important;
   }
 }
 

@@ -7,6 +7,7 @@ import {
   useScroll,
   useMotionValueEvent,
 } from "motion/react";
+import Link from "next/link";
 
 import React, { useRef, useState } from "react";
 
@@ -14,6 +15,8 @@ import React, { useRef, useState } from "react";
 interface NavbarProps {
   children: React.ReactNode;
   className?: string;
+  /** Optional entrance hook for GSAP Hero polish */
+  "data-nav-entrance"?: boolean | string;
 }
 
 interface NavBodyProps {
@@ -49,7 +52,11 @@ interface MobileNavMenuProps {
   onClose: () => void;
 }
 
-export const Navbar = ({ children, className }: NavbarProps) => {
+export const Navbar = ({
+  children,
+  className,
+  "data-nav-entrance": dataNavEntrance,
+}: NavbarProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll({
     target: ref,
@@ -68,6 +75,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   return (
     <motion.div
       ref={ref}
+      data-nav-entrance={dataNavEntrance === undefined ? undefined : ""}
       className={cn("fixed inset-x-0 top-0 z-50 w-full", className)}
     >
       {React.Children.map(children, (child) =>
@@ -135,7 +143,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-md bg-hover/80"
+              className="absolute inset-0 h-full w-full rounded-full bg-hover/80"
             />
           )}
           <span className="relative z-20">{item.name}</span>
@@ -246,13 +254,13 @@ export const MobileNavToggle = ({
 
 export const NavbarLogo = () => {
   return (
-    <a
+    <Link
       href="/"
       className="relative z-20 mr-4 flex items-baseline px-2 py-1 font-display text-xl tracking-tight text-foreground"
     >
       Xoom
       <span className="text-accent">plus</span>
-    </a>
+    </Link>
   );
 };
 
@@ -274,16 +282,13 @@ export const NavbarButton = ({
   | React.ComponentPropsWithoutRef<"button">
 )) => {
   const baseStyles =
-    "type-button px-[var(--btn-pad-x)] py-[var(--btn-pad-y)] rounded-[var(--radius)] relative cursor-pointer hover:-translate-y-px transition duration-200 inline-flex items-center justify-center text-center";
+    "type-button relative inline-flex cursor-pointer items-center justify-center text-center";
 
   const variantStyles = {
-    primary:
-      "bg-accent text-accent-foreground border border-transparent hover:brightness-110",
-    secondary:
-      "bg-transparent shadow-none text-foreground border border-border hover:bg-hover hover:text-hover-foreground",
-    dark: "bg-foreground text-background border border-transparent",
-    gradient:
-      "bg-accent text-accent-foreground border border-transparent hover:brightness-110",
+    primary: "btn-primary",
+    secondary: "btn-ghost",
+    dark: "bg-foreground text-background border border-transparent rounded-[var(--btn-radius)] px-[var(--btn-pad-x)] py-[var(--btn-pad-y)]",
+    gradient: "btn-primary",
   };
 
   return (
