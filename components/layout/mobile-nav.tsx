@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import {
   AnimatePresence,
   motion,
@@ -13,6 +13,7 @@ import { createPortal } from "react-dom";
 
 import { BrandMark } from "@/components/layout/brand-mark";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { LocationMegaMenu } from "@/components/locations/location-mega-menu";
 import Magnet from "@/components/ui/magnet";
 import { useIsClient } from "@/hooks/use-is-client";
 import {
@@ -61,9 +62,11 @@ export function MobileNav() {
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [portfoliosOpen, setPortfoliosOpen] = useState(false);
+  const [locationsOpen, setLocationsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState(0);
   const servicesRef = useRef<HTMLLIElement>(null);
   const portfoliosRef = useRef<HTMLLIElement>(null);
+  const locationsRef = useRef<HTMLLIElement>(null);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 100);
@@ -74,6 +77,7 @@ export function MobileNav() {
     if (!open) {
       setServicesOpen(false);
       setPortfoliosOpen(false);
+      setLocationsOpen(false);
       setActiveCategory(0);
       return;
     }
@@ -115,6 +119,17 @@ export function MobileNav() {
     }, 300);
     return () => window.clearTimeout(id);
   }, [portfoliosOpen]);
+
+  useEffect(() => {
+    if (!locationsOpen) return;
+    const id = window.setTimeout(() => {
+      locationsRef.current?.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }, 300);
+    return () => window.clearTimeout(id);
+  }, [locationsOpen]);
 
   const close = () => setOpen(false);
   const compact = scrolled || open;
@@ -223,9 +238,19 @@ export function MobileNav() {
                     onClick={() => {
                       setServicesOpen((v) => !v);
                       setPortfoliosOpen(false);
+                      setLocationsOpen(false);
                     }}
                   >
-                    <span className={styles.linkLabel}>Services</span>
+                    <span className={styles.linkLabel}>
+                      Services
+                      <ChevronDown
+                        aria-hidden
+                        className={cn(
+                          "ml-2 inline size-4 shrink-0 opacity-70 transition-transform duration-200 ease-out",
+                          servicesOpen && "rotate-180",
+                        )}
+                      />
+                    </span>
                     <span className={styles.linkIndex}>
                       {servicesOpen ? "−" : "03"}
                     </span>
@@ -345,9 +370,19 @@ export function MobileNav() {
                     onClick={() => {
                       setPortfoliosOpen((v) => !v);
                       setServicesOpen(false);
+                      setLocationsOpen(false);
                     }}
                   >
-                    <span className={styles.linkLabel}>Portfolios</span>
+                    <span className={styles.linkLabel}>
+                      Portfolios
+                      <ChevronDown
+                        aria-hidden
+                        className={cn(
+                          "ml-2 inline size-4 shrink-0 opacity-70 transition-transform duration-200 ease-out",
+                          portfoliosOpen && "rotate-180",
+                        )}
+                      />
+                    </span>
                     <span className={styles.linkIndex}>
                       {portfoliosOpen ? "−" : "04"}
                     </span>
@@ -405,6 +440,64 @@ export function MobileNav() {
                   </AnimatePresence>
                 </motion.li>
 
+                {/* Locations accordion */}
+                <motion.li
+                  ref={locationsRef}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.35,
+                    delay: nextDelay(),
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className={styles.servicesBlock}
+                >
+                  <button
+                    type="button"
+                    className={styles.link}
+                    aria-expanded={locationsOpen}
+                    onClick={() => {
+                      setLocationsOpen((v) => !v);
+                      setServicesOpen(false);
+                      setPortfoliosOpen(false);
+                    }}
+                  >
+                    <span className={styles.linkLabel}>
+                      Locations
+                      <ChevronDown
+                        aria-hidden
+                        className={cn(
+                          "ml-2 inline size-4 shrink-0 opacity-70 transition-transform duration-200 ease-out",
+                          locationsOpen && "rotate-180",
+                        )}
+                      />
+                    </span>
+                    <span className={styles.linkIndex}>
+                      {locationsOpen ? "−" : "05"}
+                    </span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {locationsOpen ? (
+                      <motion.div
+                        key="locations-mega"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                        className={styles.servicesPanel}
+                      >
+                        <div className={styles.megaInner}>
+                          <LocationMegaMenu
+                            className="p-0 sm:p-0 gap-3"
+                            onNavigate={close}
+                          />
+                        </div>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </motion.li>
+
                 {BOTTOM_LINKS.map((item, index) => (
                   <motion.li
                     key={item.link}
@@ -419,7 +512,7 @@ export function MobileNav() {
                     <a href={item.link} className={styles.link} onClick={close}>
                       <span className={styles.linkLabel}>{item.name}</span>
                       <span className={styles.linkIndex}>
-                        {linkIndex(index + 5)}
+                        {linkIndex(index + 6)}
                       </span>
                     </a>
                   </motion.li>

@@ -3,7 +3,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
   playPageEnter,
@@ -15,21 +14,24 @@ import {
 import "./page-transition.css";
 
 /**
- * Intercepts same-origin internal navigations for a GSAP fade veil.
- * Does not block anchors, mailto, tel, external, or download links.
+ * Soft content crossfade between App Router navigations.
+ * Outgoing page dissolves while the destination begins settling — no black screen.
  */
 export function PageTransition() {
   const router = useRouter();
   const pathname = usePathname();
   const reduceMotion = usePrefersReducedMotion();
-  const { scrollTo } = useSmoothScroll();
   const transitioning = useRef(false);
   const lastPath = useRef(pathname);
+  const programmedLeave = useRef(false);
 
-  // Enter animation when pathname changes after a programmed leave
+  // Enter / crossfade when the route changes
   useEffect(() => {
     if (lastPath.current === pathname) return;
     lastPath.current = pathname;
+
+    const fromProgrammedLeave = programmedLeave.current;
+    programmedLeave.current = false;
 
     if (reduceMotion) {
       transitioning.current = false;
@@ -39,8 +41,17 @@ export function PageTransition() {
     let cancelled = false;
 
     const run = async () => {
-      scrollTo(0, { immediate: true });
-      await playPageEnter();
+      // Fresh navigations land at top; history traversal keeps browser restoration
+      if (fromProgrammedLeave) {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      }
+
+      try {
+        await playPageEnter();
+      } catch {
+        /* never block on animation failure */
+      }
+
       if (!cancelled) {
         refreshScrollTrigger();
         transitioning.current = false;
@@ -51,11 +62,9 @@ export function PageTransition() {
     return () => {
       cancelled = true;
     };
-  }, [pathname, reduceMotion, scrollTo]);
+  }, [pathname, reduceMotion]);
 
   useEffect(() => {
-    if (reduceMotion) return;
-
     const onClick = (event: MouseEvent) => {
       if (
         event.defaultPrevented ||
@@ -72,6 +81,7 @@ export function PageTransition() {
       const anchor = target?.closest?.("a");
       if (!anchor || !(anchor instanceof HTMLAnchorElement)) return;
       if (!shouldTransitionLink(anchor)) return;
+
       if (transitioning.current) {
         event.preventDefault();
         return;
@@ -80,16 +90,47 @@ export function PageTransition() {
       const url = new URL(anchor.href, window.location.href);
       event.preventDefault();
       transitioning.current = true;
+      programmedLeave.current = true;
 
       void (async () => {
-        await playPageLeave();
-        router.push(`${url.pathname}${url.search}${url.hash}`);
+        try {
+          if (!reduceMotion) {
+            await playPageLeave();
+          }
+        } catch {
+          /* navigate anyway */
+        }
+
+        try {
+          router.push(`${url.pathname}${url.search}${url.hash}`);
+        } catch {
+          transitioning.current = false;
+          programmedLeave.current = false;
+          window.location.assign(url.href);
+        }
       })();
     };
 
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
   }, [reduceMotion, router]);
+
+  // Safety: never leave the UI locked if a route update is aborted
+  useEffect(() => {
+    const unlock = () => {
+      if (transitioning.current) {
+        // Allow retry after a short grace if navigation stalled
+        window.setTimeout(() => {
+          if (lastPath.current === pathname) {
+            transitioning.current = false;
+            programmedLeave.current = false;
+          }
+        }, 1200);
+      }
+    };
+    window.addEventListener("pageshow", unlock);
+    return () => window.removeEventListener("pageshow", unlock);
+  }, [pathname]);
 
   return null;
 }

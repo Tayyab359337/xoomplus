@@ -48,9 +48,9 @@ export function BlogsSection({ className, posts, copy }: BlogsSectionProps) {
             {sectionCopy.eyebrow}
           </SectionEyebrow>
           <h2 className={styles.title}>{sectionCopy.title}</h2>
+          <p className={styles.body}>{sectionCopy.body}</p>
         </div>
         <div data-reveal className={styles.headerAside}>
-          <p className={styles.body}>{sectionCopy.body}</p>
           <HoverLift y={-2} scale={1.01} className="inline-flex">
             <Link href={sectionCopy.viewAll.href} className={styles.viewAll}>
               {sectionCopy.viewAll.label}

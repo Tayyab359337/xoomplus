@@ -1,10 +1,9 @@
 "use client";
 
 import { useGSAP } from "@gsap/react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 import { useAnimation } from "@/components/animations/AnimationProvider";
-import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
   createPreloaderController,
@@ -17,39 +16,29 @@ import styles from "./preloader.module.css";
 /**
  * Premium first-load preloader — zoom-through reveal on exit.
  * Visual transition only — does not gate HTML parsing or LCP.
- * Locks body/Lenis scroll while active; unmounts on exit complete.
+ * Locks body scroll while active; unmounts on exit complete.
  */
 export function Preloader() {
   const reduceMotion = usePrefersReducedMotion();
   const { preloaderDone, setPreloaderDone } = useAnimation();
-  const { stop, start } = useSmoothScroll();
   const rootRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLParagraphElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
-  const stopRef = useRef(stop);
-  const startRef = useRef(start);
   const prevHtmlOverflow = useRef("");
   const prevBodyOverflow = useRef("");
-
-  useEffect(() => {
-    stopRef.current = stop;
-    startRef.current = start;
-  }, [stop, start]);
 
   const lockScroll = () => {
     prevHtmlOverflow.current = document.documentElement.style.overflow;
     prevBodyOverflow.current = document.body.style.overflow;
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
-    stopRef.current();
   };
 
   const unlockScroll = () => {
     document.documentElement.style.overflow = prevHtmlOverflow.current;
     document.body.style.overflow = prevBodyOverflow.current;
-    startRef.current();
   };
 
   useGSAP(
@@ -147,7 +136,6 @@ export function Preloader() {
         unlockScroll();
       };
     },
-    // stop/start held in refs so Strict Mode / Lenis remounts don't re-kill the run
     { dependencies: [reduceMotion, preloaderDone, setPreloaderDone] },
   );
 

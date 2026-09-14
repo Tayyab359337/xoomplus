@@ -9,33 +9,23 @@
   width: min(100% - 2rem, var(--layout-max));
   margin: 0 auto 2.25rem;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
 }
 
-.meta {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  line-height: var(--text-meta--line-height);
-  letter-spacing: var(--text-meta--letter-spacing);
-  font-weight: var(--text-meta--font-weight);
-  text-transform: uppercase;
-  color: var(--accent);
+.eyebrow {
   margin: 0;
 }
 
-.metaMuted {
+.body {
+  margin: 0;
+  max-width: none;
+  width: 100%;
   font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  line-height: var(--text-meta--line-height);
-  letter-spacing: var(--text-meta--letter-spacing);
-  font-weight: var(--text-meta--font-weight);
-  text-transform: uppercase;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
   color: var(--muted-foreground);
-  margin: 0;
-  opacity: 0.65;
-  display: none;
 }
 
 .loopWrap {
@@ -72,12 +62,6 @@
   color: color-mix(in srgb, var(--foreground) 48%, transparent);
   transition: color var(--motion-base) var(--motion-ease);
   white-space: nowrap;
-}
-
-@media (min-width: 640px) {
-  .metaMuted {
-    display: block;
-  }
 }
 
 @media (min-width: 768px) {

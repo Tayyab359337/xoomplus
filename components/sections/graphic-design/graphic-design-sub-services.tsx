@@ -28,6 +28,7 @@ import {
   graphicDesignSubServicesCopy,
   type GraphicDesignSubService,
 } from "@/lib/data/graphic-design-sub-services";
+import type { GraphicDesignServicesIntro } from "@/lib/wordpress";
 import { cn } from "@/lib/utils";
 
 import { GraphicDesignSubServicesCarousel } from "./graphic-design-sub-services-carousel";
@@ -36,7 +37,7 @@ import styles from "./graphic-design-sub-services.module.css";
 type GraphicDesignSubServicesProps = {
   className?: string;
   services?: GraphicDesignSubService[];
-  copy?: typeof graphicDesignSubServicesCopy;
+  copy?: GraphicDesignServicesIntro;
 };
 
 const FINE_HOVER_MQ = "(hover: hover) and (pointer: fine)";

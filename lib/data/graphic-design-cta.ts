@@ -1,15 +1,15 @@
 import type { HomepageCta } from "@/lib/wordpress/types";
 
 /**
- * Graphic Design Solutions CTA — passed into ProfessionalCtaSection.
- * Links target homepage contact + this page’s approach section.
+ * Graphic Design Solutions CTA — hardcoded from WordPress page 2417.
+ * WP has one button; secondary still targets this page's approach section so the existing two-action layout stays intact.
  */
 export const graphicDesignCtaCopy: HomepageCta = {
-  eyebrow: "Start here",
-  title: "Bring the brief you're nervous to send.",
-  body: "The half-finished identity. The campaign that looks expensive but feels average. Tell us what’s unresolved — we’ll tell you how we’d begin.",
+  eyebrow: "Contact US",
+  title: "Ready to Transform Your Brand? Book Your Graphic Design Consultation",
+  body: "XoomPlus delivers expert graphic design services that make your brand unforgettable.",
   primaryCta: {
-    label: "Start a conversation",
+    label: "Talk to a Specialist",
     href: "/#contact",
   },
   secondaryCta: {

@@ -12,13 +12,11 @@ import {
   type ReactNode,
 } from "react";
 
-import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
   initScrollAnimations,
   refreshScrollTrigger,
   registerGsapPlugins,
-  syncScrollTriggerWithLenis,
 } from "@/lib/animations";
 
 type AnimationContextValue = {
@@ -45,12 +43,11 @@ type AnimationProviderProps = {
 };
 
 /**
- * Registers GSAP, bridges Lenis ↔ ScrollTrigger, and owns scroll-animation lifecycle.
+ * Registers GSAP and owns scroll-animation lifecycle on native window scroll.
  * Preloader is retired — animations start immediately.
  */
 export function AnimationProvider({ children }: AnimationProviderProps) {
   const reduceMotion = usePrefersReducedMotion();
-  const { ready: scrollReady, getInstance } = useSmoothScroll();
   const pathname = usePathname();
   const preloaderDone = true;
   const ctxRef = useRef<ReturnType<typeof initScrollAnimations>>(null);
@@ -58,17 +55,6 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
   useEffect(() => {
     registerGsapPlugins();
   }, []);
-
-  // Bridge Locomotive/Lenis → ScrollTrigger
-  useEffect(() => {
-    if (!scrollReady) {
-      syncScrollTriggerWithLenis(null);
-      return;
-    }
-    const lenis = getInstance()?.lenisInstance ?? null;
-    syncScrollTriggerWithLenis(lenis);
-    refreshScrollTrigger();
-  }, [scrollReady, getInstance]);
 
   const setPreloaderDone = useCallback((_done: boolean) => {
     // no-op — preloader removed

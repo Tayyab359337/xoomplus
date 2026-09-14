@@ -19,49 +19,6 @@ import {
 export const ANIMATE_SELECTOR = "[data-animate], [data-motion]";
 export const PARALLAX_SELECTOR = "[data-parallax], [data-motion='parallax']";
 
-type LenisLike = {
-  on?: (
-    event: "scroll",
-    cb: () => void,
-  ) => (() => void) | void;
-  off?: (event: "scroll", cb: () => void) => void;
-};
-
-let lenisUnsub: (() => void) | null = null;
-
-/**
- * Sync ScrollTrigger with Locomotive (Lenis) smooth scroll.
- */
-export function syncScrollTriggerWithLenis(lenis: LenisLike | null | undefined) {
-  registerGsapPlugins();
-
-  if (lenisUnsub) {
-    lenisUnsub();
-    lenisUnsub = null;
-  }
-
-  if (!lenis || prefersReducedMotion()) {
-    gsap.ticker.lagSmoothing(500, 33);
-    return;
-  }
-
-  const onScroll = () => {
-    ScrollTrigger.update();
-  };
-
-  if (typeof lenis.on === "function") {
-    const unsub = lenis.on("scroll", onScroll);
-    lenisUnsub =
-      typeof unsub === "function"
-        ? unsub
-        : () => {
-            lenis.off?.("scroll", onScroll);
-          };
-  }
-
-  gsap.ticker.lagSmoothing(0);
-}
-
 export function refreshScrollTrigger() {
   registerGsapPlugins();
   ScrollTrigger.refresh();

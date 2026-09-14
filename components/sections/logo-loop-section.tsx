@@ -3,6 +3,7 @@
 import { useRef } from "react";
 
 import LogoLoop from "@/components/LogoLoop";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
 import { partnerLogos, type PartnerLogo } from "@/lib/data/homepage";
 import { cn } from "@/lib/utils";
@@ -21,7 +22,7 @@ function toLogoItems(logos: PartnerLogo[]) {
           alt: partner.name,
           title: partner.name,
           href: partner.href,
-          height: 28,
+          height: 40,
         }
       : {
           node: <BrandMark name={partner.name} />,
@@ -50,7 +51,9 @@ export function LogoLoopSection({
 }: LogoLoopSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
-  const items = toLogoItems(logos ?? partnerLogos);
+  const items = toLogoItems(
+    logos && logos.length > 0 ? logos : partnerLogos,
+  );
 
   return (
     <section
@@ -60,22 +63,23 @@ export function LogoLoopSection({
       className={cn(styles.section, className)}
     >
       <div data-reveal className={styles.header}>
-        <p className={styles.meta}>
+        <SectionEyebrow className={styles.eyebrow}>
           {copy?.eyebrow || "Brands That Believe in Us"}
-        </p>
+        </SectionEyebrow>
         {copy?.body ? (
-          <p className={styles.metaMuted}>{copy.body}</p>
+          <p className={styles.body}>{copy.body}</p>
         ) : (
-          <p className={styles.metaMuted}>Partners · platforms · tools</p>
+          <p className={styles.body}>Partners · platforms · tools</p>
         )}
       </div>
 
-      <div data-reveal className={styles.loopWrap}>
+      {/* Keep logos visible even if scroll-reveal fails — critical content */}
+      <div className={styles.loopWrap}>
         <LogoLoop
           logos={items}
-          speed={70}
+          speed={55}
           direction="left"
-          logoHeight={28}
+          logoHeight={40}
           gap={64}
           pauseOnHover
           scaleOnHover

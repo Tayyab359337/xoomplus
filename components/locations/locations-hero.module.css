@@ -1,0 +1,74 @@
+.section {
+  position: relative;
+  overflow-x: clip;
+  overflow-y: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+  padding: 7.25rem 0 3.5rem;
+}
+
+.shell {
+  width: min(100% - 2rem, var(--layout-max));
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.copy {
+  max-width: none;
+  width: 100%;
+}
+
+.eyebrow {
+  margin: 0;
+}
+
+.title {
+  margin: 1.1rem 0 0;
+  max-width: none;
+  font-family: var(--font-display);
+  font-size: var(--text-h1);
+  line-height: var(--text-h1--line-height);
+  letter-spacing: var(--text-h1--letter-spacing);
+  font-weight: var(--text-h1--font-weight);
+  color: var(--foreground);
+  text-wrap: wrap;
+}
+
+.body {
+  margin: 0.9rem 0 0;
+  max-width: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--muted-foreground);
+}
+
+.mapWrap {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 8.5rem 0 4.25rem;
+  }
+
+  .shell {
+    width: min(100% - 4rem, var(--layout-max));
+    gap: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: 9.25rem 0 5rem;
+  }
+
+  .shell {
+    width: min(100% - 6rem, var(--layout-max));
+    gap: 3rem;
+  }
+}

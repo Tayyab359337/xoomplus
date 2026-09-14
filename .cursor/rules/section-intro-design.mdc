@@ -1,0 +1,32 @@
+---
+description: Section intro pattern — eyebrow, heading, full-width body
+globs: components/sections/**/*.{tsx,css},components/locations/**/*.{tsx,css},app/**/page.tsx
+alwaysApply: false
+---
+
+# Section intro design
+
+Use for **all** page section intros (homepage, services, locations, CTAs, FAQ). See also `context.md`.
+
+## Structure
+
+```tsx
+<header data-reveal className={styles.intro}>
+  <SectionEyebrow className={styles.eyebrow}>{copy.eyebrow}</SectionEyebrow>
+  <h2 className={styles.title}>{copy.title}</h2>
+  <p className={styles.body}>{copy.body}</p>
+</header>
+```
+
+- Eyebrow: always `SectionEyebrow` — never hand-rolled accent labels (locations included).
+- Title / body: `--text-h2`/`--text-h1` + `--text-body`; full shell or card width.
+
+## Width (required)
+
+```css
+.intro { max-width: none; width: 100%; }
+.title { max-width: none; text-wrap: wrap; }
+.body { max-width: none; }
+```
+
+Do not use `ch` / `40rem` caps on intro title or body. Stack eyebrow → title → body (no narrow side column for body).

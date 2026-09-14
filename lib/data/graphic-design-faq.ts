@@ -2,49 +2,43 @@ import type { FaqItem } from "@/lib/data/faq";
 import type { SectionCopy } from "@/lib/wordpress/types";
 
 /**
- * Graphic Design Solutions FAQ — passed into the shared FaqSection.
+ * Graphic Design Solutions FAQ — hardcoded from WordPress page 2417.
  */
 export const graphicDesignFaqCopy: SectionCopy = {
-  eyebrow: "Design FAQs",
-  title: "Questions brands ask before the first draft.",
-  body: "Clarity on process, deliverables, and how graphic design fits the wider Xoomplus system.",
+  eyebrow: "FAQs",
+  title: "FAQs",
+  body: "",
 };
 
 export const graphicDesignFaqItems: FaqItem[] = [
   {
-    id: "gd-start",
-    question: "How does a graphic design engagement start?",
+    id: "gd-turnaround",
+    question: "What is your typical turnaround time?",
     answer:
-      "With a focused discovery call. We map the brand problem, constraints, and the outcome that makes the partnership worth it — then propose a clear scope and first sprint.",
-  },
-  {
-    id: "gd-deliverables",
-    question: "What do we actually receive?",
-    answer:
-      "Named, organized assets — logos, identity systems, social sets, UI kits, or print files — ready for production. You get the craft and the handoff, not a folder of mystery exports.",
-  },
-  {
-    id: "gd-timeline",
-    question: "How long does a typical design project take?",
-    answer:
-      "Brand systems often land in 6–10 weeks. Campaign and UI work varies with scope — we ship in phases so you see direction early, not after months of silence.",
+      "Most logo projects are ready in 5–7 business days. Brand identity kits usually take 1–2 weeks. Larger campaigns or multi-asset jobs can take 2–4 weeks, depending on scope.",
   },
   {
     id: "gd-revisions",
-    question: "How are revisions handled?",
+    question: "How many revisions are included?",
     answer:
-      "Weekly reviews inside the sprint. We tighten craft against the brief, not endless taste debates. Extra rounds can be scoped if the problem expands.",
+      "We include up to three rounds of revisions at no extra cost. After that, you can request further tweaks for a small fee or as part of a tailored support plan.",
   },
   {
-    id: "gd-systems",
-    question: "Do you build design systems or one-off pieces?",
+    id: "gd-formats",
+    question: "What file formats do I receive?",
     answer:
-      "Both — but we prefer systems. Marks, type, and applications that stay consistent across UI, social, and print so the brand doesn’t fracture after launch.",
+      "You'll get print-ready vector files (AI, EPS, PDF) plus web-optimized versions (PNG, JPEG). Layered source files and a PDF style guide are also included for easy updates.",
   },
   {
-    id: "gd-fit",
-    question: "Who is the best fit for Graphic Design Solutions?",
+    id: "gd-consistency",
+    question: "How do you keep my brand consistent?",
     answer:
-      "Founders and marketing leads who want craft with commercial intent — startups ready to look grown-up, and established brands ready to move faster without looking generic.",
+      "Every project follows a clear style guide with approved colors, fonts and layout rules. This ensures all assets, from social posts to brochures, share the same look and feel.",
+  },
+  {
+    id: "gd-quote",
+    question: "How can I get a custom quote?",
+    answer:
+      "Simply fill out our online request form or send us a brief description of your needs. We'll review your project and send a clear, no-obligation estimate within one business day.",
   },
 ];

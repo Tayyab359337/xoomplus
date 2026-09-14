@@ -8,7 +8,6 @@ import {
   PageTransition,
 } from "@/components/animations";
 import { PageBottomBlur } from "@/components/effects/page-bottom-blur";
-import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
 type AppProvidersProps = {
@@ -16,9 +15,10 @@ type AppProvidersProps = {
 };
 
 /**
- * Single client boundary for theme, smooth scroll, GSAP, and page blur.
+ * Single client boundary for theme, GSAP, and page blur.
  * Native browser cursor only — no splash cursor / custom cursor.
  * No preloader — page transitions stay active.
+ * Native window scrolling.
  */
 export function AppProviders({ children }: AppProvidersProps) {
   return (
@@ -28,19 +28,17 @@ export function AppProviders({ children }: AppProvidersProps) {
       enableSystem={false}
       disableTransitionOnChange
     >
-      <SmoothScrollProvider>
-        <AnimationProvider>
-          <PageTransition />
-          <div
-            data-animation-root
-            className="relative z-10 flex min-h-full flex-1 flex-col"
-          >
-            <HeroEntrance />
-            {children}
-          </div>
-          <PageBottomBlur />
-        </AnimationProvider>
-      </SmoothScrollProvider>
+      <AnimationProvider>
+        <PageTransition />
+        <div
+          data-animation-root
+          className="relative z-10 flex min-h-full flex-1 flex-col"
+        >
+          <HeroEntrance />
+          {children}
+        </div>
+        <PageBottomBlur />
+      </AnimationProvider>
     </ThemeProvider>
   );
 }

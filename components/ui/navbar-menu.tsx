@@ -11,6 +11,7 @@ import React, {
   useState,
 } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { createPortal } from "react-dom";
 
@@ -18,13 +19,10 @@ import { cn } from "@/lib/utils";
 
 const CLOSE_DELAY_MS = 100;
 
+/** Fast open/close — no spring lag */
 const transition = {
-  type: "spring" as const,
-  mass: 0.5,
-  damping: 11.5,
-  stiffness: 100,
-  restDelta: 0.001,
-  restSpeed: 0.001,
+  duration: 0.08,
+  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
 };
 
 type MenuHoverApi = {
@@ -85,9 +83,12 @@ export const MenuItem = ({
       // NavBody is the sticky bar (animated width); outer wrapper is full viewport
       const navBar = (navRoot?.firstElementChild as HTMLElement | null) ?? navRoot;
       const rect = (navBar ?? trigger).getBoundingClientRect();
-      setPanelTop(Math.round(rect.bottom + 12));
+      setPanelTop(Math.round(rect.bottom + 10));
       if (matchNavWidth) {
-        setPanelWidth(Math.round(rect.width));
+        // Prefer a roomy mega panel — at least ~72rem when viewport allows
+        const navW = Math.round(rect.width);
+        const roomy = Math.min(window.innerWidth - 24, 1180);
+        setPanelWidth(Math.max(navW, roomy));
       }
     };
 
@@ -113,9 +114,9 @@ export const MenuItem = ({
           role="region"
           aria-label={item}
           data-mega-menu-panel=""
-          initial={{ opacity: 0, scale: 0.96, y: 8, x: "-50%" }}
+          initial={{ opacity: 0, scale: 0.99, y: 3, x: "-50%" }}
           animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
-          exit={{ opacity: 0, scale: 0.96, y: 8, x: "-50%" }}
+          exit={{ opacity: 0, scale: 0.99, y: 2, x: "-50%" }}
           transition={transition}
           onMouseEnter={() => hover?.clearLeaveTimer()}
           onMouseLeave={() => hover?.scheduleClose()}
@@ -124,19 +125,14 @@ export const MenuItem = ({
             event.stopPropagation();
           }}
           className={cn(
-            "fixed left-1/2 z-[100] max-h-[min(78vh,44rem)] overflow-y-auto overflow-x-hidden rounded-2xl border border-border/60 shadow-xl",
-            // Semi-transparent fill so blur reads against page content
-            "bg-background/60 dark:bg-background/55",
-            "backdrop-blur-2xl backdrop-saturate-150",
-            "supports-[backdrop-filter]:bg-background/50 supports-[backdrop-filter]:dark:bg-background/45",
+            "fixed left-1/2 z-[100] max-h-[min(86vh,52rem)] overflow-y-auto overflow-x-hidden rounded-[1.75rem] border border-border/60 shadow-xl",
+            "bg-white dark:bg-background",
             panelClassName,
           )}
           style={{
             top: panelTop,
             width: matchNavWidth && panelWidth ? panelWidth : undefined,
             maxWidth: matchNavWidth ? "calc(100vw - 1.5rem)" : undefined,
-            WebkitBackdropFilter: "blur(28px) saturate(1.6)",
-            backdropFilter: "blur(28px) saturate(1.6)",
           }}
         >
           {children}
@@ -155,13 +151,20 @@ export const MenuItem = ({
         href={href}
         transition={{ duration: 0.3 }}
         className={cn(
-          "inline-flex cursor-pointer items-center text-foreground/70 transition-colors hover:text-foreground",
+          "inline-flex cursor-pointer items-center gap-1 text-foreground/70 transition-colors hover:text-foreground",
           triggerClassName,
         )}
         aria-haspopup="true"
         aria-expanded={open}
       >
-        {item}
+        <span>{item}</span>
+        <ChevronDown
+          aria-hidden
+          className={cn(
+            "size-3.5 shrink-0 opacity-70 transition-transform duration-200 ease-out",
+            open && "rotate-180",
+          )}
+        />
       </motion.a>
       {mounted ? createPortal(panel, document.body) : null}
     </div>
@@ -183,6 +186,12 @@ export const Menu = ({
   const panelRef = useRef<HTMLElement | null>(null);
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
+  const [backdropMounted, setBackdropMounted] = useState(false);
+  const [backdropTop, setBackdropTop] = useState(0);
+
+  useEffect(() => {
+    setBackdropMounted(true);
+  }, []);
 
   const clearLeaveTimer = useCallback(() => {
     if (leaveTimerRef.current) {
@@ -220,6 +229,29 @@ export const Menu = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- close on route change only
   }, [pathname]);
 
+  /* Keep blur below the sticky nav so the bar stays sharp and hoverable */
+  useLayoutEffect(() => {
+    if (active === null) return;
+
+    const update = () => {
+      const navRoot = document.querySelector<HTMLElement>("[data-nav-entrance]");
+      const navBar =
+        (navRoot?.firstElementChild as HTMLElement | null) ?? navRoot;
+      const bottom = navBar
+        ? Math.round(navBar.getBoundingClientRect().bottom)
+        : 72;
+      setBackdropTop(Math.max(0, bottom));
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [active]);
+
   useEffect(() => {
     if (active === null) {
       panelRef.current = null;
@@ -245,8 +277,6 @@ export const Menu = ({
       if (!inTrigger && !inPanel) close();
     };
 
-    // Capture phase so we still see the event if a child stops bubble;
-    // panel itself stopPropagates in bubble — we rely on composedPath + data attr.
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("pointerdown", onPointerDown, true);
     return () => {
@@ -256,6 +286,33 @@ export const Menu = ({
   }, [active, close]);
 
   useEffect(() => () => clearLeaveTimer(), [clearLeaveTimer]);
+
+  const backdrop = (
+    <AnimatePresence>
+      {active !== null ? (
+        <motion.div
+          key="mega-menu-backdrop"
+          aria-hidden
+          data-mega-menu-backdrop=""
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          className={cn(
+            /* Under nav (z-50), above page; no pointer events so hover-leave closes */
+            "pointer-events-none fixed inset-x-0 bottom-0 z-[40]",
+            "bg-background/40 dark:bg-background/50",
+            "supports-[backdrop-filter]:bg-background/25 supports-[backdrop-filter]:dark:bg-background/35",
+          )}
+          style={{
+            top: backdropTop,
+            WebkitBackdropFilter: "blur(16px) saturate(1.45)",
+            backdropFilter: "blur(16px) saturate(1.45)",
+          }}
+        />
+      ) : null}
+    </AnimatePresence>
+  );
 
   return (
     <MenuHoverContext.Provider value={hoverApi}>
@@ -267,6 +324,7 @@ export const Menu = ({
       >
         {children}
       </div>
+      {backdropMounted ? createPortal(backdrop, document.body) : null}
     </MenuHoverContext.Provider>
   );
 };

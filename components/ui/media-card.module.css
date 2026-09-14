@@ -58,19 +58,19 @@
 
 .title {
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 1.8vw, 1.35rem);
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-  font-weight: 650;
+  font-size: var(--text-h5);
+  line-height: var(--text-h5--line-height);
+  letter-spacing: var(--text-h5--letter-spacing);
+  font-weight: var(--text-h5--font-weight);
   color: var(--foreground);
   margin: 0;
 }
 
 .description {
   font-family: var(--font-sans);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
+  font-size: var(--text-small);
+  line-height: var(--text-small--line-height);
+  letter-spacing: var(--text-small--letter-spacing);
   color: var(--muted-foreground);
   margin: 0;
 }

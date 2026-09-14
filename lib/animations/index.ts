@@ -43,7 +43,6 @@ export {
   killAllScrollTriggers,
   PARALLAX_SELECTOR,
   refreshScrollTrigger,
-  syncScrollTriggerWithLenis,
 } from "./scroll-trigger";
 
 export {

@@ -3,11 +3,8 @@
 import Image from "next/image";
 import { useMemo, useRef } from "react";
 
+import { Timeline } from "@/components/ui/timeline";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
-import { StickyScroll } from "@/components/ui/sticky-scroll-reveal";
-import { useIsClient } from "@/hooks/use-is-client";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
 import {
   graphicDesignApproachCopy,
@@ -24,7 +21,10 @@ type GraphicDesignApproachProps = {
   copy?: typeof graphicDesignApproachCopy;
 };
 
-function ApproachVisual({
+const imageShadow =
+  "shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05)]";
+
+function ApproachStepContent({
   stage,
   priority = false,
 }: {
@@ -32,55 +32,32 @@ function ApproachVisual({
   priority?: boolean;
 }) {
   return (
-    <div className={styles.visual}>
-      <Image
-        src={stage.image}
-        alt={stage.imageAlt}
-        fill
-        sizes="(max-width: 1024px) 100vw, 384px"
-        className={styles.visualImage}
-        priority={priority}
-      />
+    <div>
+      <h4 className="mb-3 font-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+        {stage.title}
+      </h4>
+      <p className="mb-8 max-w-prose text-xs font-normal text-muted-foreground md:text-sm">
+        {stage.description}
+      </p>
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg md:aspect-[16/10]">
+        <Image
+          src={stage.image}
+          alt={stage.imageAlt}
+          fill
+          sizes="(max-width: 768px) 100vw, 560px"
+          className={cn("object-cover", imageShadow)}
+          priority={priority}
+          loading={priority ? "eager" : "lazy"}
+        />
+      </div>
     </div>
   );
 }
 
-function ApproachMobileStack({
-  stages,
-}: {
-  stages: GraphicDesignApproachStage[];
-}) {
-  return (
-    <ol className={styles.mobileStack}>
-      {stages.map((stage, index) => (
-        <li key={stage.number} className={styles.mobileItem} data-reveal>
-          <div className={styles.mobileVisual}>
-            <Image
-              src={stage.image}
-              alt={stage.imageAlt}
-              fill
-              sizes="(max-width: 768px) 100vw, 640px"
-              className={styles.visualImage}
-              loading={index === 0 ? "eager" : "lazy"}
-            />
-          </div>
-          <div className={styles.mobileMeta}>
-            <p className={styles.mobileNumber}>
-              {stage.number} — {stage.title}
-            </p>
-            <h3 className={styles.mobileTitle}>{stage.title}</h3>
-            <p className={styles.mobileBody}>{stage.description}</p>
-          </div>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
 /**
- * Graphic Design — Our Approach.
- * Desktop: Aceternity Sticky Scroll Reveal.
- * Mobile / reduced motion: vertical editorial stack.
+ * Graphic Design — Our Approach (Aceternity Timeline).
+ * Intro uses section reveal; timeline itself must NOT be under GSAP transform
+ * or sticky + scroll progress becomes choppy.
  */
 export function GraphicDesignApproach({
   className,
@@ -90,19 +67,16 @@ export function GraphicDesignApproach({
   const items = stages ?? graphicDesignApproachStages;
   const sectionCopy = copy ?? graphicDesignApproachCopy;
   const sectionRef = useRef<HTMLElement>(null);
-  const isClient = useIsClient();
-  const reduceMotion = usePrefersReducedMotion();
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const useSticky = isClient && isDesktop && !reduceMotion;
 
   useSectionReveal(sectionRef);
 
-  const stickyContent = useMemo(
+  const timelineData = useMemo(
     () =>
       items.map((stage, index) => ({
-        title: `${stage.number} — ${stage.title}`,
-        description: stage.description,
-        content: <ApproachVisual stage={stage} priority={index === 0} />,
+        title: stage.number,
+        content: (
+          <ApproachStepContent stage={stage} priority={index === 0} />
+        ),
       })),
     [items],
   );
@@ -123,14 +97,10 @@ export function GraphicDesignApproach({
           <h2 className={styles.title}>{sectionCopy.title}</h2>
           <p className={styles.body}>{sectionCopy.body}</p>
         </header>
+      </div>
 
-        {useSticky ? (
-          <div className={styles.stickyWrap} data-reveal>
-            <StickyScroll content={stickyContent} />
-          </div>
-        ) : (
-          <ApproachMobileStack stages={items} />
-        )}
+      <div className={styles.timelineWrap}>
+        <Timeline data={timelineData} />
       </div>
     </section>
   );

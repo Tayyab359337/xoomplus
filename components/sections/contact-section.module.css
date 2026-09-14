@@ -32,18 +32,12 @@
 }
 
 .intro {
-  max-width: 36rem;
+  max-width: none;
+  width: 100%;
   margin-bottom: 2.75rem;
 }
 
 .eyebrow {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  line-height: var(--text-meta--line-height);
-  letter-spacing: var(--text-meta--letter-spacing);
-  font-weight: var(--text-meta--font-weight);
-  text-transform: uppercase;
-  color: var(--accent);
   margin: 0 0 var(--title-gap);
 }
 
@@ -55,7 +49,8 @@
   font-weight: var(--text-h2--font-weight);
   color: var(--foreground);
   margin: 0;
-  max-width: 16ch;
+  max-width: none;
+  text-wrap: wrap;
 }
 
 .body {
@@ -65,7 +60,7 @@
   letter-spacing: var(--text-body--letter-spacing);
   color: var(--muted-foreground);
   margin: 1.25rem 0 0;
-  max-width: 42ch;
+  max-width: none;
 }
 
 .grid {

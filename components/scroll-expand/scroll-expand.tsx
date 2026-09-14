@@ -8,8 +8,6 @@ import {
   type ReactNode,
 } from "react";
 
-import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
-
 import "./scroll-expand.css";
 
 const clamp = (v: number, a: number, b: number) =>
@@ -80,8 +78,6 @@ export default function ScrollExpand({
   style,
   ...rest
 }: ScrollExpandProps) {
-  const { getInstance, ready: scrollReady } = useSmoothScroll();
-
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -263,21 +259,13 @@ export default function ScrollExpand({
     const ro = new ResizeObserver(onResize);
     ro.observe(root);
 
-    // Prefer Lenis scroll (Locomotive) so progress tracks smoothed scroll
-    const lenis = useWindowScroll ? getInstance()?.lenisInstance : null;
-    const unsubLenis =
-      lenis && typeof lenis.on === "function"
-        ? lenis.on("scroll", onScroll)
-        : undefined;
-
     return () => {
       if (raf) cancelAnimationFrame(raf);
       scroller.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       ro.disconnect();
-      unsubLenis?.();
     };
-  }, [applyProgress, getInstance, scrollReady, useWindowScroll]);
+  }, [applyProgress, useWindowScroll]);
 
   const media =
     mediaType === "video" ? (

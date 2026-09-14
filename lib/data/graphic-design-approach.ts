@@ -20,49 +20,49 @@ function serviceImage(slug: string) {
 }
 
 /**
- * Graphic Design Solutions — process stages.
- * Language mirrors FAQ / delivery cadence (discovery, scope, phases, reviews).
+ * Graphic Design Solutions — process stages from WordPress page 2417.
+ * WP lists four numbered steps; the fifth slot is the trials/feedback line from the same section intro so the existing five-stage layout stays intact.
  */
 export const graphicDesignApproachCopy = {
-  eyebrow: "Our approach",
-  title: "Intent first. Pixels second.",
-  body: "A five-stage design rhythm — from discovery call to delivery — so the work stays sharp and the launch stays on time.",
+  eyebrow: "Our Approach",
+  title: "Our Approach to Crafting Visual Identities",
+  body: "XoomPlus reviews your brand's values and strengths to understand what makes it unique. Next, we analyse your target market and audience so every design choice speaks directly to their needs. Then XoomPlus uses market research, quick design trials, and your feedback to craft a look that fits. Here's the simple process we follow:",
 } as const;
 
 export const graphicDesignApproachStages: GraphicDesignApproachStage[] = [
   {
     number: "01",
-    title: "Discover",
+    title: "Discovery & Research",
     description:
-      "A focused discovery call — not a pitch deck. We map the brand problem, constraints, and the outcome that makes the partnership worth it.",
+      "We begin by studying your field, checking competitors' designs, and gathering insights from your target audience. This gives clear direction for every design choice. XoomPlus conducts interviews, competitive reviews, and audience profiling.",
     ...serviceImage("brand-identity-design"),
   },
   {
     number: "02",
-    title: "Define",
+    title: "Concept Development",
     description:
-      "Clear scope, first sprint, and visual priorities. Hierarchy, audience, and deliverables locked before craft begins.",
+      "Initial ideas come to life through sketches and mood boards. XoomPlus explores multiple directions, testing colors, layouts, and styles.",
     ...serviceImage("infographic-design"),
   },
   {
     number: "03",
-    title: "Design",
+    title: "Design Execution",
     description:
-      "Marks, layouts, and systems with editorial finish — type, color, and composition built to hold together across every touchpoint.",
+      "Turning concepts into polished assets requires attention to detail. XoomPlus uses professional tools to produce high-resolution mockups and iterates until every element is on point.",
     ...serviceImage("logo-design-service"),
   },
   {
     number: "04",
-    title: "Refine",
+    title: "Trials & Feedback",
     description:
-      "Weekly reviews in phases. We tighten craft, stress-test applications, and cut anything that doesn’t earn its place.",
+      "Then XoomPlus uses market research, quick design trials, and your feedback to craft a look that fits.",
     ...serviceImage("website-ui-ux-design"),
   },
   {
     number: "05",
-    title: "Deliver",
+    title: "Delivery & Ongoing Support",
     description:
-      "Campaign-ready assets and print-ready files — named, organized, and ready to ship without a second guess.",
+      "A true partnership continues after launch. XoomPlus hands over source files, provides clear usage notes, and stands by for updates or new asset requests.",
     ...serviceImage("print-design"),
   },
 ];

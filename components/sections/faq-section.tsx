@@ -20,12 +20,19 @@ type FaqSectionProps = {
   className?: string;
   items?: FaqItem[];
   copy?: SectionCopy;
+  /** @deprecated Wide intro is now the default sitewide. */
+  wideCopy?: boolean;
 };
 
 /**
  * FAQ — left editorial copy, right shadcn Accordion (not full-bleed).
+ * Aside title + body span the full column width (see context.md).
  */
-export function FaqSection({ className, items, copy }: FaqSectionProps) {
+export function FaqSection({
+  className,
+  items,
+  copy,
+}: FaqSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
   const faqs = items ?? faqItems;

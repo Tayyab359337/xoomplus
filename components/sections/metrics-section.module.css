@@ -20,19 +20,13 @@
 
 .header {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.15rem;
+  width: 100%;
 }
 
 .eyebrow {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  line-height: var(--text-meta--line-height);
-  letter-spacing: var(--text-meta--letter-spacing);
-  font-weight: var(--text-meta--font-weight);
-  text-transform: uppercase;
-  color: var(--accent);
   margin: 0;
 }
 
@@ -44,14 +38,16 @@
   font-weight: var(--text-h2--font-weight);
   color: var(--foreground);
   margin: var(--title-gap) 0 0;
-  max-width: 16ch;
+  max-width: none;
+  text-wrap: wrap;
 }
 
 .headerCopy {
-  display: none;
-  margin: 0;
-  max-width: 24ch;
-  text-align: right;
+  display: block;
+  margin: 1rem 0 0;
+  max-width: none;
+  width: 100%;
+  text-align: left;
   font-family: var(--font-sans);
   font-size: var(--text-body);
   line-height: var(--text-body--line-height);

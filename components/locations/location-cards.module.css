@@ -1,0 +1,47 @@
+.section {
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+  padding: var(--section-y-compact) 0;
+}
+
+.shell {
+  width: min(100% - 2rem, var(--layout-max));
+  margin-inline: auto;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: var(--section-y-compact-md) 0 var(--section-y);
+  }
+
+  .shell {
+    width: min(100% - 4rem, var(--layout-max));
+  }
+
+  .list {
+    gap: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: var(--section-y) 0 var(--section-y-md);
+  }
+
+  .shell {
+    width: min(100% - 6rem, var(--layout-max));
+  }
+
+  .list {
+    gap: 2rem;
+  }
+}

@@ -1,16 +1,22 @@
-/* Global page-transition veil — GSAP fade (autoAlpha), no layout impact */
-.xp-page-transition {
+/* Soft exit snapshot — carries the outgoing page during handoff (no black veil) */
+.xp-page-exit-layer {
   position: fixed;
-  inset: 0;
-  z-index: 9998;
-  background: #06090c;
+  z-index: 40;
+  margin: 0;
   pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
+  will-change: opacity, transform;
+  background: var(--background);
+  overflow: hidden;
+  max-height: 100dvh;
+}
+
+/* Kill any legacy solid veil from older builds */
+#xp-page-transition {
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .xp-page-transition {
+  .xp-page-exit-layer {
     display: none !important;
   }
 }

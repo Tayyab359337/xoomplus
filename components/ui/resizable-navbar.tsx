@@ -98,7 +98,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         boxShadow: visible
           ? "0 1px 0 0 color-mix(in oklch, var(--border) 80%, transparent)"
           : "none",
-        width: visible ? "min(1080px, 94%)" : "100%",
+        width: visible ? "min(90rem, calc(100% - 2rem))" : "100%",
         y: visible ? 12 : 0,
       }}
       transition={{
@@ -106,11 +106,8 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         stiffness: 220,
         damping: 36,
       }}
-      style={{
-        minWidth: "min(960px, 100%)",
-      }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full border border-transparent bg-transparent px-5 py-3.5 lg:flex",
+        "relative z-[60] mx-auto hidden w-full max-w-[90rem] flex-row items-center justify-between self-start overflow-visible rounded-full border border-transparent bg-transparent px-5 py-3.5 lg:flex",
         visible &&
           "border-border/60 bg-background/70 dark:bg-background/65",
         className,

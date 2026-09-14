@@ -1,0 +1,108 @@
+.section {
+  position: relative;
+  overflow-x: clip;
+  overflow-y: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+  padding: 7.25rem 0 2.5rem;
+}
+
+.shell {
+  width: min(100% - 2rem, var(--layout-max));
+  margin-inline: auto;
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.copy {
+  max-width: none;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  margin: 0;
+}
+
+.title {
+  margin: 1.1rem 0 0;
+  max-width: none;
+  font-family: var(--font-display);
+  font-size: var(--text-h1);
+  line-height: var(--text-h1--line-height);
+  letter-spacing: var(--text-h1--letter-spacing);
+  font-weight: var(--text-h1--font-weight);
+  color: var(--foreground);
+  text-wrap: wrap;
+}
+
+.body {
+  margin: 0.9rem 0 0;
+  max-width: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--muted-foreground);
+}
+
+.globeStage {
+  position: relative;
+  width: min(100%, 22rem);
+  margin-inline: auto;
+  aspect-ratio: 1;
+  isolation: isolate;
+}
+
+.globe {
+  max-width: none;
+}
+
+.globeFade {
+  pointer-events: none;
+  position: absolute;
+  inset: auto 0 0;
+  height: 28%;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--background)
+  );
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 8.5rem 0 3.25rem;
+  }
+
+  .shell {
+    width: min(100% - 4rem, var(--layout-max));
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.9fr);
+    gap: 2rem;
+  }
+
+  .globeStage {
+    width: 100%;
+    max-width: 28rem;
+    margin-inline: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: 9.25rem 0 4rem;
+  }
+
+  .shell {
+    width: min(100% - 6rem, var(--layout-max));
+    grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
+    gap: 3rem;
+  }
+
+  .globeStage {
+    max-width: 32rem;
+  }
+}

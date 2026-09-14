@@ -36,10 +36,7 @@
   .header {
     width: min(100% - 4rem, var(--layout-max));
     margin-bottom: 3rem;
-    flex-direction: row;
-    align-items: end;
-    justify-content: space-between;
-    gap: 2rem;
+    gap: 1.15rem;
   }
 }
 
@@ -50,13 +47,6 @@
 }
 
 .eyebrow {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  line-height: var(--text-meta--line-height);
-  letter-spacing: var(--text-meta--letter-spacing);
-  font-weight: var(--text-meta--font-weight);
-  text-transform: uppercase;
-  color: var(--accent);
   margin: 0;
 }
 
@@ -66,9 +56,10 @@
   line-height: var(--text-h2--line-height);
   letter-spacing: var(--text-h2--letter-spacing);
   font-weight: var(--text-h2--font-weight);
-  max-width: 16ch;
+  max-width: none;
   color: var(--foreground);
   margin: var(--title-gap) 0 0;
+  text-wrap: wrap;
 }
 
 .body {
@@ -76,16 +67,10 @@
   font-size: var(--text-body);
   line-height: var(--text-body--line-height);
   letter-spacing: var(--text-body--letter-spacing);
-  max-width: 34ch;
+  max-width: none;
+  width: 100%;
   color: var(--muted-foreground);
   margin: 0;
-}
-
-@media (min-width: 768px) {
-  .body {
-    text-align: right;
-    margin-left: auto;
-  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -409,9 +394,9 @@
 
 .cardTagline {
   font-family: var(--font-sans);
-  font-size: 0.95rem;
-  line-height: 1.45;
-  letter-spacing: -0.01em;
+  font-size: var(--text-small);
+  line-height: var(--text-small--line-height);
+  letter-spacing: var(--text-small--letter-spacing);
   font-weight: 400;
   text-transform: none;
   color: var(--muted-foreground);
@@ -420,21 +405,23 @@
 
 .cardTitle {
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 1.8vw, 1.35rem);
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-  font-weight: 650;
+  font-size: var(--text-h5);
+  line-height: var(--text-h5--line-height);
+  letter-spacing: var(--text-h5--letter-spacing);
+  font-weight: var(--text-h5--font-weight);
   color: var(--foreground);
   margin: 0;
 }
 
 .cardExpanded .cardTitle {
-  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-size: var(--text-h4);
+  line-height: var(--text-h4--line-height);
+  letter-spacing: var(--text-h4--letter-spacing);
 }
 
 .cardDescription {
   font-family: var(--font-sans);
-  font-size: 0.95rem;
+  font-size: var(--text-small);
   line-height: var(--text-body--line-height);
   letter-spacing: var(--text-body--letter-spacing);
   margin: 0.35rem 0 0;

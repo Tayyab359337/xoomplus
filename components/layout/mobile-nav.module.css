@@ -222,6 +222,8 @@
 }
 
 .linkLabel {
+  display: inline-flex;
+  align-items: center;
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 8.5vw, 2.55rem);
   line-height: 0.98;
@@ -283,9 +285,11 @@
   padding: 0.85rem;
   border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
   border-radius: calc(var(--radius) * 1.6);
-  background: color-mix(in srgb, var(--card) 70%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  backdrop-filter: blur(18px) saturate(160%);
+  background: #ffffff;
+}
+
+:global(html.dark) .megaInner {
+  background: var(--background);
 }
 
 .megaParents {

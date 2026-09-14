@@ -1,0 +1,114 @@
+.section {
+  position: relative;
+  overflow-x: clip;
+  overflow-y: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+  padding: var(--section-y) 0;
+}
+
+.map {
+  pointer-events: none;
+  position: absolute;
+  inset: -8% -6%;
+  z-index: 0;
+  opacity: 0.42;
+}
+
+.dotted {
+  color: color-mix(in srgb, var(--primary) 55%, transparent);
+}
+
+:global(.dark) .map {
+  opacity: 0.34;
+}
+
+:global(.dark) .dotted {
+  color: color-mix(in srgb, var(--accent) 42%, transparent);
+}
+
+.veil {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(
+      55% 60% at 50% 50%,
+      var(--background) 0%,
+      color-mix(in srgb, var(--background) 78%, transparent) 42%,
+      transparent 72%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--background) 0%,
+      transparent 22%,
+      transparent 78%,
+      var(--background) 100%
+    );
+}
+
+.shell {
+  position: relative;
+  z-index: 2;
+  width: min(100% - 2rem, var(--layout-max));
+  margin-inline: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  max-width: none;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.title {
+  margin: 0;
+  max-width: none;
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  letter-spacing: var(--text-h2--letter-spacing);
+  font-weight: var(--text-h2--font-weight);
+  color: var(--foreground);
+  text-wrap: wrap;
+}
+
+.body {
+  margin: 0;
+  max-width: none;
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--muted-foreground);
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: var(--section-y-md) 0;
+  }
+
+  .shell {
+    width: min(100% - 4rem, var(--layout-max));
+  }
+
+  .content {
+    gap: 1.15rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: var(--section-y-lg) 0;
+  }
+
+  .shell {
+    width: min(100% - 6rem, var(--layout-max));
+  }
+}

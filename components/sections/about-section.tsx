@@ -9,7 +9,6 @@ import {
 } from "react";
 import { useGSAP } from "@gsap/react";
 
-import { ScrollItem } from "@/components/scroll";
 import Magnet from "@/components/ui/magnet";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
@@ -98,10 +97,7 @@ export function AboutSection({ className, content }: AboutSectionProps) {
         <div className={styles.panel}>
           {about.image ? (
             <div data-animate="image-reveal" className={styles.mediaCol}>
-              <ScrollItem
-                speed={reduceMotion ? undefined : 0.22}
-                className={styles.mediaScroll}
-              >
+              <div className={styles.mediaScroll}>
                 <div data-parallax={reduceMotion ? undefined : "14"}>
                   <div
                     ref={frameRef}
@@ -129,7 +125,7 @@ export function AboutSection({ className, content }: AboutSectionProps) {
                     </div>
                   </div>
                 </div>
-              </ScrollItem>
+              </div>
             </div>
           ) : null}
 

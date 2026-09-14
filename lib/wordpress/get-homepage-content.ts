@@ -42,7 +42,7 @@ const WP_MAIN_SERVICE_MATCH: Record<
   },
   seo: {
     nameIncludes: "seo",
-    hrefFallback: `${WP_ORIGIN}/digital-marketing/search-engine-optimisation-seo/`,
+    hrefFallback: `${WP_ORIGIN}/digital-marketing/search-engine-optimization/`,
   },
   "paid-advertising": {
     nameIncludes: "ppc",

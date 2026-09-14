@@ -83,8 +83,8 @@ void main() {
   vec2 imageSize = uImageSize;
   vec2 planeSize = uPlaneSize;
 
-  float imageAspect = imageSize.x / imageSize.y;
-  float planeAspect = planeSize.x / planeSize.y;
+  float imageAspect = imageSize.x / max(imageSize.y, 0.0001);
+  float planeAspect = planeSize.x / max(planeSize.y, 0.0001);
   vec2 scale = vec2(1.0, 1.0);
 
   if (planeAspect > imageAspect) {
@@ -178,7 +178,8 @@ class Media {
         tMap: { value: texture },
         uPosition: { value: 0 },
         uPlaneSize: { value: [0, 0] },
-        uImageSize: { value: [0, 0] },
+        // Non-zero default avoids 0/0 NaNs in the fragment shader before load
+        uImageSize: { value: [1, 1] },
         uSpeed: { value: 0 },
         rotationAxis: { value: [0, 1, 0] },
         distortionAxis: { value: [1, 1, 0] },
@@ -189,13 +190,25 @@ class Media {
       cullFace: false
     });
 
+    // OGL warns but does not throw on link failure — catch it so we can fall back
+    if (!this.program.uniformLocations) {
+      throw new Error('Flying posters shader program failed to link');
+    }
+
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = this.image;
     img.onload = () => {
       texture.image = img;
-      this.program.uniforms.uImageSize.value = [img.naturalWidth, img.naturalHeight];
+      this.program.uniforms.uImageSize.value = [
+        Math.max(1, img.naturalWidth),
+        Math.max(1, img.naturalHeight)
+      ];
     };
+    img.onerror = () => {
+      // Keep placeholder aspect so the plane still renders
+      this.program.uniforms.uImageSize.value = [1, 1];
+    };
+    img.src = this.image;
   }
 
   createMesh() {
@@ -303,13 +316,39 @@ class Canvas {
   }
 
   createRenderer() {
-    this.renderer = new Renderer({
-      canvas: this.canvas,
-      alpha: true,
-      antialias: this.quality !== 'low',
-      dpr: Math.min(window.devicePixelRatio, this.quality === 'low' ? 1.25 : 2)
-    });
+    const makeRenderer = canvas =>
+      new Renderer({
+        canvas,
+        alpha: true,
+        antialias: this.quality !== 'low',
+        dpr: Math.min(window.devicePixelRatio, this.quality === 'low' ? 1.25 : 2),
+        // GLSL ES 1.0 shaders (attribute/varying/texture2D)
+        webgl: 1
+      });
+
+    const isUsable = renderer => renderer?.gl && !renderer.gl.isContextLost?.();
+
+    this.renderer = this.canvas ? makeRenderer(this.canvas) : null;
+
+    // React Strict Mode (or HMR) can leave a lost context on the same <canvas>;
+    // a lost WebGL2 context also blocks creating WebGL1 — replace the node.
+    if (!isUsable(this.renderer)) {
+      const canvas = document.createElement('canvas');
+      canvas.className = 'posters-canvas';
+      if (this.canvas?.parentNode) {
+        this.canvas.parentNode.replaceChild(canvas, this.canvas);
+      } else if (this.container) {
+        this.container.appendChild(canvas);
+      }
+      this.canvas = canvas;
+      this.renderer = makeRenderer(canvas);
+    }
+
     this.gl = this.renderer.gl;
+    if (!isUsable(this.renderer)) {
+      throw new Error('WebGL context unavailable');
+    }
+
     // Solid clear avoids translucent trail / flicker on transparent canvases
     this.gl.clearColor(0, 0, 0, 0);
   }
@@ -522,12 +561,8 @@ class Canvas {
     window.removeEventListener('touchmove', this.onTouchMove);
     window.removeEventListener('touchend', this.onTouchUp);
 
-    try {
-      const lose = this.gl?.getExtension?.('WEBGL_lose_context');
-      lose?.loseContext();
-    } catch {
-      /* ignore */
-    }
+    // Do not call WEBGL_lose_context — React Strict Mode remounts reuse the same
+    // <canvas>; a lost context cannot be restored and permanently breaks the gallery.
   }
 }
 
@@ -546,6 +581,7 @@ export default function FlyingPosters({
   /** `low` = lighter DPR/mesh for mobile. */
   quality = 'high',
   onReady,
+  onError,
   className,
   ...props
 }) {
@@ -553,10 +589,15 @@ export default function FlyingPosters({
   const canvasRef = useRef(null);
   const instanceRef = useRef(null);
   const onReadyRef = useRef(onReady);
+  const onErrorRef = useRef(onError);
 
   useEffect(() => {
     onReadyRef.current = onReady;
   }, [onReady]);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   // Mount once per items/control mode — size tweaks update in place (avoids remount flicker)
   useEffect(() => {
@@ -580,6 +621,10 @@ export default function FlyingPosters({
         quality
       });
 
+      if (!instance.gl) {
+        throw new Error('WebGL unavailable');
+      }
+
       instanceRef.current = instance;
       onReadyRef.current?.({
         setScrollProgress: progress => instance.setScrollProgress(progress),
@@ -590,8 +635,9 @@ export default function FlyingPosters({
         instance?.onResize();
       });
       ro.observe(containerRef.current);
-    } catch {
+    } catch (err) {
       instanceRef.current = null;
+      onErrorRef.current?.(err);
       onReadyRef.current?.(null);
     }
 
@@ -599,6 +645,7 @@ export default function FlyingPosters({
       ro?.disconnect();
       instance?.destroy();
       instanceRef.current = null;
+      // Cleanup only — do not treat as a hard failure
       onReadyRef.current?.(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- size props applied via setParams below

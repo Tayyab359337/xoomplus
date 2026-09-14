@@ -48,10 +48,10 @@ export function MetricsSection({
             <h2 className={styles.title}>
               {copy?.title || "Make Your Marketing More Effective"}
             </h2>
+            {copy?.body ? (
+              <p className={styles.headerCopy}>{copy.body}</p>
+            ) : null}
           </div>
-          {copy?.body ? (
-            <p className={styles.headerCopy}>{copy.body}</p>
-          ) : null}
         </div>
 
         <ul data-reveal-stagger className={styles.grid}>

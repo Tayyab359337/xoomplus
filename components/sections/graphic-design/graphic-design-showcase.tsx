@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import Magnet from "@/components/ui/magnet";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
@@ -72,18 +72,18 @@ export function GraphicDesignShowcase({
   const isClient = useIsClient();
   const isCompact = useMediaQuery("(max-width: 768px)");
   const allowPosters = isClient && !reduceMotion && canUseFlyingPosters();
-  const [mountPosters, setMountPosters] = useState(false);
-  const [webglFailed, setWebglFailed] = useState(false);
+  const [initFailed, setInitFailed] = useState(false);
 
   const posterItems = useMemo(() => posters, [posters]);
-  const showPosters = allowPosters && mountPosters && !webglFailed;
+  const showPosters = allowPosters && !initFailed;
 
   const onPostersReady = useCallback((api: PostersApi) => {
-    postersApiRef.current = api;
+    // Ignore cleanup nulls — React Strict Mode remounts; that must not kill the gallery.
     if (!api) {
-      setWebglFailed(true);
+      postersApiRef.current = null;
       return;
     }
+    postersApiRef.current = api;
     if (trackRef.current) {
       const trigger = ScrollTrigger.getAll().find(
         (st) => st.trigger === trackRef.current,
@@ -92,27 +92,11 @@ export function GraphicDesignShowcase({
     }
   }, []);
 
+  const onPostersError = useCallback(() => {
+    setInitFailed(true);
+  }, []);
+
   useSectionReveal(introRef);
-
-  // Mount WebGL only near the gallery — avoids mobile main-thread lock on first paint
-  useEffect(() => {
-    if (!allowPosters) return;
-    const track = trackRef.current;
-    if (!track) return;
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setMountPosters(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: "180px 0px", threshold: 0.01 },
-    );
-
-    io.observe(track);
-    return () => io.disconnect();
-  }, [allowPosters]);
 
   useGSAP(
     () => {
@@ -174,7 +158,7 @@ export function GraphicDesignShowcase({
         </div>
       </section>
 
-      {/* 2 — Flying Posters only (no text overlays) */}
+      {/* 2 — Flying Posters over a giant wordmark */}
       <section
         ref={galleryRef}
         id="showcase-gallery"
@@ -183,10 +167,13 @@ export function GraphicDesignShowcase({
       >
         <div
           ref={trackRef}
-          className={cn(styles.track, !allowPosters && styles.trackStatic)}
+          className={cn(styles.track, !showPosters && styles.trackStatic)}
         >
           <div className={styles.pin}>
             <div className={styles.stage}>
+              <p className={styles.wordmark} aria-hidden="true">
+                Designs!!!
+              </p>
               {showPosters ? (
                 <FlyingPosters
                   items={posterItems as never[]}
@@ -195,10 +182,11 @@ export function GraphicDesignShowcase({
                   distortion={isCompact ? 1.35 : 2.6}
                   scrollEase={isCompact ? 0.2 : 0.12}
                   cameraFov={isCompact ? 52 : 42}
-                  cameraZ={isCompact ? 18 : 18}
+                  cameraZ={18}
                   quality={isCompact ? "low" : "high"}
                   externalControl
                   onReady={onPostersReady}
+                  onError={onPostersError}
                   className={styles.posters}
                 />
               ) : (

@@ -17,14 +17,15 @@ import {
   getGraphicDesignJsonLd,
   graphicDesignSolutionsMetadata,
 } from "@/lib/seo/graphic-design-solutions";
+import { getGraphicDesignPageContent } from "@/lib/wordpress";
 
 export const metadata = graphicDesignSolutionsMetadata;
 
 /**
- * Graphic Design Solutions — final page composition.
- * Reuses SiteHeader, SiteFooter, ProfessionalCtaSection, FaqSection.
+ * Graphic Design Solutions — hero + services intro from WordPress page 2417.
  */
-export default function GraphicDesignSolutionsPage() {
+export default async function GraphicDesignSolutionsPage() {
+  const wp = await getGraphicDesignPageContent();
   const jsonLd = getGraphicDesignJsonLd();
 
   return (
@@ -36,9 +37,9 @@ export default function GraphicDesignSolutionsPage() {
         }}
       />
       <SiteHeader />
-      <main className="flex flex-1 flex-col overflow-x-clip">
-        <GraphicDesignHero />
-        <GraphicDesignSubServices />
+      <main className="flex flex-1 flex-col">
+        <GraphicDesignHero copy={wp.hero} />
+        <GraphicDesignSubServices copy={wp.servicesIntro} />
         <GraphicDesignShowcase />
         <GraphicDesignApproach />
         <GraphicDesignWhyUs />

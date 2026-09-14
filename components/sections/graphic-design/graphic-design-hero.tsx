@@ -14,12 +14,13 @@ import {
   registerGsapPlugins,
   ScrollTrigger,
 } from "@/lib/animations";
+import type { GraphicDesignHeroContent } from "@/lib/wordpress";
 import { cn } from "@/lib/utils";
 
 import styles from "./graphic-design-hero.module.css";
 
-const FloatingLines = dynamic(
-  () => import("@/components/effects/floating-lines"),
+const SoftAurora = dynamic(
+  () => import("@/components/effects/soft-aurora"),
   {
     ssr: false,
     loading: () => null,
@@ -28,13 +29,14 @@ const FloatingLines = dynamic(
 
 type GraphicDesignHeroProps = {
   className?: string;
+  copy: GraphicDesignHeroContent;
 };
 
-/** FloatingLines palette — vivid wave lines like the reference, teal-forward. */
-const LINES_LIGHT = ["#7B5CFF", "#E947F5", "#478997", "#6AADB8"];
-const LINES_DARK = ["#6AADB8", "#478997", "#E947F5", "#FEA106"];
+/** SoftAurora palette — light uses primary teal only; dark keeps secondary chroma. */
+const AURORA_LIGHT = { color1: "#478997", color2: "#478997" };
+const AURORA_DARK = { color1: "#6AADB8", color2: "#E947F5" };
 
-function canUseLines(): boolean {
+function canUseAurora(): boolean {
   if (typeof window === "undefined") return false;
 
   const coarse = window.matchMedia("(pointer: coarse)").matches;
@@ -58,17 +60,17 @@ function canUseLines(): boolean {
 }
 
 /**
- * Graphic Design Solutions hero — FloatingLines full-bleed + centered badge/headline.
- * LCP heading stays visible HTML; GSAP only enhances.
+ * Graphic Design Solutions hero — SoftAurora + WordPress page 2417 copy.
  */
-export function GraphicDesignHero({ className }: GraphicDesignHeroProps) {
+export function GraphicDesignHero({ className, copy }: GraphicDesignHeroProps) {
   const reduceMotion = usePrefersReducedMotion();
   const { resolvedTheme } = useTheme();
   const isClient = useIsClient();
   const isCompact = useMediaQuery("(max-width: 768px)");
   const sectionRef = useRef<HTMLElement>(null);
   const isLight = isClient && resolvedTheme === "light";
-  const allowLines = isClient && !reduceMotion && canUseLines();
+  const allowAurora = isClient && !reduceMotion && canUseAurora();
+  const colors = isLight ? AURORA_LIGHT : AURORA_DARK;
 
   useGSAP(
     () => {
@@ -79,7 +81,9 @@ export function GraphicDesignHero({ className }: GraphicDesignHeroProps) {
 
       const badge = hero.querySelector<HTMLElement>("[data-gd-badge]");
       const heading = hero.querySelector<HTMLElement>("[data-lcp]");
-      const lines = hero.querySelector<HTMLElement>("[data-gd-lines]");
+      const body = hero.querySelector<HTMLElement>("[data-gd-body]");
+      const aurora = hero.querySelector<HTMLElement>("[data-gd-aurora]");
+      const stack = hero.querySelector<HTMLElement>("[data-gd-stack]");
 
       const tl = gsap.timeline({ defaults: { ease: EASE_OUT_EXPO } });
 
@@ -95,9 +99,17 @@ export function GraphicDesignHero({ className }: GraphicDesignHeroProps) {
         );
       }
 
-      if (lines) {
+      if (body) {
         tl.from(
-          lines,
+          body,
+          { y: 8, opacity: 0.4, duration: 0.55, clearProps: "transform,opacity" },
+          0.12,
+        );
+      }
+
+      if (aurora) {
+        tl.from(
+          aurora,
           {
             opacity: 0.35,
             scale: 1.02,
@@ -108,7 +120,6 @@ export function GraphicDesignHero({ className }: GraphicDesignHeroProps) {
         );
       }
 
-      // Desktop-only scrub — skip costly parallax on compact viewports
       if (isCompact) {
         return () => {
           tl.kill();
@@ -124,14 +135,17 @@ export function GraphicDesignHero({ className }: GraphicDesignHeroProps) {
         },
       });
 
-      scrollTl.to(hero, { scale: 0.985, ease: "none" }, 0);
+      // Never transform the section itself — that kills backdrop-filter in Chromium
+      if (aurora) {
+        scrollTl.to(aurora, { y: 28, scale: 0.97, ease: "none" }, 0);
+      }
 
       if (heading) {
         scrollTl.to(heading, { y: -24, ease: "none" }, 0);
       }
 
-      if (lines) {
-        scrollTl.to(lines, { y: 24, scale: 0.97, ease: "none" }, 0);
+      if (stack) {
+        scrollTl.to(stack, { y: -10, ease: "none" }, 0);
       }
 
       return () => {
@@ -153,44 +167,42 @@ export function GraphicDesignHero({ className }: GraphicDesignHeroProps) {
       aria-label="Graphic Design Solutions"
       className={cn(styles.section, className)}
     >
-      <div data-gd-lines className={styles.linesLayer} aria-hidden>
-        {allowLines ? (
-          <FloatingLines
-            linesGradient={isLight ? LINES_LIGHT : LINES_DARK}
-            enabledWaves={["top", "middle", "bottom"]}
-            lineCount={isCompact ? [3, 4, 3] : [5, 7, 5]}
-            lineDistance={isCompact ? [7, 6, 7] : [5, 4, 5]}
-            topWavePosition={{ x: 10.0, y: 0.5, rotate: -0.4 }}
-            middleWavePosition={{ x: 5.0, y: 0.0, rotate: 0.2 }}
-            bottomWavePosition={{ x: 2.0, y: -0.7, rotate: -1 }}
-            animationSpeed={isCompact ? 0.4 : 0.75}
-            interactive={!isCompact}
-            parallax={!isCompact}
-            parallaxStrength={0.18}
-            bendRadius={5}
-            bendStrength={-0.45}
-            mixBlendMode="screen"
-            backgroundColor={isLight ? "#f4f8f9" : "#04070a"}
+      <div data-gd-aurora className={styles.auroraLayer} aria-hidden>
+        {allowAurora ? (
+          <SoftAurora
+            color1={colors.color1}
+            color2={colors.color2}
             lightMode={isLight}
+            speed={isCompact ? 0.4 : 0.65}
+            brightness={isLight ? 0.38 : 1.15}
+            scale={isCompact ? 1.35 : 1.55}
+            bandHeight={0.48}
+            bandSpread={1.05}
+            enableMouseInteraction={!isCompact}
+            mouseInfluence={0.22}
           />
         ) : (
-          <div className={styles.linesFallback} />
+          <div className={styles.auroraFallback} />
         )}
       </div>
 
       <div aria-hidden className={styles.veil} />
 
       <div className={styles.shell}>
-        <div className={styles.stack}>
+        <div data-gd-stack className={styles.stack}>
+          <div aria-hidden className={styles.frost} />
           <div data-gd-badge className={styles.badge}>
-            <span className={styles.badgeNew}>New</span>
-            <span className={styles.badgeLabel}>Graphic Design</span>
+            <span className={styles.badgeChip}>Home</span>
+            <span className={styles.badgeLabel}>{copy.eyebrow}</span>
           </div>
 
           <h1 data-lcp className={styles.headline}>
-            Graphic Design Solutions
-            <span className={styles.headlineBreak}>Crafted to cut through.</span>
+            {copy.headline}
           </h1>
+
+          <p data-gd-body className={styles.body}>
+            {copy.body}
+          </p>
         </div>
       </div>
     </section>
