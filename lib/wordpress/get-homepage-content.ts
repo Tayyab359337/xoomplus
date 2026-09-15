@@ -7,7 +7,10 @@ import type { FaqItem } from "@/lib/data/faq";
 import { footerCopy } from "@/lib/data/footer";
 import type { PortfolioProject, PortfolioTone } from "@/lib/data/portfolio";
 import { serviceCategories, type ServiceCategory } from "@/lib/data/services";
-import type { Testimonial } from "@/lib/data/testimonials";
+import {
+  testimonials as fallbackTestimonials,
+  type Testimonial,
+} from "@/lib/data/testimonials";
 
 import { WP_HOME_PAGE_ID, WP_ORIGIN, WP_REST } from "./config";
 import { parseHomepageHtml } from "./parse-homepage-html";
@@ -262,19 +265,25 @@ export const getHomepageContent = cache(
   ]);
 
   // Prefer live HTML (complete Elementor markup); fall back to REST content.
-  // Also merge logos from REST when the carousel is only present there.
-  const sourceHtml = html.length > 10_000 ? html : page.content?.rendered || "";
+  // Also merge logos / testimonials from REST when live markup omits them.
+  const restHtml = page.content?.rendered || "";
+  const sourceHtml = html.length > 10_000 ? html : restHtml;
   const parsed = parseHomepageHtml(sourceHtml);
-  const restLogos =
-    page.content?.rendered && page.content.rendered !== sourceHtml
-      ? parseHomepageHtml(page.content.rendered).logos
-      : [];
-  if (restLogos.length > parsed.logos.length) {
-    parsed.logos = restLogos;
+  const restParsed =
+    restHtml && restHtml !== sourceHtml ? parseHomepageHtml(restHtml) : null;
+
+  if (restParsed && restParsed.logos.length > parsed.logos.length) {
+    parsed.logos = restParsed.logos;
   }
-  // If live HTML missed logos but REST has them (or vice versa), keep whichever is populated
-  if (parsed.logos.length === 0 && page.content?.rendered) {
-    parsed.logos = parseHomepageHtml(page.content.rendered).logos;
+  if (parsed.logos.length === 0 && restParsed) {
+    parsed.logos = restParsed.logos;
+  }
+  // Review cards are reliable in REST `content.rendered`. Live HTML from some
+  // edge fetches can omit them while still matching the section heading text.
+  if (restParsed && restParsed.testimonials.length > 0) {
+    parsed.testimonials = restParsed.testimonials;
+  } else if (parsed.testimonials.length === 0 && restHtml) {
+    parsed.testimonials = parseHomepageHtml(restHtml).testimonials;
   }
 
   const portfolioImages = await resolvePortfolioImages(parsed.portfolio);
@@ -371,15 +380,19 @@ export const getHomepageContent = cache(
     answer: faq.answer,
   }));
 
-  const testimonials: Testimonial[] = parsed.testimonials.map((item) => ({
-    id: slugify(item.name),
+  const parsedTestimonials: Testimonial[] = parsed.testimonials.map((item) => ({
+    id: slugify(item.name) || slugify(item.title) || "client",
     quote: item.quote,
     name: item.name,
     role: item.title,
     company: "",
-    avatar: item.avatar,
+    avatar: item.avatar || undefined,
     avatarAlt: item.name,
   }));
+  const testimonials: Testimonial[] =
+    parsedTestimonials.length > 0
+      ? parsedTestimonials
+      : fallbackTestimonials.map((item) => ({ ...item }));
 
   const homepageTitles = [
     "WordPress Development Trends to Watch in 2026",

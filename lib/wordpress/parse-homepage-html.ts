@@ -153,14 +153,24 @@ export function parseHomepageHtml(html: string) {
   }
 
   const testimonials: ParsedTestimonial[] = [];
+  // Attribute order on <img> varies (class/src/alt); keep the match local to each card.
   const testimonialRe =
-    /<p class="card-title">([\s\S]*?)<\/p>[\s\S]*?<p class="card-text">([\s\S]*?)<\/p>[\s\S]*?<img[^>]*class="avatar"[^>]*src="([^"]+)"[^>]*alt="([^"]*)"[\s\S]*?<span class="author-name">([\s\S]*?)<\/span>/gi;
+    /<p class="[^"]*card-title[^"]*">([\s\S]*?)<\/p>[\s\S]*?<p class="[^"]*card-text[^"]*">([\s\S]*?)<\/p>[\s\S]*?<img\b([^>]*\bavatar\b[^>]*)>[\s\S]*?<span class="[^"]*author-name[^"]*">([\s\S]*?)<\/span>/gi;
   while ((match = testimonialRe.exec(html))) {
+    const imgAttrs = match[3] ?? "";
+    const avatar =
+      imgAttrs.match(/\bsrc=["']([^"']+)["']/i)?.[1] ??
+      imgAttrs.match(/\bdata-src=["']([^"']+)["']/i)?.[1] ??
+      "";
+    const alt = imgAttrs.match(/\balt=["']([^"']*)["']/i)?.[1] ?? "";
+    const quote = decodeHtml(match[2]!.replace(/<[^>]+>/g, " "));
+    const name = decodeHtml(match[4]!.replace(/<[^>]+>/g, " ")) || decodeHtml(alt);
+    if (!quote || !name) continue;
     testimonials.push({
-      title: decodeHtml(match[1]!),
-      quote: decodeHtml(match[2]!),
-      avatar: match[3]!,
-      name: decodeHtml(match[5]!) || decodeHtml(match[4]!),
+      title: decodeHtml(match[1]!.replace(/<[^>]+>/g, " ")),
+      quote,
+      avatar,
+      name,
     });
   }
 

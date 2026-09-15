@@ -191,6 +191,7 @@ export function Hero({ className }: HeroProps) {
             className={styles.trust}
             aria-label="Trusted reviews"
           >
+            <a href="https://www.google.com/search?sca_esv=2e0bf73006d1ba9f&rlz=1C1CHBF_enPK1130PK1131&kgmid=/g/11vx_slwfg&q=Xoomplus&shndl=30&shem=lcuae,lsctac,uaasie,shrtsdl&source=sh/x/loc/uni/m1/1&kgs=e67c915574c33667&utm_source=lcuae,lsctac,uaasie,shrtsdl,sh/x/loc/uni/m1/1#lrd=0x38df95000d84e457:0xe13a404eab3f5547,3,,,," target="__blank">
             <div className={styles.trustBadge}>
               <GoogleMark className={styles.trustIcon} />
               <div className={styles.trustMeta}>
@@ -201,8 +202,10 @@ export function Hero({ className }: HeroProps) {
                 </span>
               </div>
             </div>
+            </a>
 
-            <div className={styles.trustBadge}>
+           <a href="https://www.trustpilot.com/review/xoomplus.co.uk" target="__blank">
+           <div className={styles.trustBadge}>
               <TrustpilotMark className={styles.trustIcon} />
               <div className={styles.trustMeta}>
                 <span className={styles.trustName}>Trustpilot</span>
@@ -211,6 +214,7 @@ export function Hero({ className }: HeroProps) {
                 </span>
               </div>
             </div>
+           </a>
 
             <span aria-hidden className={styles.trustDivider} />
             <span className={styles.trustLabel}>Trusted Reviews</span>

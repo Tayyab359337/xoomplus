@@ -32,7 +32,8 @@ export function TestimonialsSection({
 }: TestimonialsSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
-  const list = items ?? testimonials;
+  // Empty WP parse used to win over static fallback (`??` only treats nullish).
+  const list = items && items.length > 0 ? items : testimonials;
   const sectionCopy = copy ?? testimonialsSectionCopy;
 
   return (

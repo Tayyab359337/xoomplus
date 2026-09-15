@@ -9,79 +9,69 @@ export type Testimonial = {
 };
 
 /**
- * Editable homepage testimonials — feed InfiniteMovingCards from this object only.
+ * Homepage testimonials — used when WordPress parse returns none.
+ * Keep in sync with the review cards on xoomplus.co.uk.
  */
 export const testimonials: Testimonial[] = [
   {
-    id: "mira",
+    id: "hashaam-khalid",
     quote:
-      "Xoomplus didn't decorate our product — they clarified it. The brand finally matches how the product actually feels in someone's hands.",
-    name: "Mira Chen",
-    role: "Head of Brand",
-    company: "Northline",
+      "Got great copywriting services and social media services. Great content writers, also social media team too. Wrote some of the best content ever written. Great sense of humor, charming and handsome staff. Especially content writer.",
+    name: "Hashaam Khalid",
+    role: "Outstanding Content Team",
+    company: "",
     avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80",
-    avatarAlt: "Portrait of Mira Chen",
+      "https://concisemedico.co.uk/wp-content/uploads/2024/09/user.png",
+    avatarAlt: "Hashaam Khalid",
   },
   {
-    id: "julian",
+    id: "muhammad-tayyab",
     quote:
-      "We expected decks. We got a system — strategy, craft, and launch moving as one. Revenue followed because the story finally held.",
-    name: "Julian Ortega",
-    role: "Founder",
-    company: "Pulse Lab",
+      "I had a great experience working with Xoomplus! The team is super professional and really knows their stuff when it comes to web development. They built custom solutions for me quickly without compromising on quality. Definitely recommend them if you're looking for top-notch web development.",
+    name: "Muhammad Tayyab",
+    role: "Top-Notch Web Development",
+    company: "",
     avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80",
-    avatarAlt: "Portrait of Julian Ortega",
+      "https://concisemedico.co.uk/wp-content/uploads/2024/09/user.png",
+    avatarAlt: "Muhammad Tayyab",
   },
   {
-    id: "amina",
+    id: "jawad-rehman",
     quote:
-      "The site feels like walking through our studio. Quiet confidence, sharp pacing — clients understand us before the first call.",
-    name: "Amina Okonkwo",
-    role: "Principal",
-    company: "Atelier Nine",
+      "Great experience working with XoomPlus. The team is responsive, supportive, and delivers on time. Really happy with the results",
+    name: "Jawad Rehman",
+    role: "Great Experience",
+    company: "",
     avatar:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=160&q=80",
-    avatarAlt: "Portrait of Amina Okonkwo",
+      "https://concisemedico.co.uk/wp-content/uploads/2024/09/user.png",
+    avatarAlt: "Jawad Rehman",
   },
   {
-    id: "theo",
+    id: "salma-nawaz",
     quote:
-      "Performance creative without the noise. Every asset had a job. CAC dropped, and the brand didn't get cheaper looking in the process.",
-    name: "Theo Rankin",
-    role: "VP Growth",
-    company: "Signal OS",
+      "This full stack digital marketing agency delivered outstanding results across SEO, PPC, content marketing, and social media. Their data driven approach, clear communication, and integrated strategy helped boost our online visibility, search rankings, and lead generation. Highly recommend for businesses seeking a reliable marketing solution!",
+    name: "Salma Nawaz",
+    role: "Outstanding Results",
+    company: "",
     avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=160&q=80",
-    avatarAlt: "Portrait of Theo Rankin",
+      "https://concisemedico.co.uk/wp-content/uploads/2024/09/user.png",
+    avatarAlt: "Salma Nawaz",
   },
   {
-    id: "elena",
+    id: "ayesha-khan",
     quote:
-      "They treat hospitality like cinema — every touchpoint carries tone. Guests notice before they can explain why.",
-    name: "Elena Vasquez",
-    role: "Creative Director",
-    company: "Harbor & Co.",
+      "I recently joined Xoom Plus as a Content Writer Intern, and my experience so far has been excellent. The company offers flexible working hours, which helps maintain a healthy work-life balance. The work environment is very positive, and the staff is cooperative, supportive, and welcoming.",
+    name: "Ayesha Khan",
+    role: "Great Workplace",
+    company: "",
     avatar:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=160&q=80",
-    avatarAlt: "Portrait of Elena Vasquez",
-  },
-  {
-    id: "noah",
-    quote:
-      "Embedded partnership, not vendor theater. Decisions landed fast because the team understood the constraint as well as the ambition.",
-    name: "Noah Park",
-    role: "CMO",
-    company: "Ledger Form",
-    avatar:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=160&q=80",
-    avatarAlt: "Portrait of Noah Park",
+      "https://concisemedico.co.uk/wp-content/uploads/2024/09/user.png",
+    avatarAlt: "Ayesha Khan",
   },
 ];
 
 export const testimonialsSectionCopy = {
-  eyebrow: "Clients",
-  title: "Words from people who shipped with us.",
-  body: "Not reviews for the algorithm — notes from partners who stayed.",
+  eyebrow: "testimonials",
+  title: "Discover how XoomPlus drives real growth for businesses like yours",
+  body: "",
 } as const;
