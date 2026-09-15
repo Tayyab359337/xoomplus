@@ -1,14 +1,14 @@
 "use client";
-import React, { useEffect, useId, useRef, useState } from "react";
-import { motion } from "motion/react";
+import React, { useId, useRef, useState } from "react";
+import { motion, useMotionTemplate, useMotionValue } from "motion/react";
 
 /**
  * Aceternity Text Hover Effect — SVG stroke reveal that follows the cursor.
- * IDs are scoped so multiple instances (or SSR) stay safe.
+ * Mask position uses MotionValues (no React re-renders on mousemove).
  */
 export const TextHoverEffect = ({
   text,
-  duration,
+  duration = 0,
 }: {
   text: string;
   duration?: number;
@@ -20,21 +20,20 @@ export const TextHoverEffect = ({
   const maskGradientId = `revealMask-${reactId}`;
   const maskId = `textMask-${reactId}`;
 
-  const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState(false);
-  const [maskPosition, setMaskPosition] = useState({ cx: "50%", cy: "50%" });
+  const mouseX = useMotionValue(50);
+  const mouseY = useMotionValue(50);
+  const maskCx = useMotionTemplate`${mouseX}%`;
+  const maskCy = useMotionTemplate`${mouseY}%`;
 
-  useEffect(() => {
-    if (svgRef.current && cursor.x !== null && cursor.y !== null) {
-      const svgRect = svgRef.current.getBoundingClientRect();
-      const cxPercentage = ((cursor.x - svgRect.left) / svgRect.width) * 100;
-      const cyPercentage = ((cursor.y - svgRect.top) / svgRect.height) * 100;
-      setMaskPosition({
-        cx: `${cxPercentage}%`,
-        cy: `${cyPercentage}%`,
-      });
-    }
-  }, [cursor]);
+  const onMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const svgRect = svg.getBoundingClientRect();
+    if (svgRect.width <= 0 || svgRect.height <= 0) return;
+    mouseX.set(((e.clientX - svgRect.left) / svgRect.width) * 100);
+    mouseY.set(((e.clientY - svgRect.top) / svgRect.height) * 100);
+  };
 
   const textClass =
     "fill-transparent stroke-[color-mix(in_srgb,var(--foreground)_18%,transparent)] font-display text-7xl font-bold dark:stroke-[color-mix(in_srgb,var(--foreground)_14%,transparent)]";
@@ -48,7 +47,7 @@ export const TextHoverEffect = ({
       xmlns="http://www.w3.org/2000/svg"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onMouseMove={(e) => setCursor({ x: e.clientX, y: e.clientY })}
+      onMouseMove={onMouseMove}
       className="select-none"
       aria-hidden
     >
@@ -75,9 +74,9 @@ export const TextHoverEffect = ({
           id={maskGradientId}
           gradientUnits="userSpaceOnUse"
           r="20%"
-          initial={{ cx: "50%", cy: "50%" }}
-          animate={maskPosition}
-          transition={{ duration: duration ?? 0, ease: "easeOut" }}
+          cx={maskCx}
+          cy={maskCy}
+          transition={{ duration, ease: "easeOut" }}
         >
           <stop offset="0%" stopColor="white" />
           <stop offset="100%" stopColor="black" />

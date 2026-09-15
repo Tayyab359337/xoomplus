@@ -300,6 +300,7 @@ class Canvas {
     this.cameraZ = cameraZ;
     this.raf = 0;
     this.isDestroyed = false;
+    this.suspended = false;
 
     AutoBind(this);
 
@@ -513,6 +514,11 @@ class Canvas {
   update() {
     if (this.isDestroyed) return;
 
+    if (this.suspended) {
+      this.raf = 0;
+      return;
+    }
+
     if (!this.externalControl) {
       this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease);
     }
@@ -523,6 +529,13 @@ class Canvas {
     this.renderer.render({ scene: this.scene, camera: this.camera });
     this.scroll.last = this.scroll.current;
     this.raf = requestAnimationFrame(this.update);
+  }
+
+  setSuspended(suspended) {
+    this.suspended = Boolean(suspended);
+    if (!this.suspended && !this.isDestroyed && !this.raf) {
+      this.raf = requestAnimationFrame(this.update);
+    }
   }
 
   addEventListeners() {
@@ -635,6 +648,16 @@ export default function FlyingPosters({
         instance?.onResize();
       });
       ro.observe(containerRef.current);
+
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          instance?.setSuspended(!entry.isIntersecting);
+        },
+        { rootMargin: '120px 0px' }
+      );
+      io.observe(containerRef.current);
+      // Store on instance for cleanup via closure
+      instance._visibilityIo = io;
     } catch (err) {
       instanceRef.current = null;
       onErrorRef.current?.(err);
@@ -643,6 +666,7 @@ export default function FlyingPosters({
 
     return () => {
       ro?.disconnect();
+      instance?._visibilityIo?.disconnect();
       instance?.destroy();
       instanceRef.current = null;
       // Cleanup only — do not treat as a hard failure

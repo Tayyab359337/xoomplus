@@ -109,7 +109,7 @@ export function GraphicDesignShowcase({
         trigger: track,
         start: "top top",
         end: "bottom bottom",
-        scrub: isCompact ? 0.65 : 0.45,
+        scrub: true,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           postersApiRef.current?.setScrollProgress(self.progress);

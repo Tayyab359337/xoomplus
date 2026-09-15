@@ -1,161 +1,32 @@
-import {
-  gsap,
-  isCompactViewport,
-  prefersReducedMotion,
-  registerGsapPlugins,
-} from "./gsap";
-import { EASE_OUT_EXPO, EASE_OUT_SOFT } from "./presets";
+/**
+ * Minimal helpers for the route fade.
+ * Navigation is never delayed — these only tidy leftover DOM from older builds.
+ */
 
 const EXIT_LAYER_ID = "xp-page-exit-layer";
+const LEGACY_OVERLAY_ID = "xp-page-transition";
 const ROOT_SELECTOR = "[data-animation-root]";
 
-/** Outgoing soften — keeps page visible while navigation starts */
-const LEAVE_DURATION = 0.18;
-/** Resolve leave early so the route changes mid-fade (overlap) */
-const LEAVE_HANDOFF = 0.09;
-/** Incoming settle */
-const ENTER_DURATION = 0.3;
-/** Incoming starts slightly after outgoing continues dissolving */
-const ENTER_STAGGER = 0.05;
+export const PAGE_FADE_MS = 180;
 
-function exitOffsetY() {
-  return isCompactViewport() ? -5 : -8;
-}
-
-function enterOffsetY() {
-  return isCompactViewport() ? 5 : 8;
-}
-
-function getRoot(): HTMLElement | null {
+export function getAnimationRoot(): HTMLElement | null {
   if (typeof document === "undefined") return null;
   return document.querySelector<HTMLElement>(ROOT_SELECTOR);
 }
 
-function removeExitLayer() {
+/** Remove clone/overlay leftovers so they never block interaction. */
+export function clearLegacyPageTransitionArtifacts() {
+  if (typeof document === "undefined") return;
   document.getElementById(EXIT_LAYER_ID)?.remove();
-}
-
-/** Strip legacy black veil if an older build left it in the DOM */
-function removeLegacyOverlay() {
-  document.getElementById("xp-page-transition")?.remove();
+  document.getElementById(LEGACY_OVERLAY_ID)?.remove();
+  document.querySelectorAll(".xp-page-exit-layer").forEach((el) => el.remove());
 }
 
 /**
- * Snapshot the current page into a fixed layer, then hand off quickly.
- * Navigation should start while this layer is still faintly visible.
+ * Whether an internal link is a same-origin route change.
+ * Kept for callers that want to skip hash/mailto/external links —
+ * the fade itself does not intercept clicks.
  */
-export function playPageLeave(): Promise<void> {
-  registerGsapPlugins();
-  removeLegacyOverlay();
-
-  if (prefersReducedMotion()) {
-    removeExitLayer();
-    return Promise.resolve();
-  }
-
-  const root = getRoot();
-  if (!root) return Promise.resolve();
-
-  removeExitLayer();
-
-  const rect = root.getBoundingClientRect();
-  const clone = root.cloneNode(true) as HTMLElement;
-  clone.id = EXIT_LAYER_ID;
-  clone.setAttribute("aria-hidden", "true");
-  clone.classList.add("xp-page-exit-layer");
-  clone.style.top = `${Math.round(rect.top)}px`;
-  clone.style.width = `${Math.round(rect.width)}px`;
-  clone.style.left = `${Math.round(rect.left)}px`;
-
-  document.body.appendChild(clone);
-
-  // Hide live root — clone carries the visual until the next route mounts
-  gsap.set(root, { autoAlpha: 0 });
-
-  gsap.killTweensOf(clone);
-  gsap.fromTo(
-    clone,
-    { autoAlpha: 1, y: 0 },
-    {
-      autoAlpha: 0.82,
-      y: exitOffsetY() * 0.35,
-      duration: LEAVE_DURATION,
-      ease: EASE_OUT_SOFT,
-    },
-  );
-
-  // Handoff early — destination can mount while the clone is still dissolving
-  return new Promise((resolve) => {
-    gsap.delayedCall(LEAVE_HANDOFF, () => resolve());
-  });
-}
-
-/**
- * Crossfade: finish dissolving the exit snapshot while the new root settles in.
- * Safe if there is no exit layer (back/forward / direct entry).
- */
-export function playPageEnter(): Promise<void> {
-  registerGsapPlugins();
-  removeLegacyOverlay();
-
-  const root = getRoot();
-  const clone = document.getElementById(EXIT_LAYER_ID);
-
-  if (prefersReducedMotion()) {
-    removeExitLayer();
-    if (root) gsap.set(root, { clearProps: "opacity,visibility,transform" });
-    return Promise.resolve();
-  }
-
-  if (!root) {
-    removeExitLayer();
-    return Promise.resolve();
-  }
-
-  gsap.killTweensOf([root, clone].filter(Boolean));
-
-  const yIn = enterOffsetY();
-  const yOut = exitOffsetY();
-
-  gsap.set(root, { autoAlpha: 0, y: yIn });
-
-  return new Promise((resolve) => {
-    const tl = gsap.timeline({
-      defaults: { ease: EASE_OUT_EXPO },
-      onComplete: () => {
-        removeExitLayer();
-        gsap.set(root, { clearProps: "opacity,visibility,transform" });
-        resolve();
-      },
-    });
-
-    if (clone) {
-      tl.to(
-        clone,
-        {
-          autoAlpha: 0,
-          y: yOut,
-          duration: 0.2,
-          ease: EASE_OUT_SOFT,
-        },
-        0,
-      );
-    }
-
-    tl.to(
-      root,
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: ENTER_DURATION,
-        ease: EASE_OUT_EXPO,
-      },
-      clone ? ENTER_STAGGER : 0,
-    );
-  });
-}
-
-/** Whether a click should use the app page transition */
 export function shouldTransitionLink(anchor: HTMLAnchorElement): boolean {
   const href = anchor.getAttribute("href");
   if (!href) return false;
@@ -175,7 +46,6 @@ export function shouldTransitionLink(anchor: HTMLAnchorElement): boolean {
   }
 
   if (anchor.dataset.noTransition != null) return false;
-
   if (href.startsWith("#")) return false;
 
   try {
@@ -191,4 +61,23 @@ export function shouldTransitionLink(anchor: HTMLAnchorElement): boolean {
   } catch {
     return false;
   }
+}
+
+/** @deprecated No-op — leave animations removed; navigation must never wait. */
+export function playPageLeave(): Promise<void> {
+  clearLegacyPageTransitionArtifacts();
+  return Promise.resolve();
+}
+
+/** @deprecated Prefer the CSS fade in PageTransition; kept for import compatibility. */
+export function playPageEnter(): Promise<void> {
+  clearLegacyPageTransitionArtifacts();
+  const root = getAnimationRoot();
+  if (root) {
+    root.removeAttribute("data-page-fade");
+    root.style.removeProperty("opacity");
+    root.style.removeProperty("visibility");
+    root.style.removeProperty("transform");
+  }
+  return Promise.resolve();
 }

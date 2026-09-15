@@ -46,8 +46,15 @@
   border: 1px solid color-mix(in srgb, #71717a 22%, transparent);
 }
 
-:global(.dark) .loopWrap :global(.logoloop) {
-  --logoloop-fadeColor: #d4d4d8;
+/* Dark mode: no edge fades — they clash with the zinc band */
+:global(.dark) .loopWrap :global(.logoloop--fade)::before,
+:global(.dark) .loopWrap :global(.logoloop--fade)::after,
+.loopWrap[data-logo-fade="off"] :global(.logoloop--fade)::before,
+.loopWrap[data-logo-fade="off"] :global(.logoloop--fade)::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  background: none !important;
 }
 
 :global(.dark) .brand {

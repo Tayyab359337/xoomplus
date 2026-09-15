@@ -31,6 +31,10 @@
   animation-play-state: paused;
 }
 
+.scroller[data-in-view="false"] .track {
+  animation-play-state: paused;
+}
+
 .set {
   display: flex;
   flex-shrink: 0;

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, memo } from "react";
+import React, { useEffect, useMemo, memo, useRef } from "react";
 import {
   motion,
   useMotionValue,
@@ -71,8 +71,10 @@ export const ParallaxHeroImages = ({
   imageClassName,
   variant = "default",
 }: ParallaxHeroImagesProps) => {
+  const rootRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const activeRef = useRef(true);
 
   const smoothMouseX = useSpring(mouseX, SPRING_CONFIG);
   const smoothMouseY = useSpring(mouseY, SPRING_CONFIG);
@@ -89,19 +91,41 @@ export const ParallaxHeroImages = ({
   }, [images, variant]);
 
   useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    if (coarse) return;
+
     const handleMouseMove = (e: MouseEvent) => {
+      if (!activeRef.current) return;
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
       mouseX.set(x);
       mouseY.set(y);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        activeRef.current = entry.isIntersecting;
+        if (!entry.isIntersecting) {
+          mouseX.set(0);
+          mouseY.set(0);
+        }
+      },
+      { rootMargin: "80px 0px" },
+    );
+    io.observe(root);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => {
+      io.disconnect();
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, [mouseX, mouseY]);
 
   return (
     <div
+      ref={rootRef}
       className={cn(
         "pointer-events-none absolute inset-0 overflow-hidden",
         className,
@@ -117,6 +141,7 @@ export const ParallaxHeroImages = ({
           imageClassName={imageClassName}
           smoothMouseX={smoothMouseX}
           smoothMouseY={smoothMouseY}
+          priority={index < 2}
         />
       ))}
     </div>
@@ -127,6 +152,7 @@ interface ParallaxImageProps extends ImagePosition {
   imageClassName?: string;
   smoothMouseX: MotionValue<number>;
   smoothMouseY: MotionValue<number>;
+  priority?: boolean;
 }
 
 const ParallaxImage = memo(function ParallaxImage({
@@ -137,6 +163,7 @@ const ParallaxImage = memo(function ParallaxImage({
   imageClassName,
   smoothMouseX,
   smoothMouseY,
+  priority = false,
 }: ParallaxImageProps) {
   const maxOffset = 40;
 
@@ -165,19 +192,23 @@ const ParallaxImage = memo(function ParallaxImage({
         y: translateY,
         zIndex: Math.round(depth * 10),
       }}
-      initial={{ opacity: 0, filter: "blur(20px)", scale: 0.9 }}
-      animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+      // Opacity/scale only — animating filter:blur is a major compositor cost.
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={{ opacity: 1, scale: 1 }}
       transition={{
         duration: 0.8,
         delay: delay,
         ease: [0.25, 0.1, 0.25, 1],
       }}
     >
+      {/* Decorative parallax — next/image sizes vary too widely for fixed art direction */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt=""
-        loading="lazy"
+        loading={priority ? "eager" : "lazy"}
         decoding="async"
+        fetchPriority={priority ? "low" : "auto"}
         className={cn(
           "aspect-4/3 h-20 w-32 rounded-lg object-cover shadow-sm ring-1 ring-black/10 sm:h-40 sm:w-56 md:h-52 md:w-80 dark:ring-white/10",
           imageClassName,

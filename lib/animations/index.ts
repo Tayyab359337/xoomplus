@@ -57,6 +57,9 @@ export {
 } from "./preloader";
 
 export {
+  clearLegacyPageTransitionArtifacts,
+  getAnimationRoot,
+  PAGE_FADE_MS,
   playPageEnter,
   playPageLeave,
   shouldTransitionLink,

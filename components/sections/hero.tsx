@@ -73,9 +73,9 @@ export function Hero({ className }: HeroProps) {
             cursorSize={110}
             isViscous={false}
             viscous={30}
-            iterationsViscous={16}
-            iterationsPoisson={16}
-            resolution={0.28}
+            iterationsViscous={12}
+            iterationsPoisson={12}
+            resolution={0.22}
             isBounce={false}
             autoDemo={false}
             autoSpeed={0.45}

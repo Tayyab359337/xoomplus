@@ -7,7 +7,7 @@ import { useCallback, useRef } from "react";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
-import { gsap, registerGsapPlugins, ScrollTrigger } from "@/lib/animations";
+import { gsap, refreshScrollTrigger, registerGsapPlugins, ScrollTrigger } from "@/lib/animations";
 import {
   seoProcessCopy,
   seoProcessSteps,
@@ -172,7 +172,7 @@ export function SeoProcess({
 
         triggerRef.current = tween.scrollTrigger ?? null;
 
-        const refresh = () => ScrollTrigger.refresh();
+        const refresh = () => refreshScrollTrigger();
         requestAnimationFrame(refresh);
         window.addEventListener("load", refresh, { once: true });
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 
 import type { Testimonial } from "@/lib/data/testimonials";
 import { cn } from "@/lib/utils";
@@ -39,7 +39,7 @@ function buildLoopItems(items: Testimonial[], minCount = 8): Testimonial[] {
 
 /**
  * Aceternity-style infinite marquee — true seamless loop via duplicated sets.
- * Token-based; no hard-coded theme colors.
+ * Token-based; no hard-coded theme colors. Pauses off-screen to save CPU.
  */
 export function InfiniteMovingCards({
   items,
@@ -48,7 +48,23 @@ export function InfiniteMovingCards({
   pauseOnHover = true,
   className,
 }: InfiniteMovingCardsProps) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const loopItems = useMemo(() => buildLoopItems(items), [items]);
+
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        root.dataset.inView = entry.isIntersecting ? "true" : "false";
+      },
+      { rootMargin: "80px 0px" },
+    );
+    root.dataset.inView = "true";
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
 
   const style = {
     "--animation-duration": speedDuration[speed],
@@ -56,10 +72,12 @@ export function InfiniteMovingCards({
 
   return (
     <div
+      ref={scrollerRef}
       className={cn(styles.scroller, className)}
       style={style}
       data-direction={direction}
       data-pause-hover={pauseOnHover ? "true" : "false"}
+      data-in-view="true"
     >
       <ul
         className={styles.track}

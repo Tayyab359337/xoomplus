@@ -84,7 +84,7 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
       const root = document.querySelector<HTMLElement>("[data-animation-root]");
       ctxRef.current = initScrollAnimations(root ?? document);
 
-      const t = window.setTimeout(() => refreshScrollTrigger(), 120);
+      const t = window.setTimeout(() => refreshScrollTrigger(), 280);
       return () => {
         window.clearTimeout(t);
         ctxRef.current?.revert();

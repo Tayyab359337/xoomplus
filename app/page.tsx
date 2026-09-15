@@ -1,24 +1,61 @@
+import dynamic from "next/dynamic";
+
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { AboutSection } from "@/components/sections/about-section";
-import { BlogsSection } from "@/components/sections/blogs-section";
-import { ContactSection } from "@/components/sections/contact-section";
 import { FaqSection } from "@/components/sections/faq-section";
 import { Hero } from "@/components/sections/hero";
-import { KineticTypeSection } from "@/components/sections/kinetic-type-section";
 import { LogoLoopSection } from "@/components/sections/logo-loop-section";
 import { MetricsSection } from "@/components/sections/metrics-section";
 import { PortfolioSection } from "@/components/sections/portfolio-section";
-import { ProfessionalCtaSection } from "@/components/sections/professional-cta-section";
 import { ServicesSection } from "@/components/sections/services/services-section";
-import { TestimonialsSection } from "@/components/sections/testimonials-section";
 import {
   getHomepageJsonLd,
   homepageMetadata,
 } from "@/lib/seo/homepage";
 import { getHomepageContent } from "@/lib/wordpress";
 
+/** Heavy / below-fold client islands — defer JS until after first paint. */
+const KineticTypeSection = dynamic(
+  () =>
+    import("@/components/sections/kinetic-type-section").then((m) => ({
+      default: m.KineticTypeSection,
+    })),
+  { ssr: true },
+);
+const ProfessionalCtaSection = dynamic(
+  () =>
+    import("@/components/sections/professional-cta-section").then((m) => ({
+      default: m.ProfessionalCtaSection,
+    })),
+  { ssr: true },
+);
+const TestimonialsSection = dynamic(
+  () =>
+    import("@/components/sections/testimonials-section").then((m) => ({
+      default: m.TestimonialsSection,
+    })),
+  { ssr: true },
+);
+const BlogsSection = dynamic(
+  () =>
+    import("@/components/sections/blogs-section").then((m) => ({
+      default: m.BlogsSection,
+    })),
+  { ssr: true },
+);
+const ContactSection = dynamic(
+  () =>
+    import("@/components/sections/contact-section").then((m) => ({
+      default: m.ContactSection,
+    })),
+  { ssr: true },
+);
+
 export const metadata = homepageMetadata;
+
+/** Refresh WordPress-driven homepage content (logos, copy, etc.). */
+export const revalidate = 300;
 
 /**
  * Homepage — Hero unchanged; remaining sections mapped from WordPress page 215.

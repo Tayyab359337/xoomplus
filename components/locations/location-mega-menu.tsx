@@ -1,5 +1,6 @@
 import { ArrowUpRight, MapPin } from "lucide-react";
 
+import { AppLink } from "@/components/ui/app-link";
 import {
   formatLocationAddress,
   locations,
@@ -29,7 +30,7 @@ export function LocationMegaMenu({
           const address = formatLocationAddress(location);
           return (
             <li key={location.slug}>
-              <a
+              <AppLink
                 href={location.href}
                 onClick={onNavigate}
                 className="group flex items-start gap-3 rounded-2xl border border-border/50 bg-card px-4 py-3.5 text-card-foreground transition-colors hover:border-accent/35 hover:bg-hover/80"
@@ -57,20 +58,20 @@ export function LocationMegaMenu({
                 >
                   <ArrowUpRight className="size-3.5" />
                 </span>
-              </a>
+              </AppLink>
             </li>
           );
         })}
       </ul>
 
-      <a
+      <AppLink
         href={LOCATIONS_INDEX_HREF}
         onClick={onNavigate}
         className="inline-flex items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-center text-[0.95rem] font-medium text-foreground/80 transition-colors hover:bg-muted/40 hover:text-foreground"
       >
         View all locations
         <ArrowUpRight className="size-3.5" />
-      </a>
+      </AppLink>
     </div>
   );
 }

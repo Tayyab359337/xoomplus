@@ -14,7 +14,6 @@ import {
   registerGsapPlugins,
   REVEAL_Y,
   SCROLL_START,
-  ScrollTrigger,
   STAGGER,
 } from "@/lib/animations/gsap";
 
@@ -137,9 +136,9 @@ export function useSectionReveal(
         );
       }
 
-      // Lenis / late mount: if the section is already past the start line, play now.
+      // If the section is already past the start line (late mount / back-nav), finish now.
+      // Avoid ScrollTrigger.refresh() here — N sections refreshing on mount causes scroll jumps.
       requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
         for (const tween of tweens) {
           const st = tween.scrollTrigger;
           if (!st) continue;

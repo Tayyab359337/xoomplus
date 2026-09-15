@@ -54,6 +54,7 @@ export function ProfessionalCtaSection({
           mediaZoom={1.35}
           scrollDistance={1.2}
           holdDistance={0.35}
+          smoothing={0}
           overlayScrim={0.72}
           className={styles.expand}
         >

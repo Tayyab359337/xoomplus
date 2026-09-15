@@ -139,7 +139,7 @@ export function SeoHero({ className, copy }: SeoHeroProps) {
           trigger: hero,
           start: "top top",
           end: "bottom top",
-          scrub: 0.55,
+          scrub: true,
         },
       });
 

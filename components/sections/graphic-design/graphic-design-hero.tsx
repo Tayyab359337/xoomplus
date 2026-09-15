@@ -131,7 +131,7 @@ export function GraphicDesignHero({ className, copy }: GraphicDesignHeroProps) {
           trigger: hero,
           start: "top top",
           end: "bottom top",
-          scrub: 0.55,
+          scrub: true,
         },
       });
 

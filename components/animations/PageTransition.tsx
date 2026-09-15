@@ -1,136 +1,90 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { useLayoutEffect, useEffect, useRef } from "react";
 
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
-  playPageEnter,
-  playPageLeave,
+  clearLegacyPageTransitionArtifacts,
+  getAnimationRoot,
+  PAGE_FADE_MS,
   refreshScrollTrigger,
-  shouldTransitionLink,
 } from "@/lib/animations";
 
 import "./page-transition.css";
 
 /**
- * Soft content crossfade between App Router navigations.
- * Outgoing page dissolves while the destination begins settling — no black screen.
+ * Fast opacity-only route fade (~180ms).
+ *
+ * Does NOT intercept clicks or delay navigation — Next.js routes immediately.
+ * On pathname change, content fades in before paint (useLayoutEffect).
+ * Rapid navigations cancel/replace the previous fade; never leaves opacity stuck at 0.
  */
 export function PageTransition() {
-  const router = useRouter();
   const pathname = usePathname();
   const reduceMotion = usePrefersReducedMotion();
-  const transitioning = useRef(false);
   const lastPath = useRef(pathname);
-  const programmedLeave = useRef(false);
+  const fadeTimer = useRef(0);
+  const rafA = useRef(0);
+  const rafB = useRef(0);
 
-  // Enter / crossfade when the route changes
   useEffect(() => {
+    clearLegacyPageTransitionArtifacts();
+  }, []);
+
+  useLayoutEffect(() => {
     if (lastPath.current === pathname) return;
     lastPath.current = pathname;
 
-    const fromProgrammedLeave = programmedLeave.current;
-    programmedLeave.current = false;
+    if (fadeTimer.current) {
+      window.clearTimeout(fadeTimer.current);
+      fadeTimer.current = 0;
+    }
+    if (rafA.current) cancelAnimationFrame(rafA.current);
+    if (rafB.current) cancelAnimationFrame(rafB.current);
+    rafA.current = 0;
+    rafB.current = 0;
 
-    if (reduceMotion) {
-      transitioning.current = false;
+    clearLegacyPageTransitionArtifacts();
+
+    const root = getAnimationRoot();
+    if (!root) {
+      refreshScrollTrigger();
       return;
     }
 
-    let cancelled = false;
+    if (reduceMotion) {
+      root.removeAttribute("data-page-fade");
+      refreshScrollTrigger();
+      return;
+    }
 
-    const run = async () => {
-      // Fresh navigations land at top; history traversal keeps browser restoration
-      if (fromProgrammedLeave) {
-        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-      }
+    // Before paint: invisible, no transition. Then fade in on the next frames.
+    root.setAttribute("data-page-fade", "out");
 
-      try {
-        await playPageEnter();
-      } catch {
-        /* never block on animation failure */
-      }
+    rafA.current = requestAnimationFrame(() => {
+      rafB.current = requestAnimationFrame(() => {
+        root.setAttribute("data-page-fade", "in");
+        fadeTimer.current = window.setTimeout(() => {
+          root.removeAttribute("data-page-fade");
+          fadeTimer.current = 0;
+          refreshScrollTrigger();
+        }, PAGE_FADE_MS + 20);
+      });
+    });
 
-      if (!cancelled) {
-        refreshScrollTrigger();
-        transitioning.current = false;
-      }
-    };
-
-    void run();
     return () => {
-      cancelled = true;
+      if (fadeTimer.current) {
+        window.clearTimeout(fadeTimer.current);
+        fadeTimer.current = 0;
+      }
+      if (rafA.current) cancelAnimationFrame(rafA.current);
+      if (rafB.current) cancelAnimationFrame(rafB.current);
+      rafA.current = 0;
+      rafB.current = 0;
+      root.removeAttribute("data-page-fade");
     };
   }, [pathname, reduceMotion]);
-
-  useEffect(() => {
-    const onClick = (event: MouseEvent) => {
-      if (
-        event.defaultPrevented ||
-        event.button !== 0 ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.shiftKey ||
-        event.altKey
-      ) {
-        return;
-      }
-
-      const target = event.target as HTMLElement | null;
-      const anchor = target?.closest?.("a");
-      if (!anchor || !(anchor instanceof HTMLAnchorElement)) return;
-      if (!shouldTransitionLink(anchor)) return;
-
-      if (transitioning.current) {
-        event.preventDefault();
-        return;
-      }
-
-      const url = new URL(anchor.href, window.location.href);
-      event.preventDefault();
-      transitioning.current = true;
-      programmedLeave.current = true;
-
-      void (async () => {
-        try {
-          if (!reduceMotion) {
-            await playPageLeave();
-          }
-        } catch {
-          /* navigate anyway */
-        }
-
-        try {
-          router.push(`${url.pathname}${url.search}${url.hash}`);
-        } catch {
-          transitioning.current = false;
-          programmedLeave.current = false;
-          window.location.assign(url.href);
-        }
-      })();
-    };
-
-    document.addEventListener("click", onClick, true);
-    return () => document.removeEventListener("click", onClick, true);
-  }, [reduceMotion, router]);
-
-  // Safety: never leave the UI locked if a route update is aborted
-  useEffect(() => {
-    const unlock = () => {
-      if (transitioning.current) {
-        // Allow retry after a short grace if navigation stalled
-        window.setTimeout(() => {
-          if (lastPath.current === pathname) {
-            transitioning.current = false;
-            programmedLeave.current = false;
-          }
-        }, 1200);
-      }
-    };
-    window.addEventListener("pageshow", unlock);
-    return () => window.removeEventListener("pageshow", unlock);
-  }, [pathname]);
 
   return null;
 }

@@ -15,6 +15,7 @@ import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { createPortal } from "react-dom";
 
+import { AppLink } from "@/components/ui/app-link";
 import { cn } from "@/lib/utils";
 
 const CLOSE_DELAY_MS = 100;
@@ -147,25 +148,45 @@ export const MenuItem = ({
       onMouseEnter={() => setActive(item)}
       className={cn("relative z-20", className)}
     >
-      <motion.a
-        href={href}
-        transition={{ duration: 0.3 }}
-        className={cn(
-          "inline-flex cursor-pointer items-center gap-1 text-foreground/70 transition-colors hover:text-foreground",
-          triggerClassName,
-        )}
-        aria-haspopup="true"
-        aria-expanded={open}
-      >
-        <span>{item}</span>
-        <ChevronDown
-          aria-hidden
+      {href ? (
+        <AppLink
+          href={href}
           className={cn(
-            "size-3.5 shrink-0 opacity-70 transition-transform duration-200 ease-out",
-            open && "rotate-180",
+            "inline-flex cursor-pointer items-center gap-1 text-foreground/70 transition-colors hover:text-foreground",
+            triggerClassName,
           )}
-        />
-      </motion.a>
+          aria-haspopup="true"
+          aria-expanded={open}
+        >
+          <span>{item}</span>
+          <ChevronDown
+            aria-hidden
+            className={cn(
+              "size-3.5 shrink-0 opacity-70 transition-transform duration-200 ease-out",
+              open && "rotate-180",
+            )}
+          />
+        </AppLink>
+      ) : (
+        <button
+          type="button"
+          className={cn(
+            "inline-flex cursor-pointer items-center gap-1 text-foreground/70 transition-colors hover:text-foreground",
+            triggerClassName,
+          )}
+          aria-haspopup="true"
+          aria-expanded={open}
+        >
+          <span>{item}</span>
+          <ChevronDown
+            aria-hidden
+            className={cn(
+              "size-3.5 shrink-0 opacity-70 transition-transform duration-200 ease-out",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+      )}
       {mounted ? createPortal(panel, document.body) : null}
     </div>
   );
@@ -341,7 +362,7 @@ export const ProductItem = ({
   src: string;
 }) => {
   return (
-    <a href={href} className="flex max-w-[16rem] space-x-2">
+    <AppLink href={href} className="flex max-w-[16rem] space-x-2">
       {/* eslint-disable-next-line @next/next/no-img-element -- Aceternity ProductItem default */}
       <img
         src={src}
@@ -358,24 +379,26 @@ export const ProductItem = ({
           {description}
         </p>
       </div>
-    </a>
+    </AppLink>
   );
 };
 
 export const HoveredLink = ({
   children,
   className,
+  href = "#",
   ...rest
 }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   return (
-    <a
+    <AppLink
       {...rest}
+      href={href}
       className={cn(
         "text-muted-foreground transition-colors hover:text-foreground",
         className,
       )}
     >
       {children}
-    </a>
+    </AppLink>
   );
 };

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import {
   AnimatePresence,
@@ -14,6 +13,7 @@ import { createPortal } from "react-dom";
 import { BrandMark } from "@/components/layout/brand-mark";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LocationMegaMenu } from "@/components/locations/location-mega-menu";
+import { AppLink } from "@/components/ui/app-link";
 import Magnet from "@/components/ui/magnet";
 import { useIsClient } from "@/hooks/use-is-client";
 import {
@@ -69,7 +69,8 @@ export function MobileNav() {
   const locationsRef = useRef<HTMLLIElement>(null);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setScrolled(latest > 100);
+    const next = latest > 100;
+    setScrolled((prev) => (prev === next ? prev : next));
   });
 
   useEffect(() => {
@@ -210,12 +211,12 @@ export function MobileNav() {
                       ease: [0.22, 1, 0.36, 1],
                     }}
                   >
-                    <a href={item.link} className={styles.link} onClick={close}>
+                    <AppLink href={item.link} className={styles.link} onClick={close}>
                       <span className={styles.linkLabel}>{item.name}</span>
                       <span className={styles.linkIndex}>
                         {linkIndex(index + 1)}
                       </span>
-                    </a>
+                    </AppLink>
                   </motion.li>
                 ))}
 
@@ -271,7 +272,7 @@ export function MobileNav() {
                             {servicesMegaColumns.map((column, index) => {
                               const isActive = index === activeCategory;
                               return (
-                                <a
+                                <AppLink
                                   key={column.href}
                                   href={mapWpHref(column.href)}
                                   aria-current={isActive ? "true" : undefined}
@@ -304,7 +305,7 @@ export function MobileNav() {
                                   >
                                     <ArrowUpRight className="size-3.5" />
                                   </span>
-                                </a>
+                                </AppLink>
                               );
                             })}
                           </div>
@@ -312,7 +313,7 @@ export function MobileNav() {
                           <ul className={styles.megaChildren}>
                             {activeColumn.links.map((link) => (
                               <li key={link.href}>
-                                <a
+                                <AppLink
                                   href={mapWpHref(link.href)}
                                   className={styles.megaChild}
                                   onClick={close}
@@ -324,7 +325,7 @@ export function MobileNav() {
                                     }}
                                   />
                                   <span>{link.label}</span>
-                                </a>
+                                </AppLink>
                               </li>
                             ))}
                           </ul>
@@ -336,14 +337,14 @@ export function MobileNav() {
                             <p className={styles.megaFeaturedBody}>
                               {servicesMegaFeatured.description}
                             </p>
-                            <a
+                            <AppLink
                               href={mapWpHref(servicesMegaFeatured.href)}
                               className={styles.megaFeaturedBtn}
                               aria-label="View all services"
                               onClick={close}
                             >
                               <ArrowUpRight className="size-4" />
-                            </a>
+                            </AppLink>
                           </div>
                         </div>
                       </motion.div>
@@ -401,7 +402,7 @@ export function MobileNav() {
                         <div className={styles.megaInner}>
                           <div className={styles.portfolioRow}>
                             {featuredPortfolios.map((project) => (
-                              <a
+                              <AppLink
                                 key={project.id}
                                 href={project.href}
                                 className={styles.portfolioCard}
@@ -423,17 +424,17 @@ export function MobileNav() {
                                     {project.category}
                                   </span>
                                 </span>
-                              </a>
+                              </AppLink>
                             ))}
                           </div>
-                          <a
+                          <AppLink
                             href={portfolioSectionCopy.exploreCta.href}
                             className={styles.portfolioMore}
                             onClick={close}
                           >
                             {portfolioSectionCopy.exploreCta.label}
                             <ArrowUpRight className="size-3.5" />
-                          </a>
+                          </AppLink>
                         </div>
                       </motion.div>
                     ) : null}
@@ -509,12 +510,12 @@ export function MobileNav() {
                       ease: [0.22, 1, 0.36, 1],
                     }}
                   >
-                    <a href={item.link} className={styles.link} onClick={close}>
+                    <AppLink href={item.link} className={styles.link} onClick={close}>
                       <span className={styles.linkLabel}>{item.name}</span>
                       <span className={styles.linkIndex}>
                         {linkIndex(index + 6)}
                       </span>
-                    </a>
+                    </AppLink>
                   </motion.li>
                 ))}
               </ul>
@@ -526,7 +527,7 @@ export function MobileNav() {
                 transition={{ duration: 0.3, delay: 0.35 }}
               >
                 <Magnet padding={40} magnetStrength={3}>
-                  <a
+                  <AppLink
                     href={QUOTE_HREF}
                     className={cn("btn-primary", styles.cta)}
                     onClick={close}
@@ -535,7 +536,7 @@ export function MobileNav() {
                     <span aria-hidden className="translate-y-px text-[0.95em]">
                       →
                     </span>
-                  </a>
+                  </AppLink>
                 </Magnet>
               </motion.div>
             </nav>

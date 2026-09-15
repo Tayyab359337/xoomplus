@@ -37,47 +37,81 @@ export type ParsedMetric = {
 };
 export type ParsedFaq = { question: string; answer: string };
 
-const LOGO_FILES: { file: string; name: string }[] = [
-  { file: "cropped-gopsychLogo.webp", name: "GoPsych" },
-  { file: "cropped-sterling-cooper-main-logo", name: "Sterling Cooper" },
-  { file: "Concise-Medico-Logo", name: "Concise Medico" },
-  { file: "BodyKite-Header-Logo", name: "BodyKite" },
-];
+/** Prefer full-size upload URLs over WordPress resized variants (-300x85 etc.). */
+function normalizeUploadUrl(src: string): string {
+  return src.replace(/-\d+x\d+(?=\.(?:webp|jpe?g|png|gif|svg))/i, "");
+}
+
+function humanizeLogoName(altOrFile: string): string {
+  const raw = decodeHtml(altOrFile)
+    .replace(/\.[a-z0-9]+$/i, "")
+    .replace(/^(cropped[-_]?)/i, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    // Split camelCase leftovers like gopsychLogo → gopsych Logo
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\b(logo|header)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!raw) return "Partner";
+  return raw.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/**
+ * Pull brand logos from the Elementor image carousel under
+ * "Brands That Believe in Us" — no hardcoded filename whitelist.
+ */
+function parseBrandLogosFromHtml(html: string): ParsedLogo[] {
+  const brandsIdx = html.search(/Brands That Believe in Us/i);
+  if (brandsIdx < 0) return [];
+
+  const windowHtml = html.slice(brandsIdx, brandsIdx + 20_000);
+  const carouselIdx = windowHtml.search(
+    /elementor-widget-image-carousel|elementor-image-carousel/i,
+  );
+  const block =
+    carouselIdx >= 0
+      ? windowHtml.slice(carouselIdx, carouselIdx + 12_000)
+      : windowHtml.slice(0, 12_000);
+
+  const logos: ParsedLogo[] = [];
+  const seen = new Set<string>();
+  const imgTagRe = /<img\b[^>]*>/gi;
+  let imgMatch: RegExpExecArray | null;
+
+  while ((imgMatch = imgTagRe.exec(block))) {
+    const tag = imgMatch[0];
+    if (!/swiper-slide-image|elementor-carousel-image/i.test(tag)) continue;
+
+    const src =
+      tag.match(/\bsrc=["']([^"']+)["']/i)?.[1] ??
+      tag.match(/\bdata-src=["']([^"']+)["']/i)?.[1] ??
+      tag.match(/\bdata-lazy-src=["']([^"']+)["']/i)?.[1];
+    if (!src || !/wp-content\/uploads/i.test(src)) continue;
+
+    const normalized = normalizeUploadUrl(src);
+    const key = normalized.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    const alt = tag.match(/\balt=["']([^"']*)["']/i)?.[1] ?? "";
+    const fileName = normalized.split("/").pop() ?? alt;
+    logos.push({
+      name: humanizeLogoName(alt || fileName),
+      src: normalized,
+    });
+  }
+
+  return logos;
+}
 
 /**
  * Extract homepage sections from the rendered Elementor HTML.
  * Prefer this over dumping Elementor markup into React.
  */
 export function parseHomepageHtml(html: string) {
-  const logos: ParsedLogo[] = [];
-  for (const entry of LOGO_FILES) {
-    const re = new RegExp(
-      `(https:\\/\\/xoomplus\\.co\\.uk\\/wp-content\\/uploads\\/[^"'\\s]*${entry.file}[^"'\\s]*)`,
-      "i",
-    );
-    const match = html.match(re);
-    if (match?.[1]) {
-      logos.push({ name: entry.name, src: match[1].replace(/-\d+x\d+(?=\.)/, "") });
-    }
-  }
-
-  // Prefer exact homepage logo URLs when present
-  const preferred: Record<string, string> = {
-    GoPsych:
-      "https://xoomplus.co.uk/wp-content/uploads/2025/08/cropped-gopsychLogo.webp",
-    "Sterling Cooper":
-      "https://xoomplus.co.uk/wp-content/uploads/2025/08/cropped-sterling-cooper-main-logo-300x85.webp",
-    "Concise Medico":
-      "https://xoomplus.co.uk/wp-content/uploads/2025/08/Concise-Medico-Logo-300x50.webp",
-    BodyKite:
-      "https://xoomplus.co.uk/wp-content/uploads/2025/08/BodyKite-Header-Logo-300x68.webp",
-  };
-  for (const logo of logos) {
-    if (preferred[logo.name] && html.includes(preferred[logo.name]!)) {
-      logo.src = preferred[logo.name]!;
-    }
-  }
-
+  const logos = parseBrandLogosFromHtml(html);
   const services: ParsedService[] = [];
   const serviceRe =
     /src="(https:\/\/xoomplus\.co\.uk\/wp-content\/uploads\/2025\/08\/(?:social-media-marketing|copntent-marketing|ppc-ads-services|seo-services|email-marketing|ecommerce|web-dev|custom-web-development|shopify-store|web-maintenancew-ans-support|web-hosting-and-domain|web-ui-ux|infographic-desaign|social-media-post-design|logo-designx|brand-identity-design|print-deign)[^"]*)"[\s\S]{0,900}?<h3 class="elementor-heading-title[^"]*"><a href="([^"]+)">([^<]+)<\/a><\/h3>[\s\S]{0,400}?<p class="elementor-heading-title[^"]*"><a href="[^"]+">([^<]+)<\/a><\/p>/gi;

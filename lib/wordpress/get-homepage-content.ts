@@ -258,8 +258,21 @@ export async function getHomepageContent(): Promise<HomepageContent> {
   ]);
 
   // Prefer live HTML (complete Elementor markup); fall back to REST content.
+  // Also merge logos from REST when the carousel is only present there.
   const sourceHtml = html.length > 10_000 ? html : page.content?.rendered || "";
   const parsed = parseHomepageHtml(sourceHtml);
+  const restLogos =
+    page.content?.rendered && page.content.rendered !== sourceHtml
+      ? parseHomepageHtml(page.content.rendered).logos
+      : [];
+  if (restLogos.length > parsed.logos.length) {
+    parsed.logos = restLogos;
+  }
+  // If live HTML missed logos but REST has them (or vice versa), keep whichever is populated
+  if (parsed.logos.length === 0 && page.content?.rendered) {
+    parsed.logos = parseHomepageHtml(page.content.rendered).logos;
+  }
+
   const portfolioImages = await resolvePortfolioImages(parsed.portfolio);
 
   const logos: PartnerLogo[] = parsed.logos.map((logo) => ({

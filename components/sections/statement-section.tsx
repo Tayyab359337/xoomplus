@@ -53,7 +53,7 @@ export function StatementSection({ className }: { className?: string }) {
           trigger: root,
           start: "top 75%",
           end: "center 35%",
-          scrub: 0.6,
+          scrub: true,
         },
       });
 

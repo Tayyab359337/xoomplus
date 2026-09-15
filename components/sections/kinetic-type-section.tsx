@@ -54,7 +54,7 @@ export function KineticTypeSection({ className }: { className?: string }) {
               trigger: root,
               start: "top bottom",
               end: "bottom top",
-              scrub: 0.7,
+              scrub: true,
             },
           },
         );

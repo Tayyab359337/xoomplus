@@ -1,22 +1,29 @@
-/* Soft exit snapshot — carries the outgoing page during handoff (no black veil) */
-.xp-page-exit-layer {
-  position: fixed;
-  z-index: 40;
-  margin: 0;
-  pointer-events: none;
-  will-change: opacity, transform;
-  background: var(--background);
-  overflow: hidden;
-  max-height: 100dvh;
+/* Lightweight route fade — opacity only, no overlays / clones / motion offsets */
+[data-animation-root] {
+  opacity: 1;
 }
 
-/* Kill any legacy solid veil from older builds */
-#xp-page-transition {
-  display: none !important;
+[data-animation-root][data-page-fade="out"] {
+  opacity: 0;
+  transition: none;
+}
+
+[data-animation-root][data-page-fade="in"] {
+  opacity: 1;
+  transition: opacity 180ms ease-out;
+  will-change: opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .xp-page-exit-layer {
-    display: none !important;
+  [data-animation-root][data-page-fade] {
+    opacity: 1 !important;
+    transition: none !important;
+    will-change: auto !important;
   }
+}
+
+/* Kill legacy transition artifacts from older builds */
+.xp-page-exit-layer,
+#xp-page-transition {
+  display: none !important;
 }

@@ -186,6 +186,8 @@ export default function ScrollExpand({
     let target = 0;
     let stageH = 0;
     let running = false;
+    let nearViewport = true;
+    let listening = false;
 
     const measure = () => {
       const c = propsRef.current;
@@ -232,6 +234,7 @@ export default function ScrollExpand({
     };
 
     const onScroll = () => {
+      if (!nearViewport && propsRef.current.useWindowScroll) return;
       target = readProgress();
       if (propsRef.current.smoothing <= 0 || reduceMotion) {
         current = target;
@@ -248,22 +251,61 @@ export default function ScrollExpand({
       applyProgress(current);
     };
 
+    const scroller: Window | HTMLDivElement = useWindowScroll ? window : root;
+
+    const attach = () => {
+      if (listening) return;
+      scroller.addEventListener("scroll", onScroll, { passive: true });
+      listening = true;
+    };
+
+    const detach = () => {
+      if (!listening) return;
+      scroller.removeEventListener("scroll", onScroll);
+      listening = false;
+    };
+
     measure();
     target = readProgress();
     current = target;
     applyProgress(current);
-
-    const scroller: Window | HTMLDivElement = useWindowScroll ? window : root;
-    scroller.addEventListener("scroll", onScroll, { passive: true });
+    attach();
     window.addEventListener("resize", onResize);
     const ro = new ResizeObserver(onResize);
     ro.observe(root);
 
+    const io =
+      useWindowScroll && typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            ([entry]) => {
+              nearViewport = entry.isIntersecting;
+              if (nearViewport) {
+                attach();
+                onScroll();
+              } else {
+                // Snap to settled edge state so we don't leave mid-lerp work pending.
+                target = readProgress();
+                current = target;
+                applyProgress(current);
+                detach();
+                if (raf) {
+                  cancelAnimationFrame(raf);
+                  raf = 0;
+                  running = false;
+                }
+              }
+            },
+            { rootMargin: "40% 0px" },
+          )
+        : null;
+    if (io) io.observe(root);
+
     return () => {
       if (raf) cancelAnimationFrame(raf);
-      scroller.removeEventListener("scroll", onScroll);
+      detach();
       window.removeEventListener("resize", onResize);
       ro.disconnect();
+      io?.disconnect();
     };
   }, [applyProgress, useWindowScroll]);
 

@@ -212,7 +212,22 @@ export function ServicesInfiniteCarousel({
       return;
     }
 
+    const shell =
+      track.closest(`.${styles.carouselShell}`) ?? track.parentElement;
+    let inView = true;
+
+    const stop = () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      lastTsRef.current = null;
+    };
+
     const tick = (ts: number) => {
+      if (!inView) {
+        stop();
+        return;
+      }
+
       if (lastTsRef.current == null) lastTsRef.current = ts;
       const dt = Math.min(0.05, (ts - lastTsRef.current) / 1000);
       lastTsRef.current = ts;
@@ -243,11 +258,29 @@ export function ServicesInfiniteCarousel({
       rafRef.current = requestAnimationFrame(tick);
     };
 
-    rafRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
+    const start = () => {
+      if (rafRef.current != null || !inView) return;
       lastTsRef.current = null;
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    const io =
+      shell && typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            ([entry]) => {
+              inView = entry.isIntersecting;
+              if (inView) start();
+              else stop();
+            },
+            { rootMargin: "120px 0px" },
+          )
+        : null;
+    if (shell && io) io.observe(shell);
+    start();
+
+    return () => {
+      io?.disconnect();
+      stop();
       if (resumeTimerRef.current != null) {
         window.clearTimeout(resumeTimerRef.current);
       }

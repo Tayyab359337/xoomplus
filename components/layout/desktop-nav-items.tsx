@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 
 import { HoverLift } from "@/components/animations/HoverLift";
 import { LocationMegaMenu } from "@/components/locations/location-mega-menu";
+import { AppLink } from "@/components/ui/app-link";
 import { Menu, MenuItem, HoveredLink } from "@/components/ui/navbar-menu";
 import {
   servicesMegaColumns,
@@ -181,7 +182,7 @@ function NavPillLink({
   onHover: (name: string) => void;
 }) {
   return (
-    <a
+    <AppLink
       href={item.link}
       onMouseEnter={() => onHover(item.name)}
       className={cn(
@@ -198,7 +199,7 @@ function NavPillLink({
         />
       ) : null}
       <span className="relative z-20">{item.name}</span>
-    </a>
+    </AppLink>
   );
 }
 
@@ -226,7 +227,7 @@ function ServicesMegaPanel({ open }: { open: boolean }) {
         {servicesMegaColumns.map((column, index) => {
           const isActive = index === activeIndex;
           return (
-            <a
+            <AppLink
               key={column.href}
               href={mapWpHref(column.href)}
               onMouseEnter={() => setActiveIndex(index)}
@@ -258,7 +259,7 @@ function ServicesMegaPanel({ open }: { open: boolean }) {
               >
                 <ArrowUpRight className="size-3.5" />
               </span>
-            </a>
+            </AppLink>
           );
         })}
       </div>
@@ -320,13 +321,13 @@ function ServicesMegaPanel({ open }: { open: boolean }) {
         </p>
         <div className="mt-5 pt-1 lg:mt-auto lg:pt-8">
           <HoverLift y={-3} scale={1.04} className="inline-flex">
-            <a
+            <AppLink
               href={mapWpHref(servicesMegaFeatured.href)}
               aria-label={`${servicesMegaFeatured.title} — view services`}
               className="inline-flex size-11 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:border-accent/50 hover:text-accent"
             >
               <ArrowUpRight className="size-4" />
-            </a>
+            </AppLink>
           </HoverLift>
         </div>
       </div>
@@ -342,7 +343,7 @@ function PortfoliosMegaPanel() {
     <div className="flex w-full flex-col gap-4 p-5 sm:p-6" role="region" aria-label="Portfolios">
       <div className="grid grid-cols-2 gap-4">
         {featured.map((project) => (
-          <a
+          <AppLink
             key={project.id}
             href={project.href}
             className="group flex min-w-0 flex-col gap-3 overflow-hidden rounded-2xl border border-border/50 bg-card p-3 text-card-foreground transition-colors hover:border-accent/35 hover:bg-card/90"
@@ -371,17 +372,17 @@ function PortfoliosMegaPanel() {
                 <ArrowUpRight className="size-3.5" />
               </span>
             </div>
-          </a>
+          </AppLink>
         ))}
       </div>
 
-      <a
+      <AppLink
         href={portfolioSectionCopy.exploreCta.href}
         className="inline-flex items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-center text-[0.95rem] font-medium text-foreground/80 transition-colors hover:bg-muted/40 hover:text-foreground"
       >
         {portfolioSectionCopy.exploreCta.label}
         <ArrowUpRight className="size-3.5" />
-      </a>
+      </AppLink>
     </div>
   );
 }

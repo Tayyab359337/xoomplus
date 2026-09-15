@@ -8,8 +8,10 @@ import {
   useMotionValueEvent,
 } from "motion/react";
 import Link from "next/link";
-
 import React, { useRef, useState } from "react";
+
+import { AppLink } from "@/components/ui/app-link";
+import { isAppRouteHref } from "@/lib/wordpress/urls";
 
 
 interface NavbarProps {
@@ -65,11 +67,8 @@ export const Navbar = ({
   const [visible, setVisible] = useState<boolean>(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 100) {
-      setVisible(true);
-    } else {
-      setVisible(false);
-    }
+    const next = latest > 100;
+    setVisible((prev) => (prev === next ? prev : next));
   });
 
   return (
@@ -94,10 +93,6 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
   return (
     <motion.div
       animate={{
-        backdropFilter: visible ? "blur(16px)" : "blur(0px)",
-        boxShadow: visible
-          ? "0 1px 0 0 color-mix(in oklch, var(--border) 80%, transparent)"
-          : "none",
         width: visible ? "min(90rem, calc(100% - 2rem))" : "100%",
         y: visible ? 12 : 0,
       }}
@@ -108,8 +103,10 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       }}
       className={cn(
         "relative z-[60] mx-auto hidden w-full max-w-[90rem] flex-row items-center justify-between self-start overflow-visible rounded-full border border-transparent bg-transparent px-5 py-3.5 lg:flex",
-        visible &&
-          "border-border/60 bg-background/70 dark:bg-background/65",
+        "transition-[background-color,border-color,box-shadow,backdrop-filter,-webkit-backdrop-filter] duration-300 ease-out",
+        visible
+          ? "border-border/60 bg-background/70 shadow-[0_1px_0_0_color-mix(in_oklch,var(--border)_80%,transparent)] backdrop-blur-md dark:bg-background/65"
+          : "backdrop-blur-none",
         className,
       )}
     >
@@ -130,7 +127,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
       )}
     >
       {items.map((item, idx) => (
-        <a
+        <AppLink
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
           className="relative px-4 py-2 text-foreground/70 transition-colors hover:text-foreground"
@@ -144,7 +141,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
             />
           )}
           <span className="relative z-20">{item.name}</span>
-        </a>
+        </AppLink>
       ))}
     </motion.div>
   );
@@ -154,10 +151,6 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
   return (
     <motion.div
       animate={{
-        backdropFilter: visible ? "blur(16px)" : "blur(0px)",
-        boxShadow: visible
-          ? "0 1px 0 0 color-mix(in oklch, var(--border) 80%, transparent)"
-          : "none",
         width: visible ? "92%" : "100%",
         paddingRight: visible ? "12px" : "0px",
         paddingLeft: visible ? "12px" : "0px",
@@ -171,8 +164,10 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between border border-transparent bg-transparent px-0 py-3 lg:hidden",
-        visible &&
-          "border-border/60 bg-background/75 dark:bg-background/70",
+        "transition-[background-color,border-color,box-shadow,backdrop-filter,-webkit-backdrop-filter] duration-300 ease-out",
+        visible
+          ? "border-border/60 bg-background/75 shadow-[0_1px_0_0_color-mix(in_oklch,var(--border)_80%,transparent)] backdrop-blur-md dark:bg-background/70"
+          : "backdrop-blur-none",
         className,
       )}
     >
@@ -263,7 +258,7 @@ export const NavbarLogo = () => {
 
 export const NavbarButton = ({
   href,
-  as: Tag = "a",
+  as,
   children,
   className,
   variant = "primary",
@@ -287,6 +282,14 @@ export const NavbarButton = ({
     dark: "bg-foreground text-background border border-transparent rounded-[var(--btn-radius)] px-[var(--btn-pad-x)] py-[var(--btn-pad-y)]",
     gradient: "btn-primary",
   };
+
+  const Tag =
+    as ??
+    (href
+      ? isAppRouteHref(href)
+        ? Link
+        : "a"
+      : "button");
 
   return (
     <Tag

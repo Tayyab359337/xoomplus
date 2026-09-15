@@ -17,7 +17,7 @@ type AppProvidersProps = {
 /**
  * Single client boundary for theme, GSAP, and page blur.
  * Native browser cursor only — no splash cursor / custom cursor.
- * No preloader — page transitions stay active.
+ * No preloader — route changes use a non-blocking ~180ms opacity fade.
  * Native window scrolling.
  */
 export function AppProviders({ children }: AppProvidersProps) {

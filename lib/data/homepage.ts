@@ -40,19 +40,8 @@ export type PartnerLogo = {
   src?: string;
 };
 
-/** Partner / tech marks shown in the LogoLoop band */
-export const partnerLogos: PartnerLogo[] = [
-  { name: "Figma" },
-  { name: "Notion" },
-  { name: "Vercel" },
-  { name: "Stripe" },
-  { name: "Linear" },
-  { name: "Shopify" },
-  { name: "Webflow" },
-  { name: "Framer" },
-  { name: "Adobe" },
-  { name: "Slack" },
-];
+/** Partner / tech marks — optional offline fallback only (homepage uses WP logos). */
+export const partnerLogos: PartnerLogo[] = [];
 
 /**
  * Editorial About / Studio — copy kept separate from presentation.

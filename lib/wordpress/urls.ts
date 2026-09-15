@@ -31,3 +31,23 @@ export function mapWpHref(href: string): string {
 export function isInternalHref(href: string): boolean {
   return href.startsWith("/") || href.startsWith("#");
 }
+
+/**
+ * True for same-app pathnames that should use Next.js `<Link>` (SPA navigation).
+ * False for hash / tel / mailto / external absolute URLs (use `<a>`).
+ */
+export function isAppRouteHref(href: string): boolean {
+  if (!href) return false;
+  if (
+    href.startsWith("#") ||
+    href.startsWith("tel:") ||
+    href.startsWith("mailto:") ||
+    href.startsWith("sms:") ||
+    href.startsWith("blob:") ||
+    href.startsWith("data:")
+  ) {
+    return false;
+  }
+  const mapped = mapWpHref(href);
+  return mapped.startsWith("/") && !mapped.startsWith("//");
+}

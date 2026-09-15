@@ -19,9 +19,23 @@ import {
 export const ANIMATE_SELECTOR = "[data-animate], [data-motion]";
 export const PARALLAX_SELECTOR = "[data-parallax], [data-motion='parallax']";
 
+let refreshRaf = 0;
+
+/**
+ * Coalesce ScrollTrigger.refresh() — many sections used to call refresh on
+ * mount, which forces layout + jumps during scroll/hydration.
+ */
 export function refreshScrollTrigger() {
   registerGsapPlugins();
-  ScrollTrigger.refresh();
+  if (typeof window === "undefined") {
+    ScrollTrigger.refresh();
+    return;
+  }
+  if (refreshRaf) return;
+  refreshRaf = window.requestAnimationFrame(() => {
+    refreshRaf = 0;
+    ScrollTrigger.refresh();
+  });
 }
 
 export function killAllScrollTriggers() {
@@ -151,7 +165,7 @@ function attachParallax(el: HTMLElement) {
           : el.parentElement ?? el,
         start: "top bottom",
         end: "bottom top",
-        scrub: 0.65,
+        scrub: true,
       },
     },
   );
