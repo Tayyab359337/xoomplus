@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 
-import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { LocationPage } from "@/components/locations/location-page";
 import { getLocationBySlug, locations } from "@/lib/data/locations";
@@ -40,7 +39,6 @@ export default async function LocationDetailPage({
       <main className="flex flex-1 flex-col">
         <LocationPage location={location} />
       </main>
-      <SiteFooter />
     </>
   );
 }

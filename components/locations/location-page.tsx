@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+import { LocationHashScroll } from "@/components/locations/location-hash-scroll";
 import { LocationCard } from "@/components/locations/location-card";
 import { LocationHero } from "@/components/locations/location-hero";
+import { AppLink } from "@/components/ui/app-link";
 import Magnet from "@/components/ui/magnet";
 import { locationDetailCta, type Location } from "@/lib/data/locations";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,7 @@ type LocationPageProps = {
 export function LocationPage({ location, className }: LocationPageProps) {
   return (
     <div className={cn(styles.root, className)}>
+      <LocationHashScroll />
       <LocationHero location={location} />
 
       <div className={styles.page}>
@@ -31,10 +34,10 @@ export function LocationPage({ location, className }: LocationPageProps) {
           <ul className={styles.serviceList}>
             {location.services.map((service) => (
               <li key={service.href}>
-                <a href={service.href} className={styles.serviceLink}>
+                <AppLink href={service.href} className={styles.serviceLink}>
                   <span>{service.label}</span>
                   <ArrowUpRight aria-hidden className={styles.serviceIcon} />
-                </a>
+                </AppLink>
               </li>
             ))}
           </ul>

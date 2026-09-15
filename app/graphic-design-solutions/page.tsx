@@ -1,4 +1,3 @@
-import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { FaqSection } from "@/components/sections/faq-section";
 import { GraphicDesignApproach } from "@/components/sections/graphic-design/graphic-design-approach";
@@ -47,7 +46,6 @@ export default async function GraphicDesignSolutionsPage() {
         <ProfessionalCtaSection content={graphicDesignCtaCopy} />
         <FaqSection items={graphicDesignFaqItems} copy={graphicDesignFaqCopy} />
       </main>
-      <SiteFooter />
     </>
   );
 }

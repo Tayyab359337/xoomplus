@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic";
 
-import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { AboutSection } from "@/components/sections/about-section";
 import { FaqSection } from "@/components/sections/faq-section";
@@ -96,7 +95,6 @@ export default async function Home() {
         <BlogsSection posts={content.blogs} copy={content.blogsCopy} />
         <ContactSection headings={content.contactCopy} />
       </main>
-      <SiteFooter content={content.footer} />
     </>
   );
 }

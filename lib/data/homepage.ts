@@ -72,14 +72,19 @@ export const aboutContent = {
 } as const;
 
 /**
- * Parallax hero image stack (Aceternity) — layered over LiquidEther.
+ * Hero showcase strip — vertical project frames under the CTA.
  * Prefer studio / work imagery that matches the site palette.
  */
+export const heroShowcaseImages = [
+  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=720&q=80",
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=720&q=80",
+  "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=720&q=80",
+  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=720&q=80",
+  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=720&q=80",
+] as const;
+
+/** @deprecated Prefer heroShowcaseImages — kept for demos that still import the old name. */
 export const heroParallaxImages = [
-  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=80",
+  ...heroShowcaseImages,
   "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80",
 ] as const;

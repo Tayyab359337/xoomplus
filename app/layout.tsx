@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 
+import { SiteFooter } from "@/components/layout/site-footer";
 import { AppProviders } from "@/components/providers/app-providers";
+import { getSiteFooterContent } from "@/lib/wordpress";
 
 import "./globals.css";
 
@@ -27,7 +29,9 @@ export const metadata: Metadata = {
     "Grow your businesses with Xoomplus. We deliver expert digital marketing, SEO, web development, and creative solutions to boost traffic and conversions.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const footer = await getSiteFooterContent();
+
   return (
     <html
       lang="en"
@@ -35,7 +39,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="min-h-full bg-background text-foreground">
-        <AppProviders>{children}</AppProviders>
+        <AppProviders>
+          {children}
+          <SiteFooter content={footer} />
+        </AppProviders>
       </body>
     </html>
   );

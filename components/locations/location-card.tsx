@@ -1,6 +1,7 @@
 import { MapPin, Phone } from "lucide-react";
 
 import { LocationMap } from "@/components/locations/location-map";
+import { AppLink } from "@/components/ui/app-link";
 import {
   formatLocationAddress,
   type Location,
@@ -51,9 +52,9 @@ export function LocationCard({
 
       <div className={styles.actions}>
         {showViewServices ? (
-          <a href={location.servicesHref} className="btn-primary">
+          <AppLink href={location.servicesHref} className="btn-primary">
             View Services
-          </a>
+          </AppLink>
         ) : null}
         <a
           href={location.directionsUrl}

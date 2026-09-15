@@ -29,6 +29,7 @@ export function HeroEntrance() {
       const nav = document.querySelectorAll<HTMLElement>("[data-nav-entrance]");
       const eyebrow = hero.querySelector<HTMLElement>("[data-hero-eyebrow]");
       const body = hero.querySelector<HTMLElement>("[data-hero-body]");
+      const trust = hero.querySelector<HTMLElement>("[data-hero-trust]");
       const actions = hero.querySelector<HTMLElement>("[data-hero-actions]");
       const visuals = hero.querySelectorAll<HTMLElement>("[data-hero-visual]");
       const heading = hero.querySelector<HTMLElement>("[data-lcp]");
@@ -78,12 +79,20 @@ export function HeroEntrance() {
         );
       }
 
+      if (trust) {
+        tl.from(
+          trust,
+          { y: 12, duration: 0.55, clearProps: "transform" },
+          0.24,
+        );
+      }
+
       if (actions) {
         const kids = actions.querySelectorAll(":scope > *");
         tl.from(
           kids,
           { y: 14, duration: 0.55, stagger: 0.06, clearProps: "transform" },
-          0.28,
+          0.3,
         );
       }
     },

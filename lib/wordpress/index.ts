@@ -4,7 +4,7 @@ export {
   WP_ORIGIN,
   WP_REST,
 } from "./config";
-export { getHomepageContent } from "./get-homepage-content";
+export { getHomepageContent, getSiteFooterContent } from "./get-homepage-content";
 export { getGraphicDesignPageContent } from "./get-graphic-design-content";
 export type {
   GraphicDesignHeroContent,

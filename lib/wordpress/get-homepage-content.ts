@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import type { AgencyMetric, PartnerLogo } from "@/lib/data/homepage";
 import { aboutContent } from "@/lib/data/homepage";
 import type { BlogPost } from "@/lib/data/blogs";
@@ -9,7 +11,7 @@ import type { Testimonial } from "@/lib/data/testimonials";
 
 import { WP_HOME_PAGE_ID, WP_ORIGIN, WP_REST } from "./config";
 import { parseHomepageHtml } from "./parse-homepage-html";
-import type { HomepageContent } from "./types";
+import type { HomepageContent, HomepageFooter } from "./types";
 import { mapWpHref } from "./urls";
 
 const PORTFOLIO_TONES: PortfolioTone[] = [
@@ -246,8 +248,10 @@ async function resolvePortfolioImages(
 /**
  * Fetch WordPress homepage content and map it onto existing Next.js data shapes.
  * Hero is intentionally excluded.
+ * Wrapped in React cache() so layout footer + homepage share one request.
  */
-export async function getHomepageContent(): Promise<HomepageContent> {
+export const getHomepageContent = cache(
+  async (): Promise<HomepageContent> => {
   const [page, html, posts, contactPage] = await Promise.all([
     fetchJson<WpPage>(`${WP_REST}/pages/${WP_HOME_PAGE_ID}`),
     fetchText(`${WP_ORIGIN}/`),
@@ -561,4 +565,28 @@ export async function getHomepageContent(): Promise<HomepageContent> {
     contactCopy,
     footer,
   };
+  },
+);
+
+/** Same footer the homepage uses — shared across the site via root layout. */
+export async function getSiteFooterContent(): Promise<HomepageFooter> {
+  try {
+    const { footer } = await getHomepageContent();
+    return footer;
+  } catch {
+    return {
+      tagline: footerCopy.tagline,
+      wordmark: footerCopy.wordmark,
+      navigation: footerCopy.navigation.map((item) => ({ ...item })),
+      services: footerCopy.services.map((item) => ({ ...item })),
+      social: footerCopy.social.map((item) => ({ ...item })),
+      contact: {
+        email: footerCopy.contact.email,
+        phone: footerCopy.contact.phone,
+        addressLines: [...footerCopy.contact.addressLines],
+      },
+      legal: footerCopy.legal.map((item) => ({ ...item })),
+      copyrightName: footerCopy.copyrightName,
+    };
+  }
 }

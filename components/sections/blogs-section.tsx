@@ -26,7 +26,7 @@ type BlogsSectionProps = {
 };
 
 /**
- * Blogs — latest 3 equal media cards (padded image + title + excerpt).
+ * Blogs — latest 3 equal media cards (image + title + published date).
  */
 export function BlogsSection({ className, posts, copy }: BlogsSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -71,12 +71,15 @@ export function BlogsSection({ className, posts, copy }: BlogsSectionProps) {
   );
 }
 
+/**
+ * Blog card — image + title + published date only.
+ */
 function BlogCard({ post }: { post: BlogPost }) {
   return (
     <HoverLift y={-5} scale={1.01} className={styles.cardHover}>
-      <article className={mediaCard.card}>
+      <article className={cn(mediaCard.card, styles.blogCard)}>
         <Link href={post.href} className={styles.cardLink}>
-          <div className={mediaCard.media}>
+          <div className={cn(mediaCard.media, styles.blogMedia)}>
             {post.image ? (
               <Image
                 src={post.image}
@@ -88,9 +91,15 @@ function BlogCard({ post }: { post: BlogPost }) {
             ) : null}
           </div>
 
-          <div className={mediaCard.content}>
-            <h3 className={mediaCard.title}>{post.title}</h3>
-            <p className={mediaCard.description}>{post.excerpt}</p>
+          <div className={cn(mediaCard.content, styles.blogContent)}>
+            <h3 className={cn(mediaCard.title, styles.blogTitle)}>
+              {post.title}
+            </h3>
+            {post.publishedAt ? (
+              <time className={styles.date} dateTime={post.publishedAt}>
+                {post.publishedAt}
+              </time>
+            ) : null}
           </div>
         </Link>
       </article>

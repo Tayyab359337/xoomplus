@@ -3,13 +3,14 @@
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 
-import Magnet from "@/components/ui/magnet";
-import { ParallaxHeroImages } from "@/components/ui/parallax-hero-images";
-import { SectionEyebrow } from "@/components/ui/section-eyebrow";
+import { DotPattern } from "@/components/ui/dot-pattern";
 import { useIsClient } from "@/hooks/use-is-client";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
-import { heroParallaxImages } from "@/lib/data/homepage";
+import { heroShowcaseImages } from "@/lib/data/homepage";
 import { cn } from "@/lib/utils";
+
+import styles from "./hero.module.css";
 
 const LiquidEther = dynamic(() => import("@/components/effects/liquid-ether"), {
   ssr: false,
@@ -39,33 +40,95 @@ function canUseHeroWebGL(): boolean {
   return true;
 }
 
+function LightningBolt({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M13.2 2.1 4.8 13.4c-.35.47-.01 1.13.58 1.13h5.02l-1.05 7.18c-.12.82.9 1.3 1.42.67l9.05-11.1c.38-.47.04-1.18-.57-1.18h-5.3l.7-7.32c.08-.84-.94-1.28-1.45-.68Z" />
+    </svg>
+  );
+}
+
+function GoogleMark({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden className={className} viewBox="0 0 24 24">
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53Z"
+      />
+    </svg>
+  );
+}
+
+function TrustpilotMark({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden className={className} viewBox="0 0 24 24" fill="#00B67A">
+      <path d="M12 1.5 14.7 9.1H22.8l-6.6 4.8 2.5 7.6L12 16.7 5.3 21.5l2.5-7.6L1.2 9.1h8.1L12 1.5Z" />
+    </svg>
+  );
+}
+
+function Stars() {
+  return (
+    <span className={styles.stars} aria-hidden>
+      {Array.from({ length: 5 }, (_, i) => (
+        <svg key={i} viewBox="0 0 12 12" className={styles.star}>
+          <path d="M6 0.6 7.6 4.4 11.7 4.7 8.6 7.4 9.6 11.4 6 9.3 2.4 11.4 3.4 7.4 0.3 4.7 4.4 4.4 6 0.6Z" />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+function TrustpilotStars() {
+  return (
+    <span className={styles.tpStars} aria-hidden>
+      {Array.from({ length: 5 }, (_, i) => (
+        <span key={i} className={styles.tpCell}>
+          <svg viewBox="0 0 12 12" className={styles.tpStar}>
+            <path d="M6 0.6 7.6 4.4 11.7 4.7 8.6 7.4 9.6 11.4 6 9.3 2.4 11.4 3.4 7.4 0.3 4.7 4.4 4.4 6 0.6Z" />
+          </svg>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 /**
- * Homepage Hero — LiquidEther + Aceternity parallax images + LCP-safe typography.
- * SplashCursor stays global; no second cursor system here.
+ * Homepage Hero — LiquidEther (protected) + centered reference composition.
  * Primary heading is always visible HTML (never opacity:0 for LCP).
+ * Trust strip sits above the primary CTA.
  */
 export function Hero({ className }: HeroProps) {
   const reduceMotion = usePrefersReducedMotion();
   const { resolvedTheme } = useTheme();
   const isClient = useIsClient();
+  const isMobile = useMediaQuery("(max-width: 767px)");
   const allowWebGL = isClient && !reduceMotion && canUseHeroWebGL();
-  const allowParallax = isClient && !reduceMotion;
   const isLight = isClient && resolvedTheme === "light";
+  /** Mount dots only on mobile — never paint on desktop. */
+  const showDotPattern = isClient && isMobile;
 
   return (
-    <section
-      data-hero
-      className={cn(
-        "relative flex min-h-[100dvh] origin-center flex-col overflow-hidden border-b border-border bg-background",
-        className,
-      )}
-    >
+    <section data-hero className={cn(styles.section, className)}>
       {/* WebGL atmosphere — decorative, never blocks LCP text */}
-      <div
-        aria-hidden
-        data-hero-visual
-        className="pointer-events-none absolute inset-0 z-0 opacity-90"
-      >
+      <div aria-hidden data-hero-visual className={styles.ether}>
         {allowWebGL ? (
           <LiquidEther
             colors={isLight ? ETHER_COLORS_LIGHT : ETHER_COLORS_DARK}
@@ -93,66 +156,109 @@ export function Hero({ className }: HeroProps) {
         )}
       </div>
 
-      {/* Aceternity mouse parallax — sits above ether, below copy */}
-      {allowParallax ? (
-        <div data-hero-visual className="contents">
-          <ParallaxHeroImages
-            images={[...heroParallaxImages]}
-            variant="edge-focus"
-            className="z-[1] opacity-[0.55] md:opacity-70"
-            imageClassName="rounded-[var(--radius)] shadow-[0_12px_40px_color-mix(in_srgb,var(--foreground)_18%,transparent)] ring-border/40"
+      {/* Minimal veil — readability only, keeps Liquid Ether visible */}
+      <div aria-hidden className={styles.veil} />
+
+      {/* Mobile-only Magic UI dots — absolute, faded; not mounted on desktop */}
+      {showDotPattern ? (
+        <div aria-hidden className={styles.dotPattern}>
+          <DotPattern
+            width={18}
+            height={18}
+            cr={1}
+            className="text-foreground/[0.07] dark:text-foreground/[0.09]"
           />
         </div>
       ) : null}
 
-      {/* Readability veil — keeps type clear over ether + images */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-background/25 via-background/45 to-background/90"
-      />
-
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col items-center justify-center px-4 pb-16 pt-28 text-center md:px-8 md:pb-28 md:pt-36 lg:px-12">
-        <div className="flex w-full max-w-4xl flex-col items-center">
-          <SectionEyebrow variant="bare" showArrow={false} data-hero-eyebrow>
-            Creative studio
-          </SectionEyebrow>
-
+      <div className={styles.content}>
+        <div className={styles.stack}>
           {/* Real HTML heading for LCP — visible without JS animation */}
-          <h1 data-lcp className="type-display mt-6 max-w-[18ch] text-foreground">
-            Xoomplus{" "}
-            <span className="text-accent">Digital Marketing</span>, Web &amp;
-            Design Experts.
+          <h1 data-lcp className={styles.heading}>
+            <span className={styles.line}>Xoomplus</span>{" "}
+            <span className={styles.gradient}>
+            Digital Marketing,
+            </span>
+            <span className={styles.line}>Web & Design Experts</span>{" "}
           </h1>
 
-          <p
-            data-hero-body
-            className="type-body mx-auto mt-8 max-w-lg text-muted-foreground"
-          >
-            Ready to shine online? At XoomPlus, we create smart digital
-            marketing, web development, and design solutions that get attention,
-            engage visitors, and drive sales. From SEO and social media to
-            branding and beautiful websites, we help your business grow quickly
-            and effectively
+          <p data-hero-body className={styles.body}>
+          Ready to shine online? At XoomPlus, we create smart digital marketing, web development, and design solutions that get attention, engage visitors, and drive sales. From SEO and social media to branding and beautiful websites, we help your business grow quickly and effectively
           </p>
 
           <div
-            data-hero-actions
-            className="mt-10 flex flex-wrap items-center justify-center gap-4"
+            data-hero-trust
+            className={styles.trust}
+            aria-label="Trusted reviews"
           >
-            <Magnet padding={60} magnetStrength={3}>
-              <a href="#contact" className="btn-primary min-w-[10.5rem]">
-                Start a project
-                <span aria-hidden className="translate-y-px text-[0.95em]">
-                  →
+            <div className={styles.trustBadge}>
+              <GoogleMark className={styles.trustIcon} />
+              <div className={styles.trustMeta}>
+                <span className={styles.trustName}>Google rating</span>
+                <span className={styles.trustScore}>
+                  <span className={styles.trustValue}>5.0</span>
+                  <Stars />
                 </span>
-              </a>
-            </Magnet>
-            <Magnet padding={50} magnetStrength={3.5}>
-              <a href="#work" className="btn-ghost backdrop-blur-sm">
-                View selected work
-              </a>
-            </Magnet>
+              </div>
+            </div>
+
+            <div className={styles.trustBadge}>
+              <TrustpilotMark className={styles.trustIcon} />
+              <div className={styles.trustMeta}>
+                <span className={styles.trustName}>Trustpilot</span>
+                <span className={styles.trustScore}>
+                  <TrustpilotStars />
+                </span>
+              </div>
+            </div>
+
+            <span aria-hidden className={styles.trustDivider} />
+            <span className={styles.trustLabel}>Trusted Reviews</span>
           </div>
+
+          <div data-hero-actions className={styles.actions}>
+            <a href="#contact" className="btn-primary min-w-[10.5rem]">
+              Book a call
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Static showcase strip — reference composition, no mouse parallax */}
+      <div
+        aria-hidden
+        data-hero-visual
+        className={styles.showcase}
+      >
+        <div className={styles.showcaseTrack}>
+          {heroShowcaseImages.map((src, index) => (
+            <div key={src} className={styles.card}>
+              {/* Decorative only — next/image not required for LCP here */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt=""
+                className={styles.cardImg}
+                loading={index < 2 ? "eager" : "lazy"}
+                decoding="async"
+                fetchPriority="low"
+              />
+              {index === 2 ? (
+                <div className={styles.play}>
+                  <span className={styles.playDot}>
+                    <svg
+                      className={styles.playIcon}
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden
+                    >
+                      <path d="M8.2 5.6v12.8c0 .7.76 1.12 1.35.74l9.4-6.4a.88.88 0 0 0 0-1.48l-9.4-6.4a.88.88 0 0 0-1.35.74Z" />
+                    </svg>
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          ))}
         </div>
       </div>
     </section>

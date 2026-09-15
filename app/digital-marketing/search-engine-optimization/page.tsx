@@ -1,4 +1,3 @@
-import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { FaqSection } from "@/components/sections/faq-section";
 import { ProfessionalCtaSection } from "@/components/sections/professional-cta-section";
@@ -51,7 +50,6 @@ export default function SearchEngineOptimizationPage() {
         <ProfessionalCtaSection content={seoCtaCopy} />
         <FaqSection items={seoFaqItems} copy={seoFaqCopy} />
       </main>
-      <SiteFooter />
     </>
   );
 }
