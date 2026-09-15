@@ -42,11 +42,6 @@ export function unwrapWpMediaUrl(input: string | undefined | null): string {
   return "";
 }
 
-/** True when HTML has been rewritten by a media CDN (e.g. FastPixel). */
-export function isCdnRewrittenHtml(html: string): boolean {
-  return /data-fpo-src/i.test(html) || /fpo-lazyloaded/i.test(html);
-}
-
 /**
  * Map WordPress absolute URLs to Next.js pathnames when on the same origin.
  * External / tel / mailto / hash links are returned unchanged.
