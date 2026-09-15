@@ -11,5 +11,5 @@ export type {
   GraphicDesignPageContent,
   GraphicDesignServicesIntro,
 } from "./get-graphic-design-content";
-export { mapWpHref, isInternalHref } from "./urls";
+export { mapWpHref, isInternalHref, unwrapWpMediaUrl } from "./urls";
 export type { HomepageContent } from "./types";
