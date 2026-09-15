@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 
 import Magnet from "@/components/ui/magnet";
 import { InterfaceCraftsCards } from "@/components/ui/interface-crafts-cards";
@@ -21,6 +21,9 @@ type PortfolioSectionProps = {
   className?: string;
   projects?: PortfolioProject[];
   copy?: HomepagePortfolioCopy;
+  /** Optional media (e.g. case-study video dialog) rendered under the cards. */
+  media?: ReactNode;
+  ariaLabel?: string;
 };
 
 /**
@@ -30,6 +33,8 @@ export function PortfolioSection({
   className,
   projects,
   copy,
+  media,
+  ariaLabel = "Portfolio",
 }: PortfolioSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
@@ -40,7 +45,7 @@ export function PortfolioSection({
     <section
       ref={sectionRef}
       id="work"
-      aria-label="Portfolio"
+      aria-label={ariaLabel}
       data-section-reveal
       className={cn(styles.section, className)}
     >
@@ -61,6 +66,12 @@ export function PortfolioSection({
       <div data-reveal className={styles.stage}>
         <InterfaceCraftsCards items={items} />
       </div>
+
+      {media ? (
+        <div data-reveal className={styles.media}>
+          {media}
+        </div>
+      ) : null}
 
       <div data-reveal className={styles.ctaWrap}>
         <Magnet padding={60} magnetStrength={3}>

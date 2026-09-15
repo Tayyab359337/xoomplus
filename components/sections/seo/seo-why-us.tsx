@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 
-import { WhyUsBento } from "@/components/ui/why-us-bento";
+import { WhyUsBento, type WhyUsBentoItem } from "@/components/ui/why-us-bento";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
 import {
@@ -14,15 +14,31 @@ import { cn } from "@/lib/utils";
 
 import gdStyles from "@/components/sections/graphic-design/graphic-design-why-us.module.css";
 
+type SeoWhyUsCopy = {
+  eyebrow: string;
+  title: string;
+  body: string;
+};
+
 type SeoWhyUsProps = {
   className?: string;
+  copy?: SeoWhyUsCopy;
+  items?: WhyUsBentoItem[];
+  teamAvatars?: string[];
+  ariaLabel?: string;
 };
 
 /**
- * SEO Services — Why Choose XoomPlus.
- * Same WhyUsBento layout as Graphic Design; copy is from WordPress page 3062.
+ * Why Choose — shared WhyUsBento section used on SEO Services (and About).
+ * Defaults keep the SEO Services page unchanged.
  */
-export function SeoWhyUs({ className }: SeoWhyUsProps) {
+export function SeoWhyUs({
+  className,
+  copy = seoWhyUsCopy,
+  items = seoWhyUsItems,
+  teamAvatars = seoWhyUsAvatars,
+  ariaLabel = "Why choose Xoomplus for SEO",
+}: SeoWhyUsProps) {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
 
@@ -30,19 +46,19 @@ export function SeoWhyUs({ className }: SeoWhyUsProps) {
     <section
       ref={sectionRef}
       id="why-us"
-      aria-label="Why choose Xoomplus for SEO"
+      aria-label={ariaLabel}
       data-section-reveal
       className={cn(gdStyles.section, className)}
     >
       <div className={gdStyles.shell}>
         <header data-reveal className={gdStyles.intro}>
-          <SectionEyebrow>{seoWhyUsCopy.eyebrow}</SectionEyebrow>
-          <h2 className={gdStyles.title}>{seoWhyUsCopy.title}</h2>
-          <p className={gdStyles.body}>{seoWhyUsCopy.body}</p>
+          <SectionEyebrow>{copy.eyebrow}</SectionEyebrow>
+          <h2 className={gdStyles.title}>{copy.title}</h2>
+          <p className={gdStyles.body}>{copy.body}</p>
         </header>
 
         <div data-reveal className={gdStyles.bento}>
-          <WhyUsBento items={seoWhyUsItems} teamAvatars={seoWhyUsAvatars} />
+          <WhyUsBento items={items} teamAvatars={teamAvatars} />
         </div>
       </div>
     </section>

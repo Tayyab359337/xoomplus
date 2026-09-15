@@ -1,0 +1,203 @@
+.section {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--muted) 42%, var(--background)) 0%,
+      var(--background) 100%
+    );
+  padding: var(--section-y) 0;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: var(--section-y-md) 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: var(--section-y-lg) 0;
+  }
+}
+
+.shell {
+  width: min(100% - 2rem, var(--layout-max));
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .shell {
+    width: min(100% - 4rem, var(--layout-max));
+    gap: 2.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    width: min(100% - 6rem, var(--layout-max));
+  }
+}
+
+.intro {
+  max-width: none;
+  width: 100%;
+}
+
+.title {
+  margin: var(--title-gap) 0 0;
+  max-width: none;
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  letter-spacing: var(--text-h2--letter-spacing);
+  font-weight: var(--text-h2--font-weight);
+  color: var(--foreground);
+  text-wrap: wrap;
+}
+
+.composition {
+  display: grid;
+  gap: 1.75rem;
+  align-items: end;
+}
+
+@media (min-width: 768px) {
+  .composition {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+    gap: 2.5rem;
+    align-items: stretch;
+  }
+}
+
+.anchor {
+  position: relative;
+  min-width: 0;
+  padding: 0.25rem 0 0;
+}
+
+.giant {
+  display: flex;
+  align-items: baseline;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(5.5rem, 18vw, 14.5rem);
+  font-weight: 600;
+  line-height: 0.78;
+  letter-spacing: -0.07em;
+  color: var(--foreground);
+}
+
+.giantTicker {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+.giantSuffix {
+  color: var(--accent);
+}
+
+.primaryBody {
+  margin: 1.35rem 0 0;
+  max-width: 28rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--muted-foreground);
+}
+
+.rocket {
+  position: absolute;
+  right: 0;
+  bottom: 0.25rem;
+  width: min(38%, 13rem);
+  pointer-events: none;
+  opacity: 0.88;
+}
+
+@media (max-width: 639px) {
+  .rocket {
+    width: 7.5rem;
+    right: -0.4rem;
+    bottom: -0.4rem;
+    opacity: 0.72;
+  }
+}
+
+.rocketImage {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 1.5rem 0 0.15rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+@media (min-width: 768px) {
+  .aside {
+    padding: 0 0 0.4rem 1.5rem;
+    border-top: 0;
+    border-left: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    justify-content: center;
+  }
+}
+
+.clients {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  line-height: var(--text-meta--line-height);
+  letter-spacing: var(--text-meta--letter-spacing);
+  font-weight: var(--text-meta--font-weight);
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.secondary {
+  display: flex;
+  align-items: baseline;
+  margin: 0.35rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 7vw, 5.5rem);
+  font-weight: 600;
+  line-height: 0.88;
+  letter-spacing: -0.055em;
+  color: var(--foreground);
+}
+
+.secondaryTicker {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+.secondarySuffix {
+  color: var(--accent);
+}
+
+.secondaryBody {
+  margin: 0.7rem 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rocket {
+    opacity: 0.8;
+  }
+}
