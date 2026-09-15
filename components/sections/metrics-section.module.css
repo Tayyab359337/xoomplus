@@ -157,3 +157,101 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* About case-studies band — matches homepage metrics content in a compact teal strip */
+.banner {
+  border-bottom: none;
+  background: #3d8a96;
+  color: #f7fbfc;
+  padding: 3rem 0;
+}
+
+@media (min-width: 768px) {
+  .banner {
+    padding: 3.35rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .banner {
+    padding: 3.6rem 0;
+  }
+
+  .banner .inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+}
+
+.banner .inner {
+  gap: 2rem;
+}
+
+.banner .header {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.banner :global([data-section-eyebrow="mark"] > span) {
+  border-color: transparent;
+  background: #f3efe6;
+  color: #2f6b76;
+}
+
+.banner :global([data-section-eyebrow="mark"] > span:hover) {
+  background: #f3efe6;
+}
+
+.banner .title {
+  color: #f7fbfc;
+  max-width: 11em;
+  font-size: clamp(1.65rem, 2.6vw, 2.15rem);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.banner .grid {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  grid-template-columns: none;
+  gap: 1.75rem 2.35rem;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+}
+
+@media (min-width: 640px) {
+  .banner .grid {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+}
+
+.banner .card {
+  background: transparent;
+  min-width: 6.5rem;
+}
+
+.banner .cardInner {
+  gap: 0.35rem;
+  min-height: 0;
+  padding: 0;
+}
+
+.banner .value {
+  font-size: clamp(1.7rem, 2.8vw, 2.1rem);
+  letter-spacing: -0.04em;
+  color: #f7fbfc;
+}
+
+.banner .suffix {
+  color: inherit;
+}
+
+.banner .label {
+  color: color-mix(in srgb, #f7fbfc 82%, transparent);
+}
