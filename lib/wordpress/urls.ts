@@ -44,11 +44,7 @@ export function unwrapWpMediaUrl(input: string | undefined | null): string {
 
 /** True when HTML has been rewritten by a media CDN (e.g. FastPixel). */
 export function isCdnRewrittenHtml(html: string): boolean {
-  return (
-    /cdn\.fastpixel\.io/i.test(html) ||
-    /data-fpo-src/i.test(html) ||
-    /fpo-lazyloaded/i.test(html)
-  );
+  return /data-fpo-src/i.test(html) || /fpo-lazyloaded/i.test(html);
 }
 
 /**

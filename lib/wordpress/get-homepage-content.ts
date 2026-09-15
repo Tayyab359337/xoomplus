@@ -15,7 +15,7 @@ import {
 import { WP_HOME_PAGE_ID, WP_ORIGIN, WP_REST } from "./config";
 import { parseHomepageHtml } from "./parse-homepage-html";
 import type { HomepageContent, HomepageFooter } from "./types";
-import { isCdnRewrittenHtml, mapWpHref, unwrapWpMediaUrl } from "./urls";
+import { mapWpHref, unwrapWpMediaUrl } from "./urls";
 
 type ParsedHomepage = ReturnType<typeof parseHomepageHtml>;
 
@@ -320,9 +320,8 @@ async function resolvePortfolioImages(
  */
 export const getHomepageContent = cache(
   async (): Promise<HomepageContent> => {
-  const [page, html, posts, contactPage] = await Promise.all([
+  const [page, posts, contactPage] = await Promise.all([
     fetchJson<WpPage>(`${WP_REST}/pages/${WP_HOME_PAGE_ID}`),
-    fetchText(`${WP_ORIGIN}/`).catch(() => ""),
     fetchJson<WpPost[]>(
       `${WP_REST}/posts?per_page=3&_embed=1&orderby=date&order=desc`,
     ),
@@ -330,24 +329,29 @@ export const getHomepageContent = cache(
   ]);
 
   const restHtml = page.content?.rendered || "";
-  const liveHtml = html.length > 10_000 ? html : "";
-  // CDN-optimized live HTML is not a valid parse source for media-bearing
-  // widgets — FastPixel replaces img src with SVG placeholders and empties
-  // case-study background-image URLs. REST keeps original WP upload URLs.
-  const liveIsCdn = liveHtml.length > 0 && isCdnRewrittenHtml(liveHtml);
-  const primaryHtml = liveHtml && !liveIsCdn ? liveHtml : restHtml;
-  const secondaryHtml =
-    !liveIsCdn && restHtml && restHtml !== primaryHtml ? restHtml : "";
+  const parsedPrimary = parseHomepageHtml(restHtml);
 
-  const parsedPrimary = parseHomepageHtml(primaryHtml);
-  const parsedSecondary = secondaryHtml
-    ? parseHomepageHtml(secondaryHtml)
-    : null;
+  // Live homepage HTML is FastPixel-optimized (~2.5MB, over Next's 2MB data-cache
+  // limit) and strips media URLs. Only scrape it when REST is missing the
+  // media-bearing widgets we need; REST is the CMS source of truth.
+  const restLooksThin =
+    parsedPrimary.services.length === 0 ||
+    parsedPrimary.logos.length === 0 ||
+    parsedPrimary.portfolio.every((item) => !item.image);
+
+  let parsedSecondary: ParsedHomepage | null = null;
+  if (restLooksThin) {
+    const html = await fetchText(`${WP_ORIGIN}/`).catch(() => "");
+    if (html.length > 10_000) {
+      parsedSecondary = parseHomepageHtml(html);
+    }
+  }
+
   const parsed = mergeHomepageParse(parsedPrimary, parsedSecondary);
 
   // Review cards are reliable in REST `content.rendered`.
-  if (parsedSecondary && parsedSecondary.testimonials.length > 0) {
-    parsed.testimonials = parsedSecondary.testimonials;
+  if (parsedPrimary.testimonials.length > 0) {
+    parsed.testimonials = parsedPrimary.testimonials;
   }
 
   const portfolioImages = await resolvePortfolioImages(parsed.portfolio);
