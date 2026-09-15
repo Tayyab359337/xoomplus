@@ -33,7 +33,7 @@ export const aboutExpertiseMetrics = [
 
 export const aboutWorkCopy = {
   eyebrow: "Case Studies",
-  title: "Make Your Marketing More Effective",
+  title: "Make your marketing more effective",
   body: "",
 } as const;
 

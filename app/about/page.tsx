@@ -48,10 +48,9 @@ export default async function AboutPage() {
   const content = await getHomepageContent();
   const jsonLd = getAboutJsonLd();
   const workCopy = {
-    ...content.portfolioCopy,
     eyebrow: aboutWorkCopy.eyebrow,
     title: aboutWorkCopy.title,
-    body: aboutWorkCopy.body,
+    body: "",
   };
 
   return (
@@ -66,7 +65,10 @@ export default async function AboutPage() {
       <main className="flex flex-1 flex-col">
         <AboutHero />
         <AboutExpertise />
-        <AboutWorkShowcase projects={content.portfolio} copy={workCopy} />
+        <AboutWorkShowcase
+          metrics={content.metrics.length > 0 ? content.metrics : undefined}
+          copy={workCopy}
+        />
         <SeoWhyUs
           copy={aboutWhyUsCopy}
           items={aboutWhyUsItems}
