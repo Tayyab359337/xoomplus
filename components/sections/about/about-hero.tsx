@@ -173,14 +173,14 @@ export function AboutHero({ className }: AboutHeroProps) {
               </li>
               <li className={styles.crumbItem} aria-current="page">
                 <ChevronRight className={styles.crumbSep} aria-hidden />
-                <span className={styles.crumbCurrent}>
+                <span className={cn(styles.crumbCurrent, "type-body")}>
                   {aboutHeroCopy.currentLabel}
                 </span>
               </li>
             </ol>
           </nav>
 
-          <h1 data-lcp className={styles.headline}>
+          <h1 data-lcp className={cn(styles.headline, "type-body")}>
             {aboutHeroCopy.heading}
           </h1>
         </div>
