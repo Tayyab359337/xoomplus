@@ -1,3 +1,5 @@
+import { unwrapWpMediaUrl } from "./urls";
+
 function decodeHtml(input: string): string {
   return input
     .replace(/&nbsp;/g, " ")
@@ -42,6 +44,37 @@ function normalizeUploadUrl(src: string): string {
   return src.replace(/-\d+x\d+(?=\.(?:webp|jpe?g|png|gif|svg))/i, "");
 }
 
+function mediaUrlFromImgTag(tag: string): string {
+  const raw =
+    tag.match(/\bdata-fpo-src=["']([^"']+)["']/i)?.[1] ??
+    tag.match(/\bsrc=["']([^"']+)["']/i)?.[1] ??
+    tag.match(/\bdata-src=["']([^"']+)["']/i)?.[1] ??
+    tag.match(/\bdata-lazy-src=["']([^"']+)["']/i)?.[1];
+  const unwrapped = unwrapWpMediaUrl(raw);
+  return unwrapped ? normalizeUploadUrl(unwrapped) : "";
+}
+
+/**
+ * FastPixel (and similar CDNs) replace img src with SVG placeholders and
+ * stash the original upload in data-fpo-src. Restore WP media URLs so
+ * Elementor parsers that key off original wp-content upload srcs still match.
+ */
+function restoreOriginalMediaSrcs(html: string): string {
+  if (!/data-fpo-src|cdn\.fastpixel\.io/i.test(html)) return html;
+  return html.replace(/<img\b[^>]*>/gi, (tag) => {
+    const resolved = mediaUrlFromImgTag(tag);
+    if (!resolved) return tag;
+    // Drop FastPixel payload attrs so src→heading parsers stay in range.
+    const cleaned = tag
+      .replace(/\s+data-fpo-[a-z-]+="[^"]*"/gi, "")
+      .replace(/\s+id="fpoc"/gi, "");
+    if (/\bsrc=/i.test(cleaned)) {
+      return cleaned.replace(/\bsrc=["'][^"']*["']/i, `src="${resolved}"`);
+    }
+    return cleaned.replace(/<img\b/i, `<img src="${resolved}"`);
+  });
+}
+
 function humanizeLogoName(altOrFile: string): string {
   const raw = decodeHtml(altOrFile)
     .replace(/\.[a-z0-9]+$/i, "")
@@ -84,13 +117,10 @@ function parseBrandLogosFromHtml(html: string): ParsedLogo[] {
     const tag = imgMatch[0];
     if (!/swiper-slide-image|elementor-carousel-image/i.test(tag)) continue;
 
-    const src =
-      tag.match(/\bsrc=["']([^"']+)["']/i)?.[1] ??
-      tag.match(/\bdata-src=["']([^"']+)["']/i)?.[1] ??
-      tag.match(/\bdata-lazy-src=["']([^"']+)["']/i)?.[1];
-    if (!src || !/wp-content\/uploads/i.test(src)) continue;
+    const src = mediaUrlFromImgTag(tag);
+    if (!src) continue;
 
-    const normalized = normalizeUploadUrl(src);
+    const normalized = src;
     const key = normalized.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
@@ -110,7 +140,8 @@ function parseBrandLogosFromHtml(html: string): ParsedLogo[] {
  * Extract homepage sections from the rendered Elementor HTML.
  * Prefer this over dumping Elementor markup into React.
  */
-export function parseHomepageHtml(html: string) {
+export function parseHomepageHtml(rawHtml: string) {
+  const html = restoreOriginalMediaSrcs(rawHtml);
   const logos = parseBrandLogosFromHtml(html);
   const services: ParsedService[] = [];
   const serviceRe =
@@ -139,8 +170,9 @@ export function parseHomepageHtml(html: string) {
       /case-studies-hover[^>]*style="[^"]*background-image:\s*url\('([^']*)'\)/i,
     );
     const rawImage = imageMatch?.[1]?.trim() || "";
-    const image = rawImage
-      ? rawImage.replace(/-\d+x\d+(?=\.(?:webp|jpe?g|png|gif))/i, "")
+    const unwrappedImage = unwrapWpMediaUrl(rawImage);
+    const image = unwrappedImage
+      ? normalizeUploadUrl(unwrappedImage)
       : "";
 
     portfolio.push({
@@ -158,10 +190,7 @@ export function parseHomepageHtml(html: string) {
     /<p class="[^"]*card-title[^"]*">([\s\S]*?)<\/p>[\s\S]*?<p class="[^"]*card-text[^"]*">([\s\S]*?)<\/p>[\s\S]*?<img\b([^>]*\bavatar\b[^>]*)>[\s\S]*?<span class="[^"]*author-name[^"]*">([\s\S]*?)<\/span>/gi;
   while ((match = testimonialRe.exec(html))) {
     const imgAttrs = match[3] ?? "";
-    const avatar =
-      imgAttrs.match(/\bsrc=["']([^"']+)["']/i)?.[1] ??
-      imgAttrs.match(/\bdata-src=["']([^"']+)["']/i)?.[1] ??
-      "";
+    const avatar = mediaUrlFromImgTag(`<img ${imgAttrs}>`);
     const alt = imgAttrs.match(/\balt=["']([^"']*)["']/i)?.[1] ?? "";
     const quote = decodeHtml(match[2]!.replace(/<[^>]+>/g, " "));
     const name = decodeHtml(match[4]!.replace(/<[^>]+>/g, " ")) || decodeHtml(alt);

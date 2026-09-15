@@ -15,7 +15,72 @@ import {
 import { WP_HOME_PAGE_ID, WP_ORIGIN, WP_REST } from "./config";
 import { parseHomepageHtml } from "./parse-homepage-html";
 import type { HomepageContent, HomepageFooter } from "./types";
-import { mapWpHref } from "./urls";
+import { mapWpHref, unwrapWpMediaUrl } from "./urls";
+
+type ParsedHomepage = ReturnType<typeof parseHomepageHtml>;
+
+function takeLongerArray<
+  K extends "metrics" | "footerNav" | "social",
+>(target: ParsedHomepage, other: ParsedHomepage, key: K) {
+  if (other[key].length > target[key].length) {
+    target[key] = other[key];
+  }
+}
+
+function takeRicherMediaArray<K extends "logos" | "services" | "portfolio">(
+  target: ParsedHomepage,
+  other: ParsedHomepage,
+  key: K,
+  hasMedia: (item: ParsedHomepage[K][number]) => boolean,
+) {
+  const current = target[key];
+  const candidate = other[key];
+  const currentMedia = current.filter(hasMedia).length;
+  const candidateMedia = candidate.filter(hasMedia).length;
+  if (
+    candidate.length > current.length ||
+    (candidate.length === current.length && candidateMedia > currentMedia)
+  ) {
+    target[key] = candidate;
+  }
+}
+
+/**
+ * REST `content.rendered` is the CMS source of truth (original media URLs).
+ * Live HTML can be richer for chrome, but CDNs like FastPixel rewrite/strip
+ * images — never let that empty out services, portfolio, logos, or metrics.
+ */
+function mergeHomepageParse(
+  primary: ParsedHomepage,
+  secondary: ParsedHomepage | null,
+): ParsedHomepage {
+  if (!secondary) return primary;
+  const merged: ParsedHomepage = { ...primary };
+
+  takeRicherMediaArray(merged, secondary, "logos", (item) => Boolean(item.src));
+  takeRicherMediaArray(merged, secondary, "services", (item) => Boolean(item.image));
+  takeRicherMediaArray(merged, secondary, "portfolio", (item) => Boolean(item.image));
+  takeLongerArray(merged, secondary, "metrics");
+  takeLongerArray(merged, secondary, "footerNav");
+  takeLongerArray(merged, secondary, "social");
+
+  if (merged.testimonials.length === 0 && secondary.testimonials.length > 0) {
+    merged.testimonials = secondary.testimonials;
+  }
+
+  const fillEmpty = (value: string, fallback: string) =>
+    value.trim() ? value : fallback;
+
+  merged.about = {
+    ...merged.about,
+    eyebrow: fillEmpty(merged.about.eyebrow, secondary.about.eyebrow),
+    heading: fillEmpty(merged.about.heading, secondary.about.heading),
+    body: fillEmpty(merged.about.body, secondary.about.body),
+    ctaHref: fillEmpty(merged.about.ctaHref, secondary.about.ctaHref),
+  };
+
+  return merged;
+}
 
 const PORTFOLIO_TONES: PortfolioTone[] = [
   "ember",
@@ -255,42 +320,45 @@ async function resolvePortfolioImages(
  */
 export const getHomepageContent = cache(
   async (): Promise<HomepageContent> => {
-  const [page, html, posts, contactPage] = await Promise.all([
+  const [page, posts, contactPage] = await Promise.all([
     fetchJson<WpPage>(`${WP_REST}/pages/${WP_HOME_PAGE_ID}`),
-    fetchText(`${WP_ORIGIN}/`),
     fetchJson<WpPost[]>(
       `${WP_REST}/posts?per_page=3&_embed=1&orderby=date&order=desc`,
     ),
     fetchJson<WpContactPage>(`${WP_REST}/pages/1079?_fields=content`),
   ]);
 
-  // Prefer live HTML (complete Elementor markup); fall back to REST content.
-  // Also merge logos / testimonials from REST when live markup omits them.
   const restHtml = page.content?.rendered || "";
-  const sourceHtml = html.length > 10_000 ? html : restHtml;
-  const parsed = parseHomepageHtml(sourceHtml);
-  const restParsed =
-    restHtml && restHtml !== sourceHtml ? parseHomepageHtml(restHtml) : null;
+  const parsedPrimary = parseHomepageHtml(restHtml);
 
-  if (restParsed && restParsed.logos.length > parsed.logos.length) {
-    parsed.logos = restParsed.logos;
+  // Live homepage HTML is FastPixel-optimized (~2.5MB, over Next's 2MB data-cache
+  // limit) and strips media URLs. Only scrape it when REST is missing the
+  // media-bearing widgets we need; REST is the CMS source of truth.
+  const restLooksThin =
+    parsedPrimary.services.length === 0 ||
+    parsedPrimary.logos.length === 0 ||
+    parsedPrimary.portfolio.every((item) => !item.image);
+
+  let parsedSecondary: ParsedHomepage | null = null;
+  if (restLooksThin) {
+    const html = await fetchText(`${WP_ORIGIN}/`).catch(() => "");
+    if (html.length > 10_000) {
+      parsedSecondary = parseHomepageHtml(html);
+    }
   }
-  if (parsed.logos.length === 0 && restParsed) {
-    parsed.logos = restParsed.logos;
-  }
-  // Review cards are reliable in REST `content.rendered`. Live HTML from some
-  // edge fetches can omit them while still matching the section heading text.
-  if (restParsed && restParsed.testimonials.length > 0) {
-    parsed.testimonials = restParsed.testimonials;
-  } else if (parsed.testimonials.length === 0 && restHtml) {
-    parsed.testimonials = parseHomepageHtml(restHtml).testimonials;
+
+  const parsed = mergeHomepageParse(parsedPrimary, parsedSecondary);
+
+  // Review cards are reliable in REST `content.rendered`.
+  if (parsedPrimary.testimonials.length > 0) {
+    parsed.testimonials = parsedPrimary.testimonials;
   }
 
   const portfolioImages = await resolvePortfolioImages(parsed.portfolio);
 
   const logos: PartnerLogo[] = parsed.logos.map((logo) => ({
     name: logo.name,
-    src: logo.src,
+    src: unwrapWpMediaUrl(logo.src) || logo.src,
   }));
 
   const aboutBody = (parsed.about.body || aboutContent.body).replace(/\s+/g, " ").trim();
@@ -349,14 +417,18 @@ export const getHomepageContent = cache(
     return {
       ...category,
       children: category.children.map((child) => ({ ...child })),
-      image: wp?.image,
+      image: unwrapWpMediaUrl(wp?.image) || wp?.image,
       href: mapWpHref(wp?.link ?? rule?.hrefFallback ?? ""),
     };
   });
 
   const portfolio: PortfolioProject[] = parsed.portfolio.map((item, index) => {
     const media = portfolioImages.get(item.name);
-    const image = media?.src || item.image || undefined;
+    const image =
+      unwrapWpMediaUrl(media?.src || item.image) ||
+      media?.src ||
+      item.image ||
+      undefined;
     return {
       id: slugify(item.name),
       title: item.name,
