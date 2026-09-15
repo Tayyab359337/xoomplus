@@ -110,11 +110,12 @@ export function AboutSection({ className, content }: AboutSectionProps) {
                         data-animate-media
                         src={about.image.src}
                         alt={about.image.alt}
-                        width={1400}
-                        height={980}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 46vw, 520px"
+                        width={800}
+                        height={560}
+                        sizes="(max-width: 768px) 92vw, (max-width: 1200px) 42vw, 360px"
                         className={styles.mediaImage}
-                        priority={false}
+                        quality={72}
+                        loading="lazy"
                       />
                     </div>
                     <div className={styles.mediaMeta}>

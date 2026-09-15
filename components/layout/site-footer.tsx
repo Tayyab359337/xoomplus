@@ -191,7 +191,8 @@ export function SiteFooter({ className, content }: SiteFooterProps) {
         </ul>
       </div>
 
-      <div className={styles.wordmark} aria-label={copy.wordmark}>
+      {/* Decorative SVG wordmark — brand is already named via BrandMark above */}
+      <div className={styles.wordmark} aria-hidden="true">
         <TextHoverEffect text={copy.wordmark} duration={0.2} />
       </div>
     </footer>

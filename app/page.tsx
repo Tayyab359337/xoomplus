@@ -1,24 +1,56 @@
 import dynamic from "next/dynamic";
 
 import { SiteHeader } from "@/components/layout/site-header";
-import { AboutSection } from "@/components/sections/about-section";
-import { FaqSection } from "@/components/sections/faq-section";
 import { Hero } from "@/components/sections/hero";
 import { LogoLoopSection } from "@/components/sections/logo-loop-section";
-import { MetricsSection } from "@/components/sections/metrics-section";
-import { PortfolioSection } from "@/components/sections/portfolio-section";
-import { ServicesSection } from "@/components/sections/services/services-section";
 import {
   getHomepageJsonLd,
   homepageMetadata,
 } from "@/lib/seo/homepage";
 import { getHomepageContent } from "@/lib/wordpress";
 
-/** Heavy / below-fold client islands — defer JS until after first paint. */
+/** Near/above-fold copy — keep SSR, defer JS weight slightly after LCP. */
+const AboutSection = dynamic(
+  () =>
+    import("@/components/sections/about-section").then((m) => ({
+      default: m.AboutSection,
+    })),
+  { ssr: true },
+);
+const MetricsSection = dynamic(
+  () =>
+    import("@/components/sections/metrics-section").then((m) => ({
+      default: m.MetricsSection,
+    })),
+  { ssr: true },
+);
+
+/** Heavy / below-fold client islands — defer CSS+JS until after first paint. */
 const KineticTypeSection = dynamic(
   () =>
     import("@/components/sections/kinetic-type-section").then((m) => ({
       default: m.KineticTypeSection,
+    })),
+  { ssr: true },
+);
+const ServicesSection = dynamic(
+  () =>
+    import("@/components/sections/services/services-section").then((m) => ({
+      default: m.ServicesSection,
+    })),
+  { ssr: true },
+);
+const PortfolioSection = dynamic(
+  () =>
+    import("@/components/sections/portfolio-section").then((m) => ({
+      default: m.PortfolioSection,
+    })),
+  { ssr: true },
+);
+const FaqSection = dynamic(
+  () =>
+    import("@/components/sections/faq-section").then((m) => ({
+      default: m.FaqSection,
     })),
   { ssr: true },
 );
@@ -57,7 +89,7 @@ export const metadata = homepageMetadata;
 export const revalidate = 300;
 
 /**
- * Homepage — Hero unchanged; remaining sections mapped from WordPress page 215.
+ * Homepage — Hero is a Server Component for LCP; remaining sections map from WP page 215.
  */
 export default async function Home() {
   const content = await getHomepageContent();

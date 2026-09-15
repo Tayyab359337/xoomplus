@@ -22,6 +22,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  /**
+   * Next injects a fixed polyfill-module (Array.at, Object.hasOwn, …).
+   * Our modern browserslist targets support these natively — replace with a stub.
+   */
+  turbopack: {
+    resolveAlias: {
+      "next/dist/build/polyfills/polyfill-module": "./lib/empty-module.js",
+      "next/dist/build/polyfills/polyfill-module.js": "./lib/empty-module.js",
+    },
+  },
 };
 
 export default nextConfig;

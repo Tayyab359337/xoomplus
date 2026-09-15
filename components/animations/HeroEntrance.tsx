@@ -8,8 +8,8 @@ import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { EASE_OUT_EXPO, gsap, registerGsapPlugins } from "@/lib/animations";
 
 /**
- * Cinematic Hero assemble — overlapping timeline positions.
- * Primary heading stays visible HTML (LCP-safe) — never opacity:0.
+ * Lightweight hero polish after first paint.
+ * Never animates `[data-lcp]` or `[data-hero-body]` — those must paint immediately for LCP.
  */
 export function HeroEntrance() {
   const reduceMotion = usePrefersReducedMotion();
@@ -27,74 +27,67 @@ export function HeroEntrance() {
       registerGsapPlugins();
 
       const nav = document.querySelectorAll<HTMLElement>("[data-nav-entrance]");
-      const eyebrow = hero.querySelector<HTMLElement>("[data-hero-eyebrow]");
-      const body = hero.querySelector<HTMLElement>("[data-hero-body]");
       const trust = hero.querySelector<HTMLElement>("[data-hero-trust]");
       const actions = hero.querySelector<HTMLElement>("[data-hero-actions]");
       const visuals = hero.querySelectorAll<HTMLElement>("[data-hero-visual]");
-      const heading = hero.querySelector<HTMLElement>("[data-lcp]");
 
-      const tl = gsap.timeline({ defaults: { ease: EASE_OUT_EXPO } });
+      const run = () => {
+        const tl = gsap.timeline({ defaults: { ease: EASE_OUT_EXPO } });
 
-      // Overlapping assemble — not sequential drops
-      if (nav.length) {
-        tl.from(nav, { y: -8, duration: 0.55, clearProps: "transform" }, 0);
+        if (nav.length) {
+          tl.from(nav, { y: -8, duration: 0.55, clearProps: "transform" }, 0);
+        }
+
+        if (visuals.length) {
+          tl.from(
+            visuals,
+            {
+              opacity: 0.65,
+              duration: 0.7,
+              stagger: 0.04,
+              clearProps: "opacity",
+            },
+            0.08,
+          );
+        }
+
+        if (trust) {
+          tl.from(
+            trust,
+            { y: 10, duration: 0.5, clearProps: "transform" },
+            0.12,
+          );
+        }
+
+        if (actions) {
+          const kids = actions.querySelectorAll(":scope > *");
+          tl.from(
+            kids,
+            { y: 12, duration: 0.5, stagger: 0.05, clearProps: "transform" },
+            0.16,
+          );
+        }
+      };
+
+      // Defer until after first paint so LCP text is not competing with GSAP.
+      let idleId = 0;
+      let timeoutId = 0;
+      const start = () => {
+        requestAnimationFrame(() => requestAnimationFrame(run));
+      };
+
+      if (typeof window.requestIdleCallback === "function") {
+        idleId = window.requestIdleCallback(start, { timeout: 900 });
+      } else {
+        timeoutId = window.setTimeout(start, 1);
       }
 
-      if (eyebrow) {
-        tl.from(
-          eyebrow,
-          { y: 12, duration: 0.55, clearProps: "transform" },
-          0.0,
-        );
-      }
-
-      if (heading) {
-        tl.from(
-          heading,
-          { y: 8, duration: 0.65, clearProps: "transform" },
-          0.05,
-        );
-      }
-
-      if (visuals.length) {
-        tl.from(
-          visuals,
-          {
-            opacity: 0.5,
-            scale: 1.02,
-            duration: 0.85,
-            stagger: 0.04,
-            clearProps: "transform,opacity",
-          },
-          0.15,
-        );
-      }
-
-      if (body) {
-        tl.from(
-          body,
-          { y: 16, duration: 0.65, clearProps: "transform" },
-          0.18,
-        );
-      }
-
-      if (trust) {
-        tl.from(
-          trust,
-          { y: 12, duration: 0.55, clearProps: "transform" },
-          0.24,
-        );
-      }
-
-      if (actions) {
-        const kids = actions.querySelectorAll(":scope > *");
-        tl.from(
-          kids,
-          { y: 14, duration: 0.55, stagger: 0.06, clearProps: "transform" },
-          0.3,
-        );
-      }
+      return () => {
+        if (idleId && typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idleId);
+        }
+        if (timeoutId) window.clearTimeout(timeoutId);
+      };
     },
     { dependencies: [preloaderDone, reduceMotion] },
   );

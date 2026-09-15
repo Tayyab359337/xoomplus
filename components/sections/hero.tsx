@@ -1,57 +1,14 @@
-"use client";
+import Image from "next/image";
 
-import dynamic from "next/dynamic";
-import { useTheme } from "next-themes";
-
-import { DotPattern } from "@/components/ui/dot-pattern";
-import { useIsClient } from "@/hooks/use-is-client";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { HeroAtmosphere } from "@/components/sections/hero-atmosphere";
 import { heroShowcaseImages } from "@/lib/data/homepage";
 import { cn } from "@/lib/utils";
 
 import styles from "./hero.module.css";
 
-const LiquidEther = dynamic(() => import("@/components/effects/liquid-ether"), {
-  ssr: false,
-  loading: () => null,
-});
-
-/** Teal brand field — variants of #478997 / #3D7883 */
-const ETHER_COLORS_DARK = ["#2f6b76", "#3D7883", "#6aadb8"];
-const ETHER_COLORS_LIGHT = ["#478997", "#2f6b76", "#5a9aa5"];
-
 type HeroProps = {
   className?: string;
 };
-
-function canUseHeroWebGL(): boolean {
-  if (typeof window === "undefined") return false;
-
-  const coarse = window.matchMedia("(pointer: coarse)").matches;
-  const compact = window.matchMedia("(max-width: 768px)").matches;
-  const nav = navigator as Navigator & {
-    deviceMemory?: number;
-    connection?: { saveData?: boolean };
-  };
-
-  if (coarse || compact || nav.connection?.saveData) return false;
-  if (typeof nav.deviceMemory === "number" && nav.deviceMemory < 4) return false;
-  return true;
-}
-
-function LightningBolt({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
-      <path d="M13.2 2.1 4.8 13.4c-.35.47-.01 1.13.58 1.13h5.02l-1.05 7.18c-.12.82.9 1.3 1.42.67l9.05-11.1c.38-.47.04-1.18-.57-1.18h-5.3l.7-7.32c.08-.84-.94-1.28-1.45-.68Z" />
-    </svg>
-  );
-}
 
 function GoogleMark({ className }: { className?: string }) {
   return (
@@ -111,79 +68,31 @@ function TrustpilotStars() {
 }
 
 /**
- * Homepage Hero — LiquidEther (protected) + centered reference composition.
- * Primary heading is always visible HTML (never opacity:0 for LCP).
- * Trust strip sits above the primary CTA.
+ * Homepage Hero — Server Component shell for LCP text + decorative client atmosphere.
+ * Heading and body are always in the initial HTML (never opacity:0 / never gated on JS).
  */
 export function Hero({ className }: HeroProps) {
-  const reduceMotion = usePrefersReducedMotion();
-  const { resolvedTheme } = useTheme();
-  const isClient = useIsClient();
-  const isMobile = useMediaQuery("(max-width: 767px)");
-  const allowWebGL = isClient && !reduceMotion && canUseHeroWebGL();
-  const isLight = isClient && resolvedTheme === "light";
-  /** Mount dots only on mobile — never paint on desktop. */
-  const showDotPattern = isClient && isMobile;
-
   return (
     <section data-hero className={cn(styles.section, className)}>
-      {/* WebGL atmosphere — decorative, never blocks LCP text */}
-      <div aria-hidden data-hero-visual className={styles.ether}>
-        {allowWebGL ? (
-          <LiquidEther
-            colors={isLight ? ETHER_COLORS_LIGHT : ETHER_COLORS_DARK}
-            mouseForce={18}
-            cursorSize={110}
-            isViscous={false}
-            viscous={30}
-            iterationsViscous={12}
-            iterationsPoisson={12}
-            resolution={0.22}
-            isBounce={false}
-            autoDemo={false}
-            autoSpeed={0.45}
-            autoIntensity={2}
-            takeoverDuration={0.25}
-            autoResumeDelay={2800}
-            autoRampDuration={0.6}
-            BFECC={false}
-            lightMode={isLight}
-            backgroundColor={isLight ? "#f4f8f9" : "#04070a"}
-            style={{ width: "100%", height: "100%", position: "absolute" }}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,color-mix(in_oklch,var(--accent)_18%,transparent),transparent_55%)]" />
-        )}
-      </div>
+      <HeroAtmosphere />
 
       {/* Minimal veil — readability only, keeps Liquid Ether visible */}
       <div aria-hidden className={styles.veil} />
 
-      {/* Mobile-only Magic UI dots — absolute, faded; not mounted on desktop */}
-      {showDotPattern ? (
-        <div aria-hidden className={styles.dotPattern}>
-          <DotPattern
-            width={18}
-            height={18}
-            cr={1}
-            className="text-foreground/[0.07] dark:text-foreground/[0.09]"
-          />
-        </div>
-      ) : null}
-
       <div className={styles.content}>
         <div className={styles.stack}>
-          {/* Real HTML heading for LCP — visible without JS animation */}
           <h1 data-lcp className={styles.heading}>
             <span className={styles.line}>Xoomplus</span>{" "}
-            <span className={styles.gradient}>
-            Digital Marketing,
-            </span>
+            <span className={styles.gradient}>Digital Marketing,</span>
             <span className={styles.line}>Web & Design Experts</span>{" "}
           </h1>
 
           <p data-hero-body className={styles.body}>
-          Ready to shine online? At XoomPlus, we create smart digital marketing, web development, and design solutions that get attention, engage visitors, and drive sales. From SEO and social media to branding and beautiful websites, we help your business grow quickly and effectively
+            Ready to shine online? At XoomPlus, we create smart digital
+            marketing, web development, and design solutions that get attention,
+            engage visitors, and drive sales. From SEO and social media to
+            branding and beautiful websites, we help your business grow quickly
+            and effectively
           </p>
 
           <div
@@ -191,30 +100,36 @@ export function Hero({ className }: HeroProps) {
             className={styles.trust}
             aria-label="Trusted reviews"
           >
-            <a href="https://www.google.com/search?sca_esv=2e0bf73006d1ba9f&rlz=1C1CHBF_enPK1130PK1131&kgmid=/g/11vx_slwfg&q=Xoomplus&shndl=30&shem=lcuae,lsctac,uaasie,shrtsdl&source=sh/x/loc/uni/m1/1&kgs=e67c915574c33667&utm_source=lcuae,lsctac,uaasie,shrtsdl,sh/x/loc/uni/m1/1#lrd=0x38df95000d84e457:0xe13a404eab3f5547,3,,,," target="__blank">
-            <div className={styles.trustBadge}>
+            <a
+              href="https://www.google.com/search?sca_esv=2e0bf73006d1ba9f&rlz=1C1CHBF_enPK1130PK1131&kgmid=/g/11vx_slwfg&q=Xoomplus&shndl=30&shem=lcuae,lsctac,uaasie,shrtsdl&source=sh/x/loc/uni/m1/1&kgs=e67c915574c33667&utm_source=lcuae,lsctac,uaasie,shrtsdl,sh/x/loc/uni/m1/1#lrd=0x38df95000d84e457:0xe13a404eab3f5547,3,,,,"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.trustBadge}
+            >
               <GoogleMark className={styles.trustIcon} />
-              <div className={styles.trustMeta}>
+              <span className={styles.trustMeta}>
                 <span className={styles.trustName}>Google rating</span>
                 <span className={styles.trustScore}>
                   <span className={styles.trustValue}>5.0</span>
                   <Stars />
                 </span>
-              </div>
-            </div>
+              </span>
             </a>
 
-           <a href="https://www.trustpilot.com/review/xoomplus.co.uk" target="__blank">
-           <div className={styles.trustBadge}>
+            <a
+              href="https://www.trustpilot.com/review/xoomplus.co.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.trustBadge}
+            >
               <TrustpilotMark className={styles.trustIcon} />
-              <div className={styles.trustMeta}>
+              <span className={styles.trustMeta}>
                 <span className={styles.trustName}>Trustpilot</span>
                 <span className={styles.trustScore}>
                   <TrustpilotStars />
                 </span>
-              </div>
-            </div>
-           </a>
+              </span>
+            </a>
 
             <span aria-hidden className={styles.trustDivider} />
             <span className={styles.trustLabel}>Trusted Reviews</span>
@@ -228,24 +143,21 @@ export function Hero({ className }: HeroProps) {
         </div>
       </div>
 
-      {/* Static showcase strip — reference composition, no mouse parallax */}
-      <div
-        aria-hidden
-        data-hero-visual
-        className={styles.showcase}
-      >
+      {/* Decorative showcase — never competes with LCP text priority */}
+      <div aria-hidden data-hero-visual className={styles.showcase}>
         <div className={styles.showcaseTrack}>
           {heroShowcaseImages.map((src, index) => (
             <div key={src} className={styles.card}>
-              {/* Decorative only — next/image not required for LCP here */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={src}
                 alt=""
+                width={360}
+                height={480}
+                sizes="(max-width: 639px) 11rem, 18vw"
                 className={styles.cardImg}
-                loading={index < 2 ? "eager" : "lazy"}
-                decoding="async"
+                loading="lazy"
                 fetchPriority="low"
+                quality={65}
               />
               {index === 2 ? (
                 <div className={styles.play}>

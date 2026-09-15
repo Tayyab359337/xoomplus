@@ -66,7 +66,7 @@ export const aboutContent = {
     href: "/about/",
   },
   image: {
-    src: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1400&q=80",
+    src: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=800&q=75",
     alt: "Art-directed creative workspace with design tools and colour studies",
   },
 } as const;
@@ -76,11 +76,11 @@ export const aboutContent = {
  * Prefer studio / work imagery that matches the site palette.
  */
 export const heroShowcaseImages = [
-  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=720&q=80",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=720&q=80",
-  "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=720&q=80",
-  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=720&q=80",
-  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=720&q=80",
+  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=480&q=70",
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=480&q=70",
+  "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=480&q=70",
+  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=480&q=70",
+  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=480&q=70",
 ] as const;
 
 /** @deprecated Prefer heroShowcaseImages — kept for demos that still import the old name. */

@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 /* Explicit sources so section utilities (md:/lg: grids) are always generated */
 @source "../app/**/*.{js,ts,jsx,tsx}";
@@ -175,6 +174,8 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --animate-shiny-text: shiny-text 8s infinite;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
 
   /* Typography scale — headings, body, small */
   --text-h1: clamp(2.5rem, 5vw, 4rem); /* 40–64px */
@@ -654,6 +655,25 @@
   30%,
   60% {
     background-position: calc(100% + var(--shiny-width)) 0;
+  }
+}
+
+/* Radix accordion — local substitutes for tw-animate-css */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
   }
 }
 

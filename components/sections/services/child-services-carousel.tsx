@@ -246,6 +246,7 @@ export function ChildServicesCarousel({
                   className={styles.childSequence}
                   role="list"
                   aria-hidden={copyIndex > 0 ? true : undefined}
+                  inert={copyIndex > 0 ? true : undefined}
                 >
                   {items.map((child, index) => (
                     <motion.li

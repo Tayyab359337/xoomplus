@@ -373,6 +373,8 @@ export function ServicesInfiniteCarousel({
               ref={copyIndex === 0 ? seqRef : undefined}
               className={styles.sequence}
               aria-hidden={copyIndex > 0 ? true : undefined}
+              // Duplicate loop track: hide from a11y tree and remove from tab order
+              inert={copyIndex > 0 ? true : undefined}
             >
               {services.map((service) => {
                 const instanceKey = `${copyIndex}-${service.id}`;

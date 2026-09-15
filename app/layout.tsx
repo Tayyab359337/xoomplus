@@ -38,6 +38,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${bricolage.variable} ${instrument.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        {/* WP origin for early logo/media/API connections on content pages */}
+        <link
+          rel="preconnect"
+          href="https://xoomplus.co.uk"
+          crossOrigin="anonymous"
+        />
+        <link rel="dns-prefetch" href="https://xoomplus.co.uk" />
+      </head>
       <body className="min-h-full bg-background text-foreground">
         <AppProviders>
           {children}

@@ -71,7 +71,7 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
     requestAnimationFrame(() => refreshScrollTrigger());
   }, [reduceMotion]);
 
-  // Init / re-init on mount + route change.
+  // Init / re-init on mount + route change — deferred until idle so LCP wins.
   // Only revert this provider's data-animate context — do not kill
   // section-owned ScrollTriggers from useSectionReveal / kinetic type.
   useGSAP(
@@ -81,12 +81,28 @@ export function AnimationProvider({ children }: AnimationProviderProps) {
 
       if (reduceMotion) return;
 
-      const root = document.querySelector<HTMLElement>("[data-animation-root]");
-      ctxRef.current = initScrollAnimations(root ?? document);
+      let idleId = 0;
+      let timeoutId = 0;
+      let refreshTimeout = 0;
 
-      const t = window.setTimeout(() => refreshScrollTrigger(), 280);
+      const start = () => {
+        const root = document.querySelector<HTMLElement>("[data-animation-root]");
+        ctxRef.current = initScrollAnimations(root ?? document);
+        refreshTimeout = window.setTimeout(() => refreshScrollTrigger(), 280);
+      };
+
+      if (typeof window.requestIdleCallback === "function") {
+        idleId = window.requestIdleCallback(start, { timeout: 1200 });
+      } else {
+        timeoutId = window.setTimeout(start, 50);
+      }
+
       return () => {
-        window.clearTimeout(t);
+        if (idleId && typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idleId);
+        }
+        if (timeoutId) window.clearTimeout(timeoutId);
+        if (refreshTimeout) window.clearTimeout(refreshTimeout);
         ctxRef.current?.revert();
         ctxRef.current = null;
       };

@@ -85,7 +85,12 @@ export function InfiniteMovingCards({
         data-pause-hover={pauseOnHover ? "true" : "false"}
       >
         {[0, 1].map((copy) => (
-          <li key={`set-${copy}`} className={styles.set} aria-hidden={copy === 1}>
+          <li
+            key={`set-${copy}`}
+            className={styles.set}
+            aria-hidden={copy === 1 ? true : undefined}
+            inert={copy === 1 ? true : undefined}
+          >
             <ul className={styles.setList}>
               {loopItems.map((item, index) => (
                 <li

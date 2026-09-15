@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef } from "react";
 import { useTheme } from "next-themes";
 
@@ -20,11 +21,21 @@ function toLogoItems(logos: PartnerLogo[]) {
   return logos.map((partner) =>
     partner.src
       ? {
-          src: partner.src,
-          alt: partner.name,
+          node: (
+            <Image
+              src={partner.src}
+              alt={partner.name}
+              width={200}
+              height={40}
+              sizes="160px"
+              quality={70}
+              className={styles.logoImg}
+              loading="lazy"
+            />
+          ),
           title: partner.name,
+          ariaLabel: partner.name,
           href: partner.href,
-          height: 40,
         }
       : {
           node: <BrandMark name={partner.name} />,

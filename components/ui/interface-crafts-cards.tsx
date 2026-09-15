@@ -274,9 +274,10 @@ export function InterfaceCraftsCards({
                       src={card.image}
                       alt={card.imageAlt || card.title}
                       fill
-                      sizes="(max-width: 1024px) 230px, 300px"
+                      sizes="(max-width: 1024px) 210px, 220px"
                       className="object-cover"
-                      priority={index < 2}
+                      quality={70}
+                      loading="lazy"
                     />
                   ) : null}
                   <div
