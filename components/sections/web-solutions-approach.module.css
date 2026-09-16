@@ -1,0 +1,14 @@
+.section { width: 100%; overflow: hidden; border-bottom: 1px solid var(--border); background: var(--background); padding-block: var(--section-y); }
+.header { width: 100%; margin-inline: auto; padding-inline: 1rem; }
+.header h2 { max-width: 72rem; margin-top: 1rem; font-family: var(--font-display); font-size: var(--text-h2); line-height: var(--text-h2--line-height); letter-spacing: var(--text-h2--letter-spacing); }
+.header p { max-width: 60rem; margin-top: 1rem; color: var(--muted-foreground); }
+.stack, .staticStack { width: 100%; margin-top: 3rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--card) 55%, transparent); }
+.staticStack { display: grid; gap: .75rem; padding: 1rem; border: 0; background: transparent; }
+.stackItem { height: auto !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+.card { position: relative; display: grid; min-height: 16rem; grid-template-columns: auto 1fr; align-content: space-between; gap: 1rem 1.5rem; overflow: hidden; padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+.number { color: var(--primary); font-family: var(--font-mono); font-size: .75rem; font-weight: 700; letter-spacing: .12em; }
+.card h3 { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.6rem); line-height: 1; }
+.card p { max-width: 42rem; margin-top: .9rem; color: var(--muted-foreground); }
+.mark { position: absolute; right: 1.5rem; bottom: 1rem; color: color-mix(in srgb,var(--primary) 28%,transparent); font-family: var(--font-display); font-size: 3rem; font-weight: 700; }
+@media (min-width: 768px) { .section { padding-block: var(--section-y-md); } .header { padding-inline: 2rem; } .stack, .staticStack { margin-top: 4rem; } .card { min-height: 19rem; padding: 2.5rem; } }
+@media (min-width: 1024px) { .section { padding-block: var(--section-y-lg); } .header { padding-inline: 3rem; } }

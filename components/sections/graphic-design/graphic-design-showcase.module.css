@@ -98,6 +98,53 @@
   background: var(--background);
 }
 
+.domeCanvas {
+  position: relative;
+  height: min(90dvh, 720px);
+  min-height: 32rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 32%),
+    radial-gradient(circle at 82% 76%, color-mix(in srgb, var(--chart-3) 14%, transparent), transparent 34%),
+    var(--background);
+  background-size: 140% 140%, 130% 130%, 100% 100%;
+  animation: domeAtmosphere 18s ease-in-out infinite alternate;
+}
+
+.domeCanvas :global(main.sphere-main) {
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--primary) 15%, transparent), transparent 38%),
+    linear-gradient(135deg, color-mix(in srgb, var(--background) 88%, var(--primary) 12%), var(--background));
+  transition: background 500ms ease;
+}
+
+.domeCanvas :global(.overlay) {
+  background-image: radial-gradient(
+    rgba(235, 235, 235, 0) 58%,
+    color-mix(in srgb, var(--background) 84%, var(--primary) 16%) 100%
+  );
+}
+
+.domeCanvas :global(.overlay--blur) {
+  -webkit-mask-image: radial-gradient(
+    rgba(235, 235, 235, 0) 64%,
+    color-mix(in srgb, var(--background) 92%, var(--primary) 8%) 94%
+  );
+  mask-image: radial-gradient(
+    rgba(235, 235, 235, 0) 64%,
+    color-mix(in srgb, var(--background) 92%, var(--primary) 8%) 94%
+  );
+}
+
+@keyframes domeAtmosphere {
+  from {
+    background-position: 0% 0%, 100% 100%, 50% 50%;
+  }
+  to {
+    background-position: 42% 24%, 58% 76%, 50% 50%;
+  }
+}
+
 .track {
   position: relative;
   height: 260vh;
@@ -211,4 +258,17 @@
 
 .fallbackImage {
   object-fit: cover;
+}
+
+@media (max-width: 767px) {
+  .domeCanvas {
+    height: 34rem;
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .domeCanvas {
+    animation: none;
+  }
 }

@@ -230,7 +230,7 @@ Trailing slash on all routes. Status meanings:
 | `/digital-marketing/ppc-ads-services/` | … | Subservice | Scaffold | Header + CTA | Scaffolded |
 | `/digital-marketing/content-marketing/` | … | Subservice | Scaffold | Header + CTA | Scaffolded |
 | `/digital-marketing/email-marketing/` | … | Subservice | Scaffold | Header + CTA | Scaffolded |
-| `/web-solutions/` | `app/web-solutions/page.tsx` | Web hub | Scaffold | Header + CTA | Scaffolded |
+| `/web-solutions/` | `app/web-solutions/page.tsx` | Web hub | WordPress page 2412 + local service data | Hero (Antigravity), sub-services carousel, Solar System tech stack, ScrollStack approach, Why Choose Us, CTA | Implemented |
 | `/web-solutions/custom-website-development/` | … | Subservice | Scaffold | Header + CTA | Scaffolded |
 | `/web-solutions/ecommerce-website-development/` | … | Subservice | Scaffold | Header + CTA | Scaffolded |
 | `/web-solutions/shopify-store-development/` | … | Subservice | Scaffold | Header + CTA | Scaffolded |

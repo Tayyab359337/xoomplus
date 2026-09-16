@@ -1,0 +1,11 @@
+.section { border-bottom: 1px solid var(--border); background: var(--card); padding-block: var(--section-y); }
+.shell { width: min(100% - 2rem, var(--layout-max)); margin-inline: auto; }
+.intro { max-width: 70rem; margin-bottom: 3rem; }
+.title { max-width: 68rem; margin-top: 1rem; font-family: var(--font-display); font-size: var(--text-h2); line-height: var(--text-h2--line-height); letter-spacing: var(--text-h2--letter-spacing); }
+.body { max-width: 60rem; margin-top: 1rem; color: var(--muted-foreground); }
+.system { display: flex; width: 100%; min-height: 24rem; align-items: center; justify-content: center; overflow: visible; }
+.system > :global(div) { width: min(100vw, 1200px); max-width: 1200px; }
+.logo { display: grid; width: 3.5rem; height: 3.5rem; place-items: center; border: 1px solid var(--primary); border-radius: 50%; color: var(--primary); font-family: var(--font-display); font-weight: 700; }
+@media (min-width: 768px) { .section { padding-block: var(--section-y-md); } .shell { width: min(100% - 4rem, var(--layout-max)); } .intro { margin-bottom: 4rem; } }
+@media (min-width: 1024px) { .section { padding-block: var(--section-y-lg); } .shell { width: min(100% - 6rem, var(--layout-max)); } }
+@media (max-width: 767px) { .system { min-height: 21rem; overflow: hidden; } .system > :global(div) { width: 100vw; max-width: none; } }
