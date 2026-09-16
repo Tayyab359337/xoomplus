@@ -9,4 +9,8 @@ export const WP_HOME_SLUG = "home";
 export const WP_GRAPHIC_DESIGN_PAGE_ID = 2417;
 export const WP_GRAPHIC_DESIGN_SLUG = "graphic-design-solutions";
 
+/** Web Solutions page ID / slug on WordPress. */
+export const WP_WEB_SOLUTIONS_PAGE_ID = 2412;
+export const WP_WEB_SOLUTIONS_SLUG = "web-solutions";
+
 export const WP_REST = `${WP_ORIGIN}/wp-json/wp/v2` as const;

@@ -1,19 +1,13 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
 import { ArrowUpRight } from "lucide-react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 
 import Magnet from "@/components/ui/magnet";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
-import { useIsClient } from "@/hooks/use-is-client";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useSectionReveal } from "@/hooks/use-section-reveal";
-import { registerGsapPlugins, ScrollTrigger } from "@/lib/animations";
 import {
   graphicDesignShowcaseCopy,
   graphicDesignShowcaseImages,
@@ -22,18 +16,13 @@ import { cn } from "@/lib/utils";
 
 import styles from "./graphic-design-showcase.module.css";
 
-const FlyingPosters = dynamic(
-  () => import("@/components/effects/flying-posters"),
+const DomeGallery = dynamic(
+  () => import("@/components/DomeGallery"),
   {
     ssr: false,
     loading: () => null,
   },
 );
-
-type PostersApi = {
-  setScrollProgress: (progress: number) => void;
-  getScrollRange: () => number;
-} | null;
 
 type GraphicDesignShowcaseProps = {
   className?: string;
@@ -41,21 +30,8 @@ type GraphicDesignShowcaseProps = {
   copy?: typeof graphicDesignShowcaseCopy;
 };
 
-function canUseFlyingPosters(): boolean {
-  if (typeof window === "undefined") return false;
-
-  const nav = navigator as Navigator & {
-    deviceMemory?: number;
-    connection?: { saveData?: boolean };
-  };
-
-  if (nav.connection?.saveData) return false;
-  if (typeof nav.deviceMemory === "number" && nav.deviceMemory < 2) return false;
-  return true;
-}
-
 /**
- * Showcase intro (copy) + separate Flying Posters runway (no overlapping content).
+ * Showcase intro (copy) + interactive DomeGallery of selected design work.
  */
 export function GraphicDesignShowcase({
   className,
@@ -65,65 +41,13 @@ export function GraphicDesignShowcase({
   const posters = images ?? graphicDesignShowcaseImages;
   const sectionCopy = copy ?? graphicDesignShowcaseCopy;
   const introRef = useRef<HTMLElement>(null);
-  const galleryRef = useRef<HTMLElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const postersApiRef = useRef<PostersApi>(null);
-  const reduceMotion = usePrefersReducedMotion();
-  const isClient = useIsClient();
-  const isCompact = useMediaQuery("(max-width: 768px)");
-  const allowPosters = isClient && !reduceMotion && canUseFlyingPosters();
-  const [initFailed, setInitFailed] = useState(false);
-
-  const posterItems = useMemo(() => posters, [posters]);
-  const showPosters = allowPosters && !initFailed;
-
-  const onPostersReady = useCallback((api: PostersApi) => {
-    // Ignore cleanup nulls — React Strict Mode remounts; that must not kill the gallery.
-    if (!api) {
-      postersApiRef.current = null;
-      return;
-    }
-    postersApiRef.current = api;
-    if (trackRef.current) {
-      const trigger = ScrollTrigger.getAll().find(
-        (st) => st.trigger === trackRef.current,
-      );
-      if (trigger) api.setScrollProgress(trigger.progress);
-    }
-  }, []);
-
-  const onPostersError = useCallback(() => {
-    setInitFailed(true);
-  }, []);
 
   useSectionReveal(introRef);
 
-  useGSAP(
-    () => {
-      const track = trackRef.current;
-      if (!track || !showPosters) return;
-
-      registerGsapPlugins();
-
-      const trigger = ScrollTrigger.create({
-        trigger: track,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          postersApiRef.current?.setScrollProgress(self.progress);
-        },
-      });
-
-      requestAnimationFrame(() => ScrollTrigger.refresh());
-
-      return () => {
-        trigger.kill();
-      };
-    },
-    { dependencies: [showPosters, isCompact], scope: galleryRef },
-  );
+  const galleryImages = posters.map((src, index) => ({
+    src,
+    alt: `Selected graphic design work ${index + 1}`,
+  }));
 
   return (
     <div className={cn(styles.wrap, className)}>
@@ -158,58 +82,23 @@ export function GraphicDesignShowcase({
         </div>
       </section>
 
-      {/* 2 — Flying Posters over a giant wordmark */}
+      {/* 2 — DomeGallery selected work */}
       <section
-        ref={galleryRef}
         id="showcase-gallery"
         aria-label="Design gallery"
         className={styles.gallerySection}
       >
-        <div
-          ref={trackRef}
-          className={cn(styles.track, !showPosters && styles.trackStatic)}
-        >
-          <div className={styles.pin}>
-            <div className={styles.stage}>
-              <p className={styles.wordmark} aria-hidden="true">
-                Designs!!!
-              </p>
-              {showPosters ? (
-                <FlyingPosters
-                  items={posterItems as never[]}
-                  planeWidth={isCompact ? 200 : 340}
-                  planeHeight={isCompact ? 280 : 460}
-                  distortion={isCompact ? 1.35 : 2.6}
-                  scrollEase={isCompact ? 0.2 : 0.12}
-                  cameraFov={isCompact ? 52 : 42}
-                  cameraZ={18}
-                  quality={isCompact ? "low" : "high"}
-                  externalControl
-                  onReady={onPostersReady}
-                  onError={onPostersError}
-                  className={styles.posters}
-                />
-              ) : (
-                <div className={styles.fallback} role="list">
-                  {posterItems.slice(0, isCompact ? 4 : 5).map((src) => (
-                    <figure
-                      key={src}
-                      className={styles.fallbackFigure}
-                      role="listitem"
-                    >
-                      <Image
-                        src={src}
-                        alt=""
-                        fill
-                        sizes="(max-width: 768px) 70vw, 240px"
-                        className={styles.fallbackImage}
-                      />
-                    </figure>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+        <div className={styles.domeCanvas}>
+          <DomeGallery
+            images={galleryImages}
+            fit={0.8}
+            minRadius={800}
+            maxVerticalRotationDeg={20}
+            segments={34}
+            dragDampening={0.8}
+            overlayBlurColor="color-mix(in srgb, var(--background) 88%, var(--primary) 12%)"
+            grayscale={false}
+          />
         </div>
       </section>
     </div>

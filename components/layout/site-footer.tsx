@@ -97,6 +97,8 @@ function FooterLink({
 export function SiteFooter({ className, content }: SiteFooterProps) {
   const year = new Date().getFullYear();
   const copy = content ?? footerCopy;
+  const navigation =
+    copy.navigation.length > 0 ? copy.navigation : footerCopy.navigation;
   const social = copy.social.length > 0 ? copy.social : footerCopy.social;
 
   return (
@@ -128,7 +130,7 @@ export function SiteFooter({ className, content }: SiteFooterProps) {
         <nav className={styles.col} aria-label="Footer navigation">
           <p className={styles.colTitle}>Navigate</p>
           <ul className={styles.linkList}>
-            {copy.navigation.map((item) => (
+            {navigation.map((item) => (
               <li key={item.label}>
                 <FooterLink href={item.href} className={styles.link}>
                   {item.label}
