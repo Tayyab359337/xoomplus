@@ -291,13 +291,13 @@ export const NavbarButton = ({
         : "a"
       : "button");
 
-  return (
-    <Tag
-      href={href || undefined}
-      className={cn(baseStyles, variantStyles[variant], className)}
-      {...props}
-    >
-      {children}
-    </Tag>
+  return React.createElement(
+    Tag as React.ElementType,
+    {
+      href: href || undefined,
+      className: cn(baseStyles, variantStyles[variant], className),
+      ...props,
+    },
+    children,
   );
 };

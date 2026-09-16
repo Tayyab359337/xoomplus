@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import React, { type ComponentPropsWithoutRef, type ElementType, type ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
@@ -46,39 +46,38 @@ export function SectionEyebrow({
     <span>{children}</span>
   );
 
-  return (
-    <Tag
-      className={cn("m-0 inline-flex max-w-full", className)}
-      data-section-eyebrow={variant}
-      {...rest}
+  return React.createElement(
+    Tag as React.ElementType,
+    {
+      className: cn("m-0 inline-flex max-w-full", className),
+      "data-section-eyebrow": variant,
+      ...rest,
+    },
+    <span
+      className={cn(
+        "group inline-flex rounded-full border text-base transition-all ease-in",
+        "border-border/60 bg-muted/40 text-foreground",
+        "hover:bg-muted/70",
+        "dark:border-border/50 dark:bg-card/60 dark:hover:bg-card/90",
+      )}
     >
-      <span
+      <AnimatedShinyText
+        shimmerWidth={100}
         className={cn(
-          "group inline-flex rounded-full border text-base transition-all ease-in",
-          // Xoomplus tokens — not Magic UI neutral demo colors
-          "border-border/60 bg-muted/40 text-foreground",
-          "hover:bg-muted/70",
-          "dark:border-border/50 dark:bg-card/60 dark:hover:bg-card/90",
+          "mx-0 inline-flex items-center justify-center gap-0",
+          "type-meta px-3.5 py-1 uppercase tracking-[0.12em]",
+          "transition ease-out hover:duration-300",
+          "hover:text-foreground/80 dark:hover:text-muted-foreground",
         )}
       >
-        <AnimatedShinyText
-          shimmerWidth={100}
-          className={cn(
-            "mx-0 inline-flex items-center justify-center gap-0",
-            "type-meta px-3.5 py-1 uppercase tracking-[0.12em]",
-            "transition ease-out hover:duration-300",
-            "hover:text-foreground/80 dark:hover:text-muted-foreground",
-          )}
-        >
-          {label}
-          {withArrow ? (
-            <ArrowRight
-              aria-hidden
-              className="ml-1 size-3 shrink-0 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5"
-            />
-          ) : null}
-        </AnimatedShinyText>
-      </span>
-    </Tag>
+        {label}
+        {withArrow ? (
+          <ArrowRight
+            aria-hidden
+            className="ml-1 size-3 shrink-0 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5"
+          />
+        ) : null}
+      </AnimatedShinyText>
+    </span>,
   );
 }
