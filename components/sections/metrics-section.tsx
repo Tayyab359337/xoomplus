@@ -16,6 +16,9 @@ type MetricsSectionProps = {
   className?: string;
   metrics?: AgencyMetric[];
   copy?: SectionCopy;
+  /** `banner` — teal case-studies band (About). Default keeps homepage cards. */
+  variant?: "cards" | "banner";
+  ariaLabel?: string;
 };
 
 /**
@@ -25,23 +28,29 @@ export function MetricsSection({
   className,
   metrics,
   copy,
+  variant = "cards",
+  ariaLabel = "Studio metrics",
 }: MetricsSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionReveal(sectionRef);
   const items = (metrics ?? agencyMetrics).slice(0, 3);
+  const isBanner = variant === "banner";
 
   return (
     <section
       ref={sectionRef}
-      aria-label="Studio metrics"
+      aria-label={ariaLabel}
       data-section-reveal
-      className={cn(styles.section, className)}
+      className={cn(styles.section, isBanner && styles.banner, className)}
     >
       <div className={styles.inner}>
         <div data-reveal className={styles.header}>
           <div>
             {copy?.eyebrow ? (
-              <SectionEyebrow className={styles.eyebrow}>
+              <SectionEyebrow
+                showArrow={!isBanner}
+                className={styles.eyebrow}
+              >
                 {copy.eyebrow}
               </SectionEyebrow>
             ) : null}
@@ -55,32 +64,54 @@ export function MetricsSection({
         </div>
 
         <ul data-reveal-stagger className={styles.grid}>
-          {items.map((metric, index) => (
-            <li key={metric.id} className={styles.card}>
-              <HoverLift y={-3} scale={1.01} className={styles.cardHover}>
-                <div className={styles.cardInner}>
-                  <span className={styles.label}>{metric.label}</span>
-                  <div>
-                    <p className={styles.value}>
-                      {metric.prefix}
-                      <NumberTicker
-                        value={metric.value}
-                        decimalPlaces={metric.decimalPlaces ?? 0}
-                        delay={0.05 * index}
-                        className={styles.value}
-                      />
-                      {metric.suffix ? (
-                        <span className={styles.suffix}>{metric.suffix}</span>
-                      ) : null}
-                    </p>
-                    {metric.hint ? (
-                      <p className={styles.hint}>{metric.hint}</p>
-                    ) : null}
-                  </div>
+          {items.map((metric, index) => {
+            const value = (
+              <p className={styles.value}>
+                {metric.prefix}
+                <NumberTicker
+                  value={metric.value}
+                  decimalPlaces={metric.decimalPlaces ?? 0}
+                  delay={0.05 * index}
+                  className={cn(
+                    styles.value,
+                    isBanner && "text-inherit dark:text-inherit",
+                  )}
+                />
+                {metric.suffix ? (
+                  <span className={styles.suffix}>{metric.suffix}</span>
+                ) : null}
+              </p>
+            );
+
+            const inner = isBanner ? (
+              <div className={styles.cardInner}>
+                {value}
+                <span className={styles.label}>{metric.label}</span>
+              </div>
+            ) : (
+              <div className={styles.cardInner}>
+                <span className={styles.label}>{metric.label}</span>
+                <div>
+                  {value}
+                  {metric.hint ? (
+                    <p className={styles.hint}>{metric.hint}</p>
+                  ) : null}
                 </div>
-              </HoverLift>
-            </li>
-          ))}
+              </div>
+            );
+
+            return (
+              <li key={metric.id} className={styles.card}>
+                {isBanner ? (
+                  inner
+                ) : (
+                  <HoverLift y={-3} scale={1.01} className={styles.cardHover}>
+                    {inner}
+                  </HoverLift>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>

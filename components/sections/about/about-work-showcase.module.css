@@ -1,0 +1,28 @@
+.videoSection {
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+  padding: 2.5rem 0 3.25rem;
+}
+
+@media (min-width: 768px) {
+  .videoSection {
+    padding: 3rem 0 4rem;
+  }
+}
+
+.videoInner {
+  width: min(100% - 2rem, var(--layout-max));
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .videoInner {
+    width: min(100% - 4rem, var(--layout-max));
+  }
+}
+
+@media (min-width: 1024px) {
+  .videoInner {
+    width: min(100% - 6rem, var(--layout-max));
+  }
+}
